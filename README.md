@@ -19,14 +19,16 @@ Tamil speech needs a Tamil voice on the phone (Settings, Language, Text-to-speec
 
 ## Features
 
-- Start / End trip with live distance, waiting time and fare
-- GPS filtering: weak fixes ignored, stopped-time counted as waiting, GPS jumps skipped
-- Editable distance and waiting before billing
-- Night extra, luggage and your own base fare / per-km rates
-- UPI QR with the exact amount, plus a "Pay with UPI app" button
-- Share the bill on WhatsApp
-- Cash and UPI earnings book (today, this month, trip list)
-- Installable PWA, English / Tamil
+- **Trips:** Start / End with GPS, live route line on a map, live distance, waiting time and fare. Or make a **manual bill** with no GPS.
+- **Fare:** base fare, per-km, waiting, night extra and luggage, all from your own rates. Distance, waiting and extras can be corrected before billing. A waiting stopwatch is on the bill screen.
+- **Bill:** UPI QR with the exact amount, "Pay with UPI app" button, spoken total, and a WhatsApp receipt with date.
+- **Cash or UPI** is saved for each trip.
+- **Edit and delete** any trip.
+- **Expenses:** fuel, rent, repair, food, other, with a date and note.
+- **History:** day, month (calendar with daily income) and year views, with income, expenses and profit.
+- **Checks on typing:** numbers only, no negatives, and limits on very large values.
+- **Cloud backup (Turso):** optional. A random backup key restores trips, expenses and settings on a new phone. See `server/README.md`.
+- Tamil first, English with one tap. Installable PWA. Works offline.
 
 ## Run it
 
@@ -91,11 +93,11 @@ Add these repository secrets (Settings, Secrets and variables, Actions): `KEYSTO
 ## Roadmap
 
 1. Renewal reminders (FC, insurance, permit, EMI)
-2. Daily summary and monthly report
+2. Monthly report as PDF / Excel
 3. Matching UPI alerts to trips
 4. Staff phone relay (owner phone alerts a staff phone)
-5. Cloud backup (paid plan)
+5. Paid plan on top of cloud backup
 
 ## Privacy
 
-Trips, rates and UPI ID are stored in the browser's local storage on the device. Nothing is sent to a server. Clearing browser data erases them.
+Trips, expenses, rates and UPI ID are stored on the phone. Nothing is sent anywhere unless the driver turns on **Cloud backup**. Then the same data is stored in your Turso database, under a random backup key. Anyone with that key can read that driver's data, and a lost key cannot be recovered.

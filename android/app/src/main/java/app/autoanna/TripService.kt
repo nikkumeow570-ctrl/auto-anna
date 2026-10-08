@@ -58,6 +58,7 @@ class TripService : Service(), LocationListener {
         val acc = if (l.hasAccuracy()) l.accuracy else 99f
         TripState.acc = acc
         if (acc > 30f) return                                   // ignore weak fixes
+        TripState.lat = l.latitude; TripState.lon = l.longitude; TripState.hasFix = true
 
         val last = TripState.lastLoc
         if (last == null) {

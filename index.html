@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -17,53 +17,84 @@
   :root{--bg:#101010;--surface:#1B1B1A;--ink:#F3F1EA;--muted:#A8A69C;--line:#33322E;--good:#4CCB8A;--bad:#FF6B78}
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);font:19px/1.5 system-ui,-apple-system,"Noto Sans Tamil","Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
 header{position:sticky;top:0;z-index:5;background:#111;color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;align-items:center;justify-content:space-between}
 header h1{margin:0;font-size:1.25rem;font-weight:800}
 header h1 span{color:var(--amber)}
 .lang{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid #444;background:transparent;color:#fff;font:600 1rem inherit;cursor:pointer}
-main{padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+main{padding:16px 16px calc(100px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
 .view{display:none}.view.on{display:block}
 .card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
 .big{font-size:2.6rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
-.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:72px;border-radius:18px;border:0;font:800 1.4rem inherit;cursor:pointer;background:var(--amber);color:var(--on-amber)}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:72px;border-radius:18px;border:0;font:800 1.4rem inherit;cursor:pointer;background:var(--amber);color:var(--on-amber);text-decoration:none}
 .btn.go{background:var(--good);color:#fff}
 .btn.stop{background:var(--bad);color:#fff}
 .btn.ghost{background:transparent;border:2px solid var(--line);color:var(--ink);font-size:1.05rem;min-height:52px}
 .btn.sm{min-height:58px;font-size:1.1rem}
-summary{min-height:48px;display:flex;align-items:center;font-weight:600;cursor:pointer}
 .btns{display:grid;gap:10px;margin-top:12px}
 .btns.two{grid-template-columns:1fr 1fr}
 label{display:block;font-weight:600;margin:12px 0 4px}
 input{width:100%;min-height:50px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:500 1.1rem inherit}
+summary{min-height:48px;display:flex;align-items:center;font-weight:600;cursor:pointer}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .warn{border-left:5px solid var(--amber);background:color-mix(in srgb,var(--amber) 14%,var(--surface));padding:12px 14px;border-radius:0 12px 12px 0;margin-bottom:14px}
 .err{color:var(--bad);min-height:1.4em;margin-top:6px}
+.ok{color:var(--good)}
 .qr{background:#fff;border-radius:12px;padding:10px;width:230px;height:230px;margin:12px auto;display:block}
 .qr svg{width:100%;height:100%;display:block}
 .fare{font-size:3rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
-nav{position:fixed;left:0;right:0;bottom:0;background:#111;display:grid;grid-template-columns:repeat(3,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:6}
-nav button{min-height:62px;font-size:1.05rem;border:0;border-radius:12px;background:transparent;color:#bbb;font:600 1rem inherit;cursor:pointer}
+nav{position:fixed;left:0;right:0;bottom:0;background:#111;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:6}
+nav button{min-height:62px;border:0;border-radius:12px;background:transparent;color:#bbb;font:600 .9rem/1.2 inherit;cursor:pointer;padding:2px}
 nav button.on{background:var(--amber);color:#141414}
 :focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .pulse{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--bad);margin-right:8px;animation:p 1.2s infinite}
 @keyframes p{50%{opacity:.25}}
 @media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin-bottom:12px}
+.seg button{min-height:52px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 1rem inherit;cursor:pointer}
+.seg button.on{background:var(--amber);border-color:var(--amber);color:#141414}
+.nav2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.nav2 button{min-height:52px;min-width:56px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 1.3rem inherit;cursor:pointer}
+.nav2 b{font-size:1.15rem;text-align:center;flex:1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{text-align:center;font-size:.8rem;color:var(--muted)}
+.cal button{min-height:54px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .95rem inherit;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;line-height:1.15}
+.cal button small{font-size:.7rem;color:var(--good);font-weight:700}
+.cal button.blank{visibility:hidden}
+.cal button.today{border:2px solid var(--amber)}
+.cal button.has{background:color-mix(in srgb,var(--amber) 16%,var(--surface))}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border:0;border-bottom:1px solid var(--line);min-height:56px;background:none;width:100%;text-align:left;color:inherit;font:inherit}
+button.item{cursor:pointer}
+.item:last-child{border-bottom:0}
+.item .l{flex:1;min-width:0;overflow-wrap:anywhere}
+.x{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--bad);font-size:1.3rem;cursor:pointer}
+h3.sec{margin:14px 0 4px;font-size:1.1rem}
+#map{height:220px;border-radius:14px;margin-bottom:8px;background:#cfd8d6}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:92%;overflow:auto}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chipb{min-height:52px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:600 1rem inherit;cursor:pointer}
+.chipb.on{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 25%,var(--surface))}
+.keybox{font:800 1.4rem/1.3 ui-monospace,Menlo,monospace;letter-spacing:.06em;background:var(--surface);border:2px dashed var(--amber);border-radius:12px;padding:12px;text-align:center;user-select:all;margin:8px 0}
+.neg{color:var(--bad)}
 </style>
 </head>
 <body>
 
 <header>
   <h1 id="brand">Auto <span>Anna</span></h1>
-  <button class="lang" id="langBtn" type="button">தமிழ்</button>
+  <button class="lang" id="langBtn" type="button">English</button>
 </header>
 
 <main>
-  <!-- TRIP -->
+  <!-- ============ TRIP ============ -->
   <section class="view on" id="vTrip">
     <div id="needRates" class="warn" hidden></div>
 
@@ -74,10 +105,13 @@ nav button.on{background:var(--amber);color:#141414}
         <div class="muted" id="todayTrips"></div>
       </div>
       <button class="btn go" id="startBtn" type="button" data-i="start">Start trip</button>
+      <div class="btns"><button class="btn sm ghost" id="manualBtn" type="button" data-i="manual">Manual bill</button></div>
       <div class="err" id="gpsErr" role="alert"></div>
     </div>
 
     <div id="sRun" hidden>
+      <div id="map" aria-label="Map"></div>
+      <div class="muted" id="mapNote" style="margin-bottom:10px"></div>
       <div class="card">
         <div class="muted"><span class="pulse"></span><span data-i="running">Trip running</span></div>
         <div class="big"><span id="liveKm">0.00</span> km</div>
@@ -98,9 +132,14 @@ nav button.on{background:var(--amber);color:#141414}
           <div><label for="inKm" data-i="km">Distance (km)</label><input id="inKm" inputmode="decimal"></div>
           <div><label for="inWait" data-i="waitMin">Waiting (min)</label><input id="inWait" inputmode="decimal"></div>
         </div>
+        <div class="btns two" style="align-items:center">
+          <button class="btn sm ghost" id="waitBtn" type="button"></button>
+          <b id="waitClock" class="muted" style="text-align:center"></b>
+        </div>
         <label for="inLug" data-i="luggage">Luggage / extra (₹)</label>
         <input id="inLug" inputmode="numeric" value="0">
-        <div id="breakdown" style="margin-top:12px"></div>
+        <div class="err" id="billErr" role="alert"></div>
+        <div id="breakdown" style="margin-top:6px"></div>
       </div>
       <div class="card" id="qrCard">
         <div id="qrBox" class="qr" aria-label="UPI QR"></div>
@@ -121,31 +160,55 @@ nav button.on{background:var(--amber);color:#141414}
     </div>
   </section>
 
-  <!-- EARNINGS -->
+  <!-- ============ EARNINGS + HISTORY ============ -->
   <section class="view" id="vEarn">
-    <div class="card">
-      <div class="muted" data-i="today">Today</div>
-      <div class="big" id="eToday">₹0</div>
-      <div class="row"><span data-i="cashT">Cash</span><b id="eCash">₹0</b></div>
-      <div class="row"><span data-i="upiT">UPI</span><b id="eUpi">₹0</b></div>
-      <div class="row"><span data-i="kmT">Distance</span><b id="eKm">0 km</b></div>
+    <div class="seg" id="period">
+      <button type="button" data-p="day" data-i="dayT">Day</button>
+      <button type="button" data-p="month" data-i="monthT">Month</button>
+      <button type="button" data-p="year" data-i="yearT">Year</button>
+    </div>
+    <div class="nav2">
+      <button id="pPrev" type="button" aria-label="Previous">◀</button>
+      <b id="pTitle"></b>
+      <button id="pNext" type="button" aria-label="Next">▶</button>
     </div>
     <div class="card">
-      <div class="muted" data-i="month">This month</div>
-      <div class="big" id="eMonth">₹0</div>
+      <div class="muted" data-i="inc">Income</div>
+      <div class="big" id="sInc">₹0</div>
+      <div class="row"><span data-i="exp">Expense</span><b id="sExp">₹0</b></div>
+      <div class="row"><span data-i="profit">Profit</span><b id="sPro">₹0</b></div>
+      <div class="row"><span data-i="kmT">Distance</span><b id="sKm">0</b></div>
     </div>
+    <div id="pBody"></div>
     <div class="card" id="payCard" hidden>
       <div class="muted" data-i="payH">UPI alerts today</div>
       <div class="big" id="payTotal">₹0</div>
       <div id="payList" style="margin-top:8px"></div>
     </div>
+  </section>
+
+  <!-- ============ EXPENSES ============ -->
+  <section class="view" id="vExp">
     <div class="card">
-      <h3 style="margin:0 0 8px" data-i="trips">Today's trips</h3>
-      <div id="tripList"></div>
+      <h3 style="margin:0" data-i="addExp">Add expense</h3>
+      <div class="chips" id="expTypes"></div>
+      <label for="xAmt" data-i="amountL">Amount (₹)</label>
+      <input id="xAmt" inputmode="decimal">
+      <label for="xNote" data-i="noteL">Note (optional)</label>
+      <input id="xNote" autocomplete="off" maxlength="40">
+      <label for="xDate" data-i="dateL">Date</label>
+      <input id="xDate" type="date">
+      <div class="err" id="xErr" role="alert"></div>
+      <div class="btns"><button class="btn sm go" id="xAdd" type="button" data-i="addExp">Add expense</button></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0" data-i="expH">Expenses</h3>
+      <div class="muted" id="xTotal"></div>
+      <div id="xList"></div>
     </div>
   </section>
 
-  <!-- SETTINGS -->
+  <!-- ============ SETTINGS ============ -->
   <section class="view" id="vSet">
     <div class="card">
       <h3 style="margin:0" data-i="payTo">Where customers pay you</h3>
@@ -157,7 +220,6 @@ nav button.on{background:var(--amber);color:#141414}
     <div class="card">
       <h3 style="margin:0" data-i="rates">Your fare rates</h3>
       <div class="warn" style="margin-top:10px" data-i="helpNote"></div>
-      <p class="muted" style="margin:6px 0 0" data-i="ratesNote">Enter the rates you charge. Check the official fare rules for your area.</p>
       <div class="grid2">
         <div><label for="sBase" data-i="base">Base fare (₹)</label><input id="sBase" inputmode="decimal"></div>
         <div><label for="sBaseKm" data-i="baseKm">Base km included</label><input id="sBaseKm" inputmode="decimal"></div>
@@ -174,6 +236,7 @@ nav button.on{background:var(--amber);color:#141414}
         <input id="sNightTo" inputmode="numeric">
       </details>
     </div>
+
     <div class="card" id="sbCard" hidden>
       <h3 style="margin:0" data-i="sbH">UPI payment alerts</h3>
       <p class="muted" style="margin:6px 0 0" id="sbStatus"></p>
@@ -186,6 +249,25 @@ nav button.on{background:var(--amber);color:#141414}
         <button class="btn sm ghost" id="sbBattery" type="button" data-i="sbBattery">Allow background running</button>
       </div>
     </div>
+
+    <div class="card" id="cloudCard">
+      <h3 style="margin:0" data-i="cloudH">Cloud backup</h3>
+      <p class="muted" style="margin:6px 0 0" data-i="cloudHelp"></p>
+      <div id="cloudOff">
+        <div class="btns"><button class="btn sm" id="cloudOn" type="button" data-i="cloudOn">Turn on backup</button></div>
+        <label for="cloudIn" data-i="cloudRestore">Restore with a key</label>
+        <input id="cloudIn" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX">
+        <div class="btns"><button class="btn sm ghost" id="cloudRestoreBtn" type="button" data-i="restore">Restore</button></div>
+      </div>
+      <div id="cloudOnBox" hidden>
+        <div class="muted" style="margin-top:10px" data-i="cloudKey">Your backup key</div>
+        <div class="keybox" id="cloudKeyTxt"></div>
+        <div class="warn" data-i="cloudKeyNote"></div>
+        <div class="btns"><button class="btn sm" id="cloudNow" type="button" data-i="cloudNow">Sync now</button></div>
+      </div>
+      <div class="muted" id="cloudStatus" style="margin-top:8px"></div>
+    </div>
+
     <div class="err" id="setErr" role="alert"></div>
     <button class="btn" id="saveSet" type="button" data-i="save">Save</button>
     <div class="btns"><button class="btn ghost" id="wipe" type="button" data-i="wipe">Delete all trips</button></div>
@@ -193,82 +275,160 @@ nav button.on{background:var(--amber);color:#141414}
   </section>
 </main>
 
+<!-- edit trip -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <h3 id="mTitle" style="margin:0" data-i="editTrip">Edit trip</h3>
+    <label for="mFare" data-i="fareL">Fare (₹)</label>
+    <input id="mFare" inputmode="decimal">
+    <div class="grid2">
+      <div><label for="mKm" data-i="km">Distance (km)</label><input id="mKm" inputmode="decimal"></div>
+      <div><label for="mWait" data-i="waitMin">Waiting (min)</label><input id="mWait" inputmode="decimal"></div>
+    </div>
+    <label data-i="modeL">Paid by</label>
+    <div class="seg" id="mMode">
+      <button type="button" data-m="cash" data-i="cashT">Cash</button>
+      <button type="button" data-m="upi" data-i="upiT">UPI</button>
+    </div>
+    <div class="err" id="mErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn sm go" id="mSave" type="button" data-i="save">Save</button>
+      <button class="btn sm ghost" id="mDel" type="button" data-i="delete" style="color:var(--bad)">Delete</button>
+      <button class="btn sm ghost" id="mCancel" type="button" data-i="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <nav aria-label="Main">
   <button class="on" data-v="vTrip" type="button" data-i="nTrip">Trip</button>
   <button data-v="vEarn" type="button" data-i="nEarn">Earnings</button>
+  <button data-v="vExp" type="button" data-i="nExp">Expenses</button>
   <button data-v="vSet" type="button" data-i="nSet">Settings</button>
 </nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 <script>
-/* ===== CONFIG: change the app name here ===== */
+/* ===== CONFIG ===== */
 var APP_NAME = "Auto Anna";
 var APP_TA = "ஆட்டோ அண்ணா";
-/* ============================================ */
+/* After you deploy the sync server (see server/README.md), put its address here:
+   var SYNC_URL = "https://your-project.vercel.app/api/sync"; */
+var SYNC_URL = "";
+/* ================== */
+
 var NATIVE = false;
 try { NATIVE = !!(window.AndroidBridge && window.AndroidBridge.isNative && window.AndroidBridge.isNative()); } catch (e) {}
 
 var TXT = {
- en:{today:"Today",start:"Start trip",running:"Trip running",waiting:"Waiting",time:"Time",fareNow:"Fare so far",gps:"GPS signal",
-  keepOn:"Keep this screen open while the trip runs.",end:"End trip and bill",total:"Total fare",km:"Distance (km)",waitMin:"Waiting (min)",
-  luggage:"Luggage / extra (₹)",payApp:"Pay with UPI app",share:"Share bill on WhatsApp",cash:"Got cash",upi:"Got UPI",discard:"Discard trip",
-  cashT:"Cash",upiT:"UPI",kmT:"Distance",month:"This month",trips:"Today's trips",payTo:"Where customers pay you",name:"Your name",upiId:"Your UPI ID",
-  rates:"Your fare rates",ratesNote:"Enter the rates you charge. Check the official fare rules for your area.",base:"Base fare (₹)",baseKm:"Base km included",
-  perKm:"Per km after (₹)",waitRate:"Waiting per min (₹)",nightPct:"Night extra (%)",nightFrom:"Night from (hour 0-23)",nightTo:"Night until (hour 0-23)",
-  save:"Save",wipe:"Delete all trips",nTrip:"Trip",nEarn:"Earnings",nSet:"Settings",
+ en:{today:"Today",start:"Start trip",manual:"Manual bill",running:"Trip running",waiting:"Waiting",time:"Time",fareNow:"Fare so far",gps:"GPS signal",
+  keepOn:"Keep this screen open while the trip runs.",keepOnNative:"GPS keeps running if you switch apps.",
+  end:"End trip and bill",total:"Total fare",km:"Distance (km)",waitMin:"Waiting (min)",
+  luggage:"Luggage / extra (₹)",payApp:"Pay with UPI app",share:"Share bill on WhatsApp",speak:"Say total",cash:"Got cash",upi:"Got UPI",discard:"Discard trip",
+  cashT:"Cash",upiT:"UPI",kmT:"Distance",inc:"Income",exp:"Expense",profit:"Profit",dayT:"Day",monthT:"Month",yearT:"Year",
+  tripsH:"Trips",expH:"Expenses",tripsN:"{n} trips",noTrips:"No trips.",noExp:"No expenses.",
+  payTo:"Where customers pay you",name:"Your name",upiId:"Your UPI ID",
+  rates:"Your fare rates",helpNote:"One-time setup. Fill this with a friend or helper.",base:"Base fare (₹)",baseKm:"Base km included",
+  perKm:"Per km after (₹)",waitRate:"Waiting per min (₹)",moreRates:"Night charge (optional)",nightPct:"Night extra (%)",nightFrom:"Night from (hour 0-23)",nightTo:"Night until (hour 0-23)",
+  save:"Save",wipe:"Delete all trips",nTrip:"Trip",nEarn:"Earnings",nExp:"Expenses",nSet:"Settings",
   needRates:"Set your UPI ID and fare rates in Settings before your first trip.",
-  noTrips:"No trips yet today.",tripsN:"{n} trips",
   gpsDenied:"Location permission was denied. Allow location for this app in your phone settings.",gpsNo:"This phone cannot give GPS location.",
-  gpsWeak:"Weak",gpsOk:"Good",gpsWait:"Searching...",
+  gpsWeak:"Weak",gpsOk:"Good",gpsWait:"Searching...",gpsOff:"Turn on phone location",
   fBase:"Base fare",fExtra:"Distance charge",fWait:"Waiting",fNight:"Night extra",fLug:"Luggage / extra",
   needUpi:"Enter a valid UPI ID in Settings to show the QR.",qrNote:"Customer scans and pays this exact amount.",
-  saved:"Saved.",badUpi:"Enter a valid UPI ID like name@bank.",badNum:"Check the rates. Use numbers only.",
-  confirmWipe:"Delete all saved trips?",
-  billMsg:"{app} bill\nDistance: {km} km\nWaiting: {w} min\nTotal: ₹{fare}\nPay by UPI: {link}",
+  saved:"Saved.",badUpi:"Enter a valid UPI ID like name@bank.",badNum:"Check the rates. Use numbers only.",badBig:"One of the numbers is too large.",
+  badNeg:"Enter a number above 0.",confirmWipe:"Delete all saved trips?",confirmDel:"Delete this?",
+  billMsg:"{app} bill\n{date}\nDistance: {km} km\nWaiting: {w} min\nTotal: ₹{fare}\nPay by UPI: {link}",
   disclaimer:"This app calculates a bill from GPS distance and your own rates. It is not a legal fare meter. Check local transport rules before you rely on it for fares.",
-  cashL:"Cash",upiL:"UPI",speak:"Say total",moreRates:"Night charge (optional)",helpNote:"One-time setup. Fill this with a friend or helper.",
+  cashL:"Cash",upiL:"UPI",
+  waitStart:"Start waiting timer",waitStop:"Stop timer",mapOffline:"The map needs internet. The route line still works.",
+  editTrip:"Edit trip",fareL:"Fare (₹)",modeL:"Paid by",delete:"Delete",cancel:"Cancel",
+  addExp:"Add expense",amountL:"Amount (₹)",noteL:"Note (optional)",dateL:"Date",
+  x_fuel:"Fuel",x_rent:"Rent",x_repair:"Repair",x_food:"Food",x_other:"Other",
+  cloudH:"Cloud backup",cloudHelp:"Save your trips, expenses, rates and UPI ID online, and restore them on a new phone with your backup key.",
+  cloudOn:"Turn on backup",cloudRestore:"Restore with a key",restore:"Restore",cloudKey:"Your backup key",
+  cloudKeyNote:"Write this key down. It is the only way to restore your data.",cloudNow:"Sync now",
+  cloudSynced:"Synced.",cloudFail:"Could not sync. Check internet.",cloudNotReady:"Cloud backup is not set up yet.",cloudBadKey:"That key looks wrong.",cloudWorking:"Syncing...",
   sbH:"UPI payment alerts",sbHelp:"The app reads \"money received\" notifications from GPay, PhonePe, Paytm and BHIM on this phone and speaks the amount. Only the amount is saved, on this phone.",
   sbHelp2:"If the switch is greyed out: phone Settings, Apps, this app, three dots, Allow restricted settings.",
   sbOnTxt:"Listening for payments.",sbOffTxt:"Not listening. Turn on payment alerts.",sbEnable:"Turn on payment alerts",
   sbVoiceOn:"Voice: On",sbVoiceOff:"Voice: Off",sbTest:"Test voice",sbBattery:"Allow background running",
-  payH:"UPI alerts today",noPay:"No payments heard today.",keepOnNative:"GPS keeps running if you switch apps.",gpsOff:"Turn on phone location"},
- ta:{today:"இன்று",start:"பயணத்தைத் தொடங்கு",running:"பயணம் நடக்கிறது",waiting:"காத்திருப்பு",time:"நேரம்",fareNow:"இதுவரை கட்டணம்",gps:"GPS சிக்னல்",
-  keepOn:"பயணம் நடக்கும்போது இந்தத் திரையைத் திறந்தே வைக்கவும்.",end:"பயணம் முடி, பில் போடு",total:"மொத்தக் கட்டணம்",km:"தூரம் (கி.மீ)",waitMin:"காத்திருப்பு (நிமிடம்)",
-  luggage:"லக்கேஜ் / கூடுதல் (₹)",payApp:"UPI செயலியில் செலுத்து",share:"WhatsApp-இல் பில் அனுப்பு",cash:"பணம் வாங்கினேன்",upi:"UPI வந்தது",discard:"பயணத்தை நீக்கு",
-  cashT:"பணம்",upiT:"UPI",kmT:"தூரம்",month:"இந்த மாதம்",trips:"இன்றைய பயணங்கள்",payTo:"வாடிக்கையாளர் உங்களுக்கு எங்கே செலுத்துவார்",name:"உங்கள் பெயர்",upiId:"உங்கள் UPI ID",
-  rates:"உங்கள் கட்டண விகிதங்கள்",ratesNote:"நீங்கள் வசூலிக்கும் விகிதங்களை உள்ளிடுங்கள். உங்கள் பகுதிக்கான அதிகாரப்பூர்வ கட்டண விதிகளைச் சரிபார்க்கவும்.",base:"அடிப்படைக் கட்டணம் (₹)",baseKm:"அடிப்படையில் அடங்கும் கி.மீ",
-  perKm:"அதற்கு மேல் ஒரு கி.மீ (₹)",waitRate:"காத்திருப்பு நிமிடத்திற்கு (₹)",nightPct:"இரவு கூடுதல் (%)",nightFrom:"இரவு தொடக்கம் (மணி 0-23)",nightTo:"இரவு முடிவு (மணி 0-23)",
-  save:"சேமி",wipe:"எல்லா பயணங்களையும் நீக்கு",nTrip:"பயணம்",nEarn:"வருமானம்",nSet:"அமைப்புகள்",
-  needRates:"முதல் பயணத்திற்கு முன் அமைப்புகளில் உங்கள் UPI ID மற்றும் கட்டண விகிதங்களை அமைக்கவும்.",
-  noTrips:"இன்று இன்னும் பயணம் இல்லை.",tripsN:"{n} பயணங்கள்",
+  payH:"UPI alerts today",noPay:"No payments heard today.",
+  total_say:"Total {n} rupees"},
+ ta:{today:"இன்று",start:"பயணம் தொடங்கு",manual:"கையால் பில்",running:"பயணம் நடக்கிறது",waiting:"காத்திருப்பு",time:"நேரம்",fareNow:"இதுவரை கட்டணம்",gps:"GPS சிக்னல்",
+  keepOn:"பயணம் நடக்கும்போது இந்தத் திரையைத் திறந்தே வைக்கவும்.",keepOnNative:"வேறு செயலிக்குச் சென்றாலும் GPS இயங்கும்.",
+  end:"பயணம் முடி, பில் போடு",total:"மொத்தக் கட்டணம்",km:"தூரம் (கி.மீ)",waitMin:"காத்திருப்பு (நிமிடம்)",
+  luggage:"லக்கேஜ் / கூடுதல் (₹)",payApp:"UPI செயலியில் செலுத்து",share:"WhatsApp-இல் பில் அனுப்பு",speak:"தொகையைச் சொல்",cash:"பணம் வாங்கினேன்",upi:"UPI வந்தது",discard:"பயணத்தை நீக்கு",
+  cashT:"பணம்",upiT:"UPI",kmT:"தூரம்",inc:"வரவு",exp:"செலவு",profit:"லாபம்",dayT:"நாள்",monthT:"மாதம்",yearT:"வருடம்",
+  tripsH:"பயணங்கள்",expH:"செலவுகள்",tripsN:"{n} பயணங்கள்",noTrips:"பயணம் இல்லை.",noExp:"செலவு இல்லை.",
+  payTo:"வாடிக்கையாளர் உங்களுக்கு எங்கே செலுத்துவார்",name:"உங்கள் பெயர்",upiId:"உங்கள் UPI ID",
+  rates:"உங்கள் கட்டண விகிதங்கள்",helpNote:"ஒருமுறை மட்டும் அமைக்க வேண்டும். நண்பர் உதவியுடன் நிரப்புங்கள்.",base:"அடிப்படைக் கட்டணம் (₹)",baseKm:"அடிப்படையில் அடங்கும் கி.மீ",
+  perKm:"அதற்கு மேல் ஒரு கி.மீ (₹)",waitRate:"காத்திருப்பு நிமிடத்திற்கு (₹)",moreRates:"இரவு கூடுதல் (விருப்பம்)",nightPct:"இரவு கூடுதல் (%)",nightFrom:"இரவு தொடக்கம் (மணி 0-23)",nightTo:"இரவு முடிவு (மணி 0-23)",
+  save:"சேமி",wipe:"எல்லா பயணங்களையும் நீக்கு",nTrip:"பயணம்",nEarn:"வருமானம்",nExp:"செலவு",nSet:"அமைப்பு",
+  needRates:"முதல் பயணத்திற்கு முன் அமைப்பில் உங்கள் UPI ID மற்றும் கட்டண விகிதங்களை அமைக்கவும்.",
   gpsDenied:"இருப்பிட அனுமதி மறுக்கப்பட்டது. போன் அமைப்புகளில் இந்தச் செயலிக்கு இருப்பிடத்தை அனுமதிக்கவும்.",gpsNo:"இந்த போனில் GPS இருப்பிடம் கிடைக்கவில்லை.",
-  gpsWeak:"பலவீனம்",gpsOk:"நன்று",gpsWait:"தேடுகிறது...",
+  gpsWeak:"பலவீனம்",gpsOk:"நன்று",gpsWait:"தேடுகிறது...",gpsOff:"போன் இருப்பிடத்தை இயக்கவும்",
   fBase:"அடிப்படைக் கட்டணம்",fExtra:"தூரக் கட்டணம்",fWait:"காத்திருப்பு",fNight:"இரவு கூடுதல்",fLug:"லக்கேஜ் / கூடுதல்",
-  needUpi:"QR காட்ட அமைப்புகளில் சரியான UPI ID உள்ளிடுங்கள்.",qrNote:"வாடிக்கையாளர் ஸ்கேன் செய்து இதே தொகையைச் செலுத்துவார்.",
-  saved:"சேமிக்கப்பட்டது.",badUpi:"name@bank போன்ற சரியான UPI ID உள்ளிடுங்கள்.",badNum:"விகிதங்களைச் சரிபார்க்கவும். எண்கள் மட்டும்.",
-  confirmWipe:"சேமித்த எல்லா பயணங்களையும் நீக்கவா?",
-  billMsg:"{app} பில்\nதூரம்: {km} கி.மீ\nகாத்திருப்பு: {w} நிமிடம்\nமொத்தம்: ₹{fare}\nUPI மூலம் செலுத்த: {link}",
+  needUpi:"QR காட்ட அமைப்பில் சரியான UPI ID உள்ளிடுங்கள்.",qrNote:"வாடிக்கையாளர் ஸ்கேன் செய்து இதே தொகையைச் செலுத்துவார்.",
+  saved:"சேமிக்கப்பட்டது.",badUpi:"name@bank போன்ற சரியான UPI ID உள்ளிடுங்கள்.",badNum:"விகிதங்களைச் சரிபார்க்கவும். எண்கள் மட்டும்.",badBig:"ஒரு எண் மிகப் பெரியதாக உள்ளது.",
+  badNeg:"0-க்கு மேல் உள்ள எண்ணை உள்ளிடுங்கள்.",confirmWipe:"சேமித்த எல்லா பயணங்களையும் நீக்கவா?",confirmDel:"இதை நீக்கவா?",
+  billMsg:"{app} பில்\n{date}\nதூரம்: {km} கி.மீ\nகாத்திருப்பு: {w} நிமிடம்\nமொத்தம்: ₹{fare}\nUPI மூலம் செலுத்த: {link}",
   disclaimer:"இந்தச் செயலி GPS தூரம் மற்றும் உங்கள் சொந்த விகிதங்களை வைத்து பில் கணக்கிடுகிறது. இது சட்டப்படியான கட்டண மீட்டர் அல்ல. கட்டணத்திற்கு நம்புவதற்கு முன் உள்ளூர் போக்குவரத்து விதிகளைச் சரிபார்க்கவும்.",
-  cashL:"பணம்",upiL:"UPI",speak:"தொகையைச் சொல்",moreRates:"இரவு கூடுதல் (விருப்பம்)",helpNote:"ஒருமுறை மட்டும் அமைக்க வேண்டும். நண்பர் உதவியுடன் நிரப்புங்கள்.",
+  cashL:"பணம்",upiL:"UPI",
+  waitStart:"காத்திருப்பு நேரம் தொடங்கு",waitStop:"நிறுத்து",mapOffline:"வரைபடத்துக்கு இணையம் தேவை. பாதைக் கோடு தெரியும்.",
+  editTrip:"பயணத்தைத் திருத்து",fareL:"கட்டணம் (₹)",modeL:"செலுத்திய வகை",delete:"நீக்கு",cancel:"ரத்து",
+  addExp:"செலவு சேர்",amountL:"தொகை (₹)",noteL:"குறிப்பு (விருப்பம்)",dateL:"தேதி",
+  x_fuel:"எரிபொருள்",x_rent:"வாடகை",x_repair:"பழுது",x_food:"உணவு",x_other:"மற்றவை",
+  cloudH:"கிளவுட் பேக்அப்",cloudHelp:"உங்கள் பயணங்கள், செலவுகள், விகிதங்கள், UPI ID ஆகியவற்றை இணையத்தில் சேமித்து, புதிய போனில் உங்கள் பேக்அப் கீயால் மீட்டெடுக்கலாம்.",
+  cloudOn:"பேக்அப் இயக்கு",cloudRestore:"கீ மூலம் மீட்டெடு",restore:"மீட்டெடு",cloudKey:"உங்கள் பேக்அப் கீ",
+  cloudKeyNote:"இந்த கீயை எழுதி வையுங்கள். உங்கள் தரவை மீட்டெடுக்க இதுவே ஒரே வழி.",cloudNow:"இப்போது ஒத்திசை",
+  cloudSynced:"ஒத்திசைந்தது.",cloudFail:"ஒத்திசைக்க முடியவில்லை. இணையத்தைச் சரிபார்க்கவும்.",cloudNotReady:"கிளவுட் பேக்அப் இன்னும் அமைக்கப்படவில்லை.",cloudBadKey:"இந்த கீ தவறாகத் தெரிகிறது.",cloudWorking:"ஒத்திசைக்கிறது...",
   sbH:"UPI பணம் வந்த அறிவிப்பு",sbHelp:"GPay, PhonePe, Paytm, BHIM-இலிருந்து வரும் \"பணம் வந்தது\" அறிவிப்புகளை இந்த போனிலேயே படித்து, தொகையைச் சொல்லும். தொகை மட்டுமே இந்த போனில் சேமிக்கப்படும்.",
   sbHelp2:"சுவிட்ச் சாம்பல் நிறத்தில் இருந்தால்: போன் Settings, Apps, இந்தச் செயலி, மூன்று புள்ளிகள், Allow restricted settings.",
   sbOnTxt:"பணம் வருவதைக் கேட்டுக்கொண்டிருக்கிறது.",sbOffTxt:"கேட்கவில்லை. பணம் வந்த அறிவிப்பை இயக்கவும்.",sbEnable:"அறிவிப்பை இயக்கு",
   sbVoiceOn:"குரல்: இயக்கம்",sbVoiceOff:"குரல்: நிறுத்தம்",sbTest:"குரல் சோதனை",sbBattery:"பின்னணியில் இயங்க அனுமதி",
-  payH:"இன்றைய UPI அறிவிப்புகள்",noPay:"இன்று பணம் வந்த அறிவிப்பு இல்லை.",keepOnNative:"வேறு செயலிக்குச் சென்றாலும் GPS இயங்கும்.",gpsOff:"போன் இருப்பிடத்தை இயக்கவும்"}
+  payH:"இன்றைய UPI அறிவிப்புகள்",noPay:"இன்று பணம் வந்த அறிவிப்பு இல்லை.",
+  total_say:"மொத்தம் {n} ரூபாய்"}
 };
+var ICON = {start:"🟢 ",manual:"✍️ ",end:"🔴 ",share:"📲 ",cash:"💵 ",upi:"📱 ",cashT:"💵 ",upiT:"📱 ",discard:"❌ ",speak:"🔊 ",
+  nTrip:"🚖 ",nEarn:"💰 ",nExp:"🧾 ",nSet:"⚙️ ",save:"✅ ",delete:"🗑️ ",addExp:"➕ ",sbEnable:"🔔 ",sbTest:"🔊 ",sbBattery:"🔋 ",payApp:"📱 ",
+  cloudOn:"☁️ ",cloudNow:"🔄 ",restore:"⬇️ "};
+var EXPTYPES = ["fuel","rent","repair","food","other"];
+var EXPICON = {fuel:"⛽",rent:"🏠",repair:"🔧",food:"🍽️",other:"🧾"};
+var WD = {en:["S","M","T","W","T","F","S"], ta:["ஞா","தி","செ","பு","வி","வெ","ச"]};
 
-var ICON = {start:"🟢 ",end:"🔴 ",share:"📲 ",cash:"💵 ",upi:"📱 ",discard:"❌ ",speak:"🔊 ",nTrip:"🚖 ",nEarn:"💰 ",nSet:"⚙️ ",save:"✅ ",sbEnable:"🔔 ",sbTest:"🔊 ",sbBattery:"🔋 ",payApp:"📱 "};
-var DEF = {name:"",upi:"",base:"",baseKm:"",perKm:"",wait:"",night:"0",nightFrom:"23",nightTo:"5",saved:false};
-var S = load("ab_settings", DEF), TRIPS = load("ab_trips", []);
-var lang = (function(){ try{var l=localStorage.getItem("ab_lang"); if(l) return l;}catch(e){} return "ta"; })();
-
+/* ---------- storage + helpers ---------- */
 function load(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return v||d; }catch(e){ return d; } }
 function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
-function t(k,v){ var s=(TXT[lang]&&TXT[lang][k])||TXT.en[k]||k; if(v) for(var x in v) s=s.replace(new RegExp("\\{"+x+"\\}","g"),v[x]); return s; }
 function $(id){ return document.getElementById(id); }
-function inr(n){ return "₹"+Math.round(n).toLocaleString("en-IN"); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function p2(n){ return n<10?"0"+n:""+n; }
+function dk(ms){ var d=new Date(ms); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
+function inr(n){ return (n<0?"-":"")+"₹"+Math.abs(Math.round(n)).toLocaleString("en-IN"); }
 function num(v){ var n=parseFloat(String(v).replace(/,/g,"")); return isNaN(n)?0:n; }
+function clean(v,max){ return Math.min(max, Math.max(0, num(v))); }
 function fmt(sec){ sec=Math.floor(sec); var m=Math.floor(sec/60), s=sec%60; return m+":"+(s<10?"0":"")+s; }
+function live(a){ return a.filter(function(x){ return !x.d; }); }
+function dateText(d,o){ return d.toLocaleDateString(lang==="ta"?"ta-IN":"en-IN",o); }
+function timeText(ms){ return new Date(ms).toLocaleTimeString(lang==="ta"?"ta-IN":"en-IN",{hour:"2-digit",minute:"2-digit"}); }
+function short(n){ return n>=1000 ? (n/1000).toFixed(n>=10000?0:1).replace(".0","")+"k" : String(Math.round(n)); }
+
+var lang = (function(){ try{ var l=localStorage.getItem("ab_lang"); if(l==="en"||l==="ta") return l; }catch(e){} return "ta"; })();
+function t(k,v){ var s=(TXT[lang]&&TXT[lang][k])||TXT.en[k]||k; if(v) for(var x in v) s=s.replace(new RegExp("\\{"+x+"\\}","g"),v[x]); return s; }
+
+var DEF = {name:"",upi:"",base:"",baseKm:"",perKm:"",wait:"",night:"0",nightFrom:"23",nightTo:"5",saved:false,u:0};
+var S = load("ab_settings", DEF), TRIPS = load("ab_trips", []), EXP = load("ab_exp", []);
+TRIPS.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
+EXP.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
+function saveData(){ save("ab_trips",TRIPS); save("ab_exp",EXP); scheduleSync(); }
+
+/* numeric inputs: digits and one dot only, never negative */
+document.querySelectorAll("input[inputmode]").forEach(function(el){
+  el.addEventListener("input",function(){
+    var v=el.value.replace(/[^0-9.]/g,""), i=v.indexOf(".");
+    if(i>=0) v=v.slice(0,i+1)+v.slice(i+1).replace(/\./g,"");
+    if(v!==el.value) el.value=v;
+  });
+});
 
 /* ---------- fare ---------- */
 function isNight(h){
@@ -277,15 +437,13 @@ function isNight(h){
   return a>b ? (h>=a||h<b) : (h>=a&&h<b);
 }
 function fare(km, waitMin, lug, when){
-  var base=num(S.base), extraKm=Math.max(0,km-num(S.baseKm)), extra=extraKm*num(S.perKm);
-  var w=waitMin*num(S.wait);
-  var sub=base+extra+w;
+  var base=num(S.base), extra=Math.max(0,km-num(S.baseKm))*num(S.perKm);
+  var w=waitMin*num(S.wait), sub=base+extra+w;
   var night=isNight((when||new Date()).getHours()) ? sub*num(S.night)/100 : 0;
-  var total=Math.ceil(sub+night+lug);
-  return {base:base,extra:extra,wait:w,night:night,lug:lug,total:total};
+  return {base:base,extra:extra,wait:w,night:night,lug:lug,total:Math.ceil(sub+night+lug)};
 }
 
-/* ---------- views / i18n ---------- */
+/* ---------- language + navigation ---------- */
 function applyLang(){
   document.documentElement.lang=lang;
   $("langBtn").textContent = lang==="en" ? "தமிழ்" : "English";
@@ -297,17 +455,18 @@ function applyLang(){
     try{ AndroidBridge.setLang(lang); }catch(e){}
     $("keepWarn").textContent=t("keepOnNative");
     $("sbCard").hidden=false; $("payCard").hidden=false;
-  }
-  renderHome(); renderEarn(); renderBill(); renderSound();
+  } else { $("payCard").hidden=true; }
+  buildExpTypes(); setWaitBtn(!!wTimer); renderAll(); renderSound(); renderCloud();
 }
 $("langBtn").onclick=function(){ lang=lang==="en"?"ta":"en"; try{localStorage.setItem("ab_lang",lang);}catch(e){} applyLang(); };
 document.querySelectorAll("nav button").forEach(function(b){
   b.onclick=function(){
     document.querySelectorAll("nav button").forEach(function(x){x.classList.toggle("on",x===b);});
     document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("on",v.id===b.dataset.v);});
-    if(b.dataset.v==="vEarn") renderEarn();
+    window.scrollTo(0,0); renderAll();
   };
 });
+function goTab(v){ document.querySelector('nav button[data-v="'+v+'"]').click(); }
 
 /* ---------- settings ---------- */
 function fillSettings(){
@@ -315,43 +474,237 @@ function fillSettings(){
   $("sPerKm").value=S.perKm; $("sWait").value=S.wait; $("sNight").value=S.night; $("sNightFrom").value=S.nightFrom; $("sNightTo").value=S.nightTo;
 }
 $("saveSet").onclick=function(){
+  var e=$("setErr"); e.className="err";
   var upi=$("sUpi").value.trim();
-  if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)){ $("setErr").textContent=t("badUpi"); return; }
-  var vals=["sBase","sBaseKm","sPerKm","sWait","sNight","sNightFrom","sNightTo"].map(function(i){return $(i).value.trim();});
-  if(!vals[0]||!vals[1]||!vals[2]||vals.some(function(v){return v!==""&&isNaN(num(v));})){ $("setErr").textContent=t("badNum"); return; }
-  S={name:$("sName").value.trim(),upi:upi,base:vals[0],baseKm:vals[1],perKm:vals[2],wait:vals[3]||"0",night:vals[4]||"0",nightFrom:vals[5]||"23",nightTo:vals[6]||"5",saved:true};
-  save("ab_settings",S); $("setErr").textContent=""; $("setErr").style.color="var(--good)"; $("setErr").textContent=t("saved");
-  setTimeout(function(){ $("setErr").textContent=""; $("setErr").style.color=""; },2000);
+  if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)){ e.textContent=t("badUpi"); return; }
+  var v=["sBase","sBaseKm","sPerKm","sWait","sNight","sNightFrom","sNightTo"].map(function(i){return $(i).value.trim();});
+  if(!v[0]||!v[1]||!v[2]){ e.textContent=t("badNum"); return; }
+  if(num(v[0])>5000||num(v[1])>100||num(v[2])>1000||num(v[3])>1000||num(v[4])>300||num(v[5])>23||num(v[6])>23){ e.textContent=t("badBig"); return; }
+  S={name:$("sName").value.trim().slice(0,40),upi:upi,base:v[0],baseKm:v[1],perKm:v[2],wait:v[3]||"0",night:v[4]||"0",nightFrom:v[5]||"23",nightTo:v[6]||"5",saved:true,u:Date.now()};
+  save("ab_settings",S); scheduleSync();
+  e.className="err ok"; e.textContent=t("saved");
+  setTimeout(function(){ e.textContent=""; e.className="err"; },2000);
   renderHome();
 };
-$("wipe").onclick=function(){ if(confirm(t("confirmWipe"))){ TRIPS=[]; save("ab_trips",TRIPS); renderEarn(); renderHome(); } };
+$("wipe").onclick=function(){
+  if(!confirm(t("confirmWipe"))) return;
+  var now=Date.now(); TRIPS.forEach(function(x){ x.d=true; x.u=now; }); saveData(); renderAll();
+};
 
-/* ---------- earnings ---------- */
-function sameDay(a,b){ return a.toDateString()===b.toDateString(); }
-function todayTrips(){ var n=new Date(); return TRIPS.filter(function(x){return sameDay(new Date(x.t),n);}); }
+/* ---------- aggregation ---------- */
+function buildIndex(){
+  var m={};
+  function g(ms){ var k=dk(ms); return m[k]||(m[k]={inc:0,exp:0,km:0,cash:0,trips:[],exps:[]}); }
+  live(TRIPS).forEach(function(x){ var o=g(x.t); o.inc+=x.fare; o.km+=x.km||0; if(x.mode==="cash") o.cash+=x.fare; o.trips.push(x); });
+  live(EXP).forEach(function(x){ var o=g(x.t); o.exp+=x.amt; o.exps.push(x); });
+  return m;
+}
+function sumRange(idx,pred){
+  var s={inc:0,exp:0,km:0,n:0};
+  for(var k in idx){ if(pred(k)){ var o=idx[k]; s.inc+=o.inc; s.exp+=o.exp; s.km+=o.km; s.n+=o.trips.length; } }
+  return s;
+}
+function renderAll(){ renderHome(); renderEarn(); renderExp(); if(bill) renderBill(); }
+
 function renderHome(){
-  var tt=todayTrips(), sum=tt.reduce(function(a,x){return a+x.fare;},0);
-  $("todayTotal").textContent=inr(sum);
-  $("todayTrips").textContent=t("tripsN",{n:tt.length});
+  var o=buildIndex()[dk(Date.now())]||{inc:0,trips:[]};
+  $("todayTotal").textContent=inr(o.inc);
+  $("todayTrips").textContent=t("tripsN",{n:o.trips.length});
   var need=$("needRates"); need.hidden=!!S.saved; need.textContent=t("needRates");
+}
+
+/* ---------- earnings / history ---------- */
+var EV={mode:"day",cur:new Date()};
+function mkRow(left,right,cls,onClick){
+  var el=document.createElement(onClick?"button":"div"); if(onClick) el.type="button";
+  el.className="item"; var a=document.createElement("span"); a.className="l"; a.textContent=left;
+  var b=document.createElement("b"); b.textContent=right; if(cls) b.className=cls;
+  el.appendChild(a); el.appendChild(b); if(onClick) el.onclick=onClick; return el;
+}
+function expRow(x){
+  var el=document.createElement("div"); el.className="item";
+  var a=document.createElement("span"); a.className="l";
+  a.textContent=EXPICON[x.type]+" "+t("x_"+(EXPICON[x.type]?x.type:"other"))+(x.note?" - "+x.note:"");
+  var b=document.createElement("b"); b.textContent=inr(x.amt);
+  var d=document.createElement("button"); d.type="button"; d.className="x"; d.textContent="✕"; d.setAttribute("aria-label",t("delete"));
+  d.onclick=function(){ if(confirm(t("confirmDel"))){ x.d=true; x.u=Date.now(); saveData(); renderAll(); } };
+  el.appendChild(a); el.appendChild(b); el.appendChild(d); return el;
+}
+function h3(txt){ var h=document.createElement("h3"); h.className="sec"; h.textContent=txt; return h; }
+
+function renderDay(o,body){
+  body.appendChild(h3(t("tripsH")));
+  var card=document.createElement("div"); card.className="card";
+  if(!o.trips.length){ card.textContent=t("noTrips"); card.className="card muted"; }
+  o.trips.slice().sort(function(a,b){return b.t-a.t;}).forEach(function(x){
+    card.appendChild(mkRow(timeText(x.t)+"  "+(x.km||0).toFixed(1)+" km  "+(x.mode==="cash"?"💵":"📱"),inr(x.fare),"",function(){ openEdit(x.id); }));
+  });
+  body.appendChild(card);
+  body.appendChild(h3(t("expH")));
+  var c2=document.createElement("div"); c2.className="card";
+  if(!o.exps.length){ c2.textContent=t("noExp"); c2.className="card muted"; }
+  o.exps.slice().sort(function(a,b){return b.t-a.t;}).forEach(function(x){ c2.appendChild(expRow(x)); });
+  body.appendChild(c2);
+}
+function renderMonth(idx,body){
+  var d=EV.cur, y=d.getFullYear(), m=d.getMonth(), first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  var card=document.createElement("div"); card.className="card";
+  var g=document.createElement("div"); g.className="cal";
+  WD[lang].forEach(function(w){ var s=document.createElement("div"); s.className="wd"; s.textContent=w; g.appendChild(s); });
+  for(var i=0;i<first;i++){ var bl=document.createElement("button"); bl.className="blank"; bl.disabled=true; g.appendChild(bl); }
+  var todayKey=dk(Date.now());
+  for(var day=1;day<=days;day++){
+    (function(day){
+      var key=y+"-"+p2(m+1)+"-"+p2(day), o=idx[key];
+      var b=document.createElement("button"); b.type="button";
+      b.appendChild(document.createTextNode(String(day)));
+      if(o&&o.inc>0){ var sm=document.createElement("small"); sm.textContent=short(o.inc); b.appendChild(sm); b.classList.add("has"); }
+      if(key===todayKey) b.classList.add("today");
+      b.onclick=function(){ EV.cur=new Date(y,m,day); EV.mode="day"; renderEarn(); };
+      g.appendChild(b);
+    })(day);
+  }
+  card.appendChild(g); body.appendChild(card);
+}
+function renderYear(idx,body){
+  var y=EV.cur.getFullYear(), card=document.createElement("div"); card.className="card";
+  for(var mo=0;mo<12;mo++){
+    (function(mo){
+      var pre=y+"-"+p2(mo+1), s=sumRange(idx,function(k){return k.indexOf(pre)===0;});
+      var name=dateText(new Date(y,mo,1),{month:"long"});
+      var r=mkRow(name+"  "+inr(s.inc)+" / "+inr(s.exp), inr(s.inc-s.exp), (s.inc-s.exp)<0?"neg":"", function(){ EV.cur=new Date(y,mo,1); EV.mode="month"; renderEarn(); });
+      card.appendChild(r);
+    })(mo);
+  }
+  body.appendChild(card);
 }
 function renderEarn(){
   renderPays();
-  var tt=todayTrips(), now=new Date();
-  var sum=tt.reduce(function(a,x){return a+x.fare;},0);
-  var cash=tt.filter(function(x){return x.mode==="cash";}).reduce(function(a,x){return a+x.fare;},0);
-  var km=tt.reduce(function(a,x){return a+x.km;},0);
-  var month=TRIPS.filter(function(x){var d=new Date(x.t);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce(function(a,x){return a+x.fare;},0);
-  $("eToday").textContent=inr(sum); $("eCash").textContent=inr(cash); $("eUpi").textContent=inr(sum-cash);
-  $("eKm").textContent=km.toFixed(1)+" km"; $("eMonth").textContent=inr(month);
-  var list=$("tripList"); list.innerHTML="";
-  if(!tt.length){ list.textContent=t("noTrips"); return; }
-  tt.slice().reverse().forEach(function(x){
-    var d=new Date(x.t), r=document.createElement("div"); r.className="row";
-    var a=document.createElement("span"); a.textContent=d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+"  "+x.km.toFixed(1)+" km  "+(x.mode==="cash"?t("cashL"):t("upiL"));
-    var b=document.createElement("b"); b.textContent=inr(x.fare);
-    r.appendChild(a); r.appendChild(b); list.appendChild(r);
+  var idx=buildIndex(), d=EV.cur, body=$("pBody"); body.innerHTML="";
+  document.querySelectorAll("#period button").forEach(function(b){ b.classList.toggle("on",b.dataset.p===EV.mode); });
+  var s, title;
+  if(EV.mode==="day"){
+    var key=dk(d.getTime()); s=sumRange(idx,function(k){return k===key;});
+    title=dateText(d,{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+    renderDay(idx[key]||{trips:[],exps:[]},body);
+  } else if(EV.mode==="month"){
+    var pre=d.getFullYear()+"-"+p2(d.getMonth()+1); s=sumRange(idx,function(k){return k.indexOf(pre)===0;});
+    title=dateText(d,{month:"long",year:"numeric"}); renderMonth(idx,body);
+  } else {
+    var yr=String(d.getFullYear()); s=sumRange(idx,function(k){return k.indexOf(yr+"-")===0;});
+    title=yr; renderYear(idx,body);
+  }
+  $("pTitle").textContent=title;
+  $("sInc").textContent=inr(s.inc); $("sExp").textContent=inr(s.exp);
+  var pro=s.inc-s.exp; $("sPro").textContent=inr(pro); $("sPro").className=pro<0?"neg":"";
+  $("sKm").textContent=s.km.toFixed(1)+" km, "+t("tripsN",{n:s.n});
+}
+document.querySelectorAll("#period button").forEach(function(b){ b.onclick=function(){ EV.mode=b.dataset.p; renderEarn(); }; });
+function step(dir){
+  var d=EV.cur;
+  if(EV.mode==="day") EV.cur=new Date(d.getFullYear(),d.getMonth(),d.getDate()+dir);
+  else if(EV.mode==="month") EV.cur=new Date(d.getFullYear(),d.getMonth()+dir,1);
+  else EV.cur=new Date(d.getFullYear()+dir,0,1);
+  renderEarn();
+}
+$("pPrev").onclick=function(){ step(-1); };
+$("pNext").onclick=function(){ step(1); };
+
+/* ---------- edit / delete trip ---------- */
+var editId=null, editMode="cash";
+function setMode(m){ editMode=m; document.querySelectorAll("#mMode button").forEach(function(b){ b.classList.toggle("on",b.dataset.m===m); }); }
+document.querySelectorAll("#mMode button").forEach(function(b){ b.onclick=function(){ setMode(b.dataset.m); }; });
+function findTrip(id){ for(var i=0;i<TRIPS.length;i++) if(TRIPS[i].id===id) return TRIPS[i]; return null; }
+function openEdit(id){
+  var x=findTrip(id); if(!x) return; editId=id;
+  $("mFare").value=x.fare; $("mKm").value=(x.km||0).toFixed(2); $("mWait").value=Math.round(x.wait||0);
+  setMode(x.mode==="upi"?"upi":"cash"); $("mErr").textContent="";
+  $("modal").classList.add("on");
+}
+function closeEdit(){ $("modal").classList.remove("on"); editId=null; }
+$("mCancel").onclick=closeEdit;
+$("modal").addEventListener("click",function(e){ if(e.target===$("modal")) closeEdit(); });
+$("mSave").onclick=function(){
+  var x=findTrip(editId); if(!x) return closeEdit();
+  var f=clean($("mFare").value,100000);
+  if(!(f>0)){ $("mErr").textContent=t("badNeg"); return; }
+  x.fare=Math.round(f); x.km=clean($("mKm").value,500); x.wait=clean($("mWait").value,600); x.mode=editMode; x.u=Date.now();
+  saveData(); closeEdit(); renderAll();
+};
+$("mDel").onclick=function(){
+  var x=findTrip(editId); if(!x) return closeEdit();
+  if(!confirm(t("confirmDel"))) return;
+  x.d=true; x.u=Date.now(); saveData(); closeEdit(); renderAll();
+};
+
+/* ---------- expenses ---------- */
+var xType="fuel";
+function buildExpTypes(){
+  var box=$("expTypes"); box.innerHTML="";
+  EXPTYPES.forEach(function(k){
+    var b=document.createElement("button"); b.type="button"; b.className="chipb"+(k===xType?" on":"");
+    b.textContent=EXPICON[k]+" "+t("x_"+k);
+    b.onclick=function(){ xType=k; buildExpTypes(); };
+    box.appendChild(b);
   });
+}
+function dateToMs(v){
+  if(!v) return Date.now();
+  var p=v.split("-"), d=new Date(+p[0],+p[1]-1,+p[2],12);
+  if(isNaN(d.getTime())) return Date.now();
+  return dk(d.getTime())===dk(Date.now()) ? Date.now() : d.getTime();
+}
+$("xAdd").onclick=function(){
+  var amt=clean($("xAmt").value,1000000);
+  if(!(amt>0)){ $("xErr").textContent=t("badNeg"); $("xAmt").focus(); return; }
+  $("xErr").textContent="";
+  EXP.push({id:uid(),t:dateToMs($("xDate").value),type:xType,amt:Math.round(amt*100)/100,note:$("xNote").value.trim().slice(0,40),u:Date.now()});
+  $("xAmt").value=""; $("xNote").value=""; saveData(); renderAll();
+};
+function renderExp(){
+  if(!$("xDate").value) $("xDate").value=dk(Date.now());
+  var all=live(EXP).sort(function(a,b){return b.t-a.t;});
+  var pre=dk(Date.now()).slice(0,7), tot=0;
+  all.forEach(function(x){ if(dk(x.t).indexOf(pre)===0) tot+=x.amt; });
+  $("xTotal").textContent=t("exp")+": "+inr(tot);
+  var list=$("xList"); list.innerHTML="";
+  if(!all.length){ list.textContent=t("noExp"); return; }
+  all.slice(0,30).forEach(function(x){
+    var r=expRow(x);
+    r.firstChild.textContent=dateText(new Date(x.t),{day:"numeric",month:"short"})+"  "+r.firstChild.textContent;
+    list.appendChild(r);
+  });
+}
+
+/* ---------- map ---------- */
+var map=null, line=null, dot=null;
+function loadLeaflet(cb){
+  if(window.L) return cb();
+  var c=document.createElement("link"); c.rel="stylesheet"; c.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(c);
+  var s=document.createElement("script"); s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+  s.onload=cb; s.onerror=function(){ $("mapNote").textContent=t("mapOffline"); };
+  document.head.appendChild(s);
+}
+function initMap(){
+  $("mapNote").textContent="";
+  loadLeaflet(function(){
+    if(!trip||map) return;
+    map=L.map("map",{zoomControl:false}).setView([10.8,78.7],7);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
+    line=L.polyline([],{color:"#F5B800",weight:6}).addTo(map);
+    dot=L.circleMarker([10.8,78.7],{radius:8,color:"#fff",weight:3,fillColor:"#0B7A3E",fillOpacity:1});
+    setTimeout(function(){ if(map) map.invalidateSize(); },200);
+    if(trip.pts&&trip.pts.length){ line.setLatLngs(trip.pts); dot.addTo(map).setLatLng(trip.pts[trip.pts.length-1]); map.setView(trip.pts[trip.pts.length-1],17); }
+  });
+}
+function killMap(){ if(map){ try{ map.remove(); }catch(e){} } map=null; line=null; dot=null; }
+function addPoint(lat,lon){
+  if(!trip||!trip.pts) return;
+  var last=trip.pts[trip.pts.length-1];
+  if(last && hav({lat:last[0],lon:last[1]},{lat:lat,lon:lon})<5) return;
+  trip.pts.push([lat,lon]);
+  if(trip.pts.length>600){ var keep=trip.pts[trip.pts.length-1]; trip.pts=trip.pts.filter(function(_,i){return i%2===0;}); trip.pts.push(keep); }
+  if(map&&line){ line.setLatLngs(trip.pts); if(!map.hasLayer(dot)) dot.addTo(map); dot.setLatLng([lat,lon]); map.setView([lat,lon],Math.max(map.getZoom(),16)); }
 }
 
 /* ---------- GPS trip ---------- */
@@ -365,12 +718,13 @@ function onPos(p){
   if(!trip) return;
   var acc=p.coords.accuracy, pt={lat:p.coords.latitude,lon:p.coords.longitude,ts:p.timestamp};
   trip.acc=acc;
-  if(acc>30) return;                               /* ignore weak fixes */
+  if(acc>30) return;
+  addPoint(pt.lat,pt.lon);
   if(!trip.last){ trip.last=pt; trip.lastTs=pt.ts; return; }
   var d=hav(trip.last,pt), dt=(pt.ts-trip.lastTs)/1000;
   if(dt<=0) return;
-  if(d/dt>45){ trip.last=pt; trip.lastTs=pt.ts; return; }     /* GPS jump (>160 km/h): skip */
-  if(d<Math.max(8,acc*0.5)){ trip.waitSec+=dt; trip.lastTs=pt.ts; return; }  /* stopped: count waiting, ignore drift */
+  if(d/dt>45){ trip.last=pt; trip.lastTs=pt.ts; return; }
+  if(d<Math.max(8,acc*0.5)){ trip.waitSec+=dt; trip.lastTs=pt.ts; return; }
   trip.dist+=d; trip.last=pt; trip.lastTs=pt.ts;
 }
 function tick(){
@@ -379,9 +733,12 @@ function tick(){
     var n={}; try{ n=JSON.parse(AndroidBridge.getTrip()); }catch(e){}
     if(n.denied){
       stopWatch(); try{ AndroidBridge.endTrip(); }catch(e){}
-      trip=null; show("sIdle"); $("gpsErr").textContent=t("gpsDenied"); return;
+      trip=null; killMap(); show("sIdle"); $("gpsErr").textContent=t("gpsDenied"); return;
     }
-    if(n.active){ trip.dist=n.km*1000; trip.waitSec=n.waitSec; trip.acc=n.acc<0?null:n.acc; trip.gpsOn=n.gpsOn; if(n.start) trip.start=n.start; }
+    if(n.active){
+      trip.dist=n.km*1000; trip.waitSec=n.waitSec; trip.acc=n.acc<0?null:n.acc; trip.gpsOn=n.gpsOn; if(n.start) trip.start=n.start;
+      if(n.hasFix) addPoint(n.lat,n.lon);
+    }
   }
   var km=trip.dist/1000, wm=trip.waitSec/60;
   $("liveKm").textContent=km.toFixed(2);
@@ -390,23 +747,26 @@ function tick(){
   $("liveFare").textContent=inr(fare(km,wm,0,new Date()).total);
   $("liveAcc").textContent=(trip.native&&trip.gpsOn===false)?t("gpsOff"):(trip.acc==null?t("gpsWait"):(trip.acc>30?t("gpsWeak"):t("gpsOk"))+" ("+Math.round(trip.acc)+" m)");
 }
+function needSetup(){
+  if(!S.saved){ goTab("vSet"); return true; }
+  return false;
+}
 $("startBtn").onclick=function(){
   $("gpsErr").textContent="";
-  if(!S.saved){ document.querySelector('nav button[data-v="vSet"]').click(); return; }
+  if(needSetup()) return;
   if(NATIVE){
-    trip={native:true,start:Date.now(),dist:0,waitSec:0,acc:null};
+    trip={native:true,start:Date.now(),dist:0,waitSec:0,acc:null,pts:[]};
     try{ AndroidBridge.startTrip(); }catch(e){}
-    ticker=setInterval(tick,1000); tick(); show("sRun"); return;
+    ticker=setInterval(tick,1000); tick(); show("sRun"); initMap(); return;
   }
   if(!navigator.geolocation){ $("gpsErr").textContent=t("gpsNo"); return; }
-  trip={start:Date.now(),dist:0,waitSec:0,last:null,lastTs:0,acc:null};
+  trip={start:Date.now(),dist:0,waitSec:0,last:null,lastTs:0,acc:null,pts:[]};
   watchId=navigator.geolocation.watchPosition(onPos,function(e){
     $("gpsErr").textContent = e.code===1 ? t("gpsDenied") : t("gpsNo");
-    if(e.code===1) stopWatch();
+    if(e.code===1){ stopWatch(); trip=null; killMap(); show("sIdle"); $("gpsErr").textContent=t("gpsDenied"); }
   },{enableHighAccuracy:true,maximumAge:0,timeout:20000});
   try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(function(w){wakeLock=w;}).catch(function(){}); }catch(e){}
-  ticker=setInterval(tick,1000); tick();
-  show("sRun");
+  ticker=setInterval(tick,1000); tick(); show("sRun"); initMap();
 };
 function stopWatch(){
   if(watchId!=null){ navigator.geolocation.clearWatch(watchId); watchId=null; }
@@ -415,20 +775,46 @@ function stopWatch(){
 }
 function show(id){ ["sIdle","sRun","sBill"].forEach(function(s){ $(s).hidden=(s!==id); }); }
 
+/* manual bill (no GPS) */
+$("manualBtn").onclick=function(){
+  if(needSetup()) return;
+  bill={km:0,wait:0,start:Date.now()};
+  $("inKm").value=""; $("inWait").value=""; $("inLug").value="0"; $("billErr").textContent="";
+  show("sBill"); renderBill();
+};
+
 /* ---------- bill ---------- */
-var bill=null;
+var bill=null, wTimer=null, wStart=0;
 $("endBtn").onclick=function(){
   if(!trip) return;
-  stopWatch();
+  stopWatch(); killMap();
   if(trip.native){
     try{ var r=JSON.parse(AndroidBridge.endTrip()); trip.dist=r.km*1000; trip.waitSec=r.waitSec; if(r.start) trip.start=r.start; }catch(e){}
   }
   bill={km:trip.dist/1000, wait:trip.waitSec/60, start:trip.start};
   trip=null;
-  $("inKm").value=bill.km.toFixed(2); $("inWait").value=Math.round(bill.wait); $("inLug").value="0";
+  $("inKm").value=bill.km.toFixed(2); $("inWait").value=Math.round(bill.wait); $("inLug").value="0"; $("billErr").textContent="";
   show("sBill"); renderBill(); speakFare();
 };
 ["inKm","inWait","inLug"].forEach(function(i){ $(i).addEventListener("input",renderBill); });
+
+function setWaitBtn(running){
+  $("waitBtn").textContent=(running?"⏹️ ":"⏱️ ")+t(running?"waitStop":"waitStart");
+  if(!running) $("waitClock").textContent="";
+}
+$("waitBtn").onclick=function(){
+  if(wTimer){
+    clearInterval(wTimer); wTimer=null;
+    var mins=(Date.now()-wStart)/60000;
+    $("inWait").value=(Math.round((num($("inWait").value)+mins)*100)/100).toString();
+    setWaitBtn(false); renderBill();
+  } else {
+    wStart=Date.now(); setWaitBtn(true);
+    wTimer=setInterval(function(){ $("waitClock").textContent=fmt((Date.now()-wStart)/1000); },1000);
+  }
+};
+function resetWait(){ if(wTimer){ clearInterval(wTimer); wTimer=null; } setWaitBtn(false); }
+
 function drawQr(text){
   var box=$("qrBox"); box.innerHTML="";
   if(typeof qrcode!=="function") return false;
@@ -441,29 +827,31 @@ function drawQr(text){
   }catch(e){ return false; }
 }
 function currentBill(){
-  var km=num($("inKm").value), w=num($("inWait").value), lug=num($("inLug").value);
+  var km=clean($("inKm").value,500), w=clean($("inWait").value,600), lug=clean($("inLug").value,5000);
   return {km:km,w:w,lug:lug,f:fare(km,w,lug,new Date(bill?bill.start:Date.now()))};
 }
 function upiUrl(amount){
-  return "upi://pay?pa="+encodeURIComponent(S.upi)+"&pn="+encodeURIComponent(S.name||APP_NAME)+"&am="+amount+"&cu=INR&tn="+encodeURIComponent("Auto fare");
+  return "upi://pay?pa="+encodeURIComponent(S.upi)+"&pn="+encodeURIComponent(S.name||(lang==="ta"?APP_TA:APP_NAME))+"&am="+amount+"&cu=INR&tn="+encodeURIComponent("Auto fare");
 }
 function renderBill(){
   if(!bill) return;
   var b=currentBill(), f=b.f;
+  $("billErr").textContent = (num($("inKm").value)>500||num($("inWait").value)>600||num($("inLug").value)>5000) ? t("badBig") : "";
   $("billFare").textContent=inr(f.total);
   var rows=[[t("fBase"),f.base],[t("fExtra"),f.extra],[t("fWait"),f.wait]];
   if(f.night>0) rows.push([t("fNight"),f.night]);
   if(f.lug>0) rows.push([t("fLug"),f.lug]);
   var el=$("breakdown"); el.innerHTML="";
-  rows.forEach(function(r){ var d=document.createElement("div"); d.className="row"; var a=document.createElement("span"); a.textContent=r[0]; var c=document.createElement("b"); c.textContent=inr(r[1]); d.appendChild(a); d.appendChild(c); el.appendChild(d); });
+  rows.forEach(function(r){ el.appendChild(mkRow(r[0],inr(r[1]),"")); el.lastChild.className="row"; });
   var url=upiUrl(f.total.toFixed(2));
   $("upiLink").href=url;
   var ok=drawQr(url);
   $("qrNote").textContent = ok ? t("qrNote") : t("needUpi");
 }
 function speakFare(){
+  if(!bill) return;
   var f=currentBill().f.total;
-  var ta="மொத்தம் "+f+" ரூபாய்", en="Total "+f+" rupees";
+  var ta=TXT.ta.total_say.replace("{n}",f), en=TXT.en.total_say.replace("{n}",f);
   if(NATIVE){ try{ AndroidBridge.speak(ta,en); }catch(e){} }
   else if("speechSynthesis" in window){
     try{ var u=new SpeechSynthesisUtterance(lang==="ta"?ta:en); u.lang=lang==="ta"?"ta-IN":"en-IN"; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
@@ -472,17 +860,19 @@ function speakFare(){
 $("speakBtn").onclick=speakFare;
 $("shareBtn").onclick=function(){
   var b=currentBill();
-  var msg=t("billMsg",{app:(lang==="ta"?APP_TA:APP_NAME),km:b.km.toFixed(1),w:Math.round(b.w),fare:b.f.total,link:upiUrl(b.f.total.toFixed(2))});
+  var msg=t("billMsg",{app:(lang==="ta"?APP_TA:APP_NAME),date:dateText(new Date(),{day:"numeric",month:"short",year:"numeric"})+" "+timeText(Date.now()),
+    km:b.km.toFixed(1),w:Math.round(b.w),fare:b.f.total,link:upiUrl(b.f.total.toFixed(2))});
   window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
 };
 function finish(mode){
   var b=currentBill();
-  TRIPS.push({t:Date.now(),km:b.km,wait:b.w,fare:b.f.total,mode:mode});
-  save("ab_trips",TRIPS); bill=null; show("sIdle"); renderHome(); renderEarn();
+  if(!(b.f.total>0)){ $("billErr").textContent=t("badNeg"); return; }
+  TRIPS.push({id:uid(),t:Date.now(),km:b.km,wait:b.w,fare:b.f.total,mode:mode,u:Date.now()});
+  saveData(); resetWait(); bill=null; show("sIdle"); renderAll();
 }
 $("saveCash").onclick=function(){ finish("cash"); };
 $("saveUpi").onclick=function(){ finish("upi"); };
-$("discard").onclick=function(){ bill=null; show("sIdle"); };
+$("discard").onclick=function(){ resetWait(); bill=null; show("sIdle"); };
 
 /* ---------- native soundbox (Android app only) ---------- */
 function renderSound(){
@@ -496,16 +886,11 @@ function renderPays(){
   if(!NATIVE) return;
   var list=$("payList"); list.innerHTML="";
   var arr=[]; try{ arr=JSON.parse(AndroidBridge.getPayments()); }catch(e){}
-  var now=new Date();
-  arr=arr.filter(function(x){ return sameDay(new Date(x.ts),now); });
+  var today=dk(Date.now());
+  arr=arr.filter(function(x){ return dk(x.ts)===today; });
   $("payTotal").textContent=inr(arr.reduce(function(a,x){return a+x.amt;},0));
   if(!arr.length){ list.textContent=t("noPay"); return; }
-  arr.slice().reverse().forEach(function(x){
-    var r=document.createElement("div"); r.className="row";
-    var a=document.createElement("span"); a.textContent=new Date(x.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+"  "+x.app;
-    var b=document.createElement("b"); b.textContent=inr(x.amt);
-    r.appendChild(a); r.appendChild(b); list.appendChild(r);
-  });
+  arr.slice().reverse().forEach(function(x){ list.appendChild(mkRow(timeText(x.ts)+"  "+x.app,inr(x.amt),"")); list.lastChild.className="row"; });
 }
 if(NATIVE){
   $("sbEnable").onclick=function(){ AndroidBridge.openListenerSettings(); };
@@ -515,17 +900,104 @@ if(NATIVE){
   document.addEventListener("visibilitychange",function(){ if(!document.hidden){ renderSound(); renderPays(); } });
 }
 
+/* ---------- cloud backup (Turso, through your sync server) ---------- */
+var SY = load("ab_sync",{key:"",last:0,pushed:0});
+var syncing=false, syncTimer=null;
+function newKey(){
+  var a="ABCDEFGHJKMNPQRSTUVWXYZ23456789", s="", r=new Uint8Array(16);
+  crypto.getRandomValues(r);
+  for(var i=0;i<16;i++){ s+=a[r[i]%a.length]; if(i%4===3&&i<15) s+="-"; }
+  return s;
+}
+function okKey(k){ return /^[A-Z2-9]{4}(-[A-Z2-9]{4}){3}$/.test(k); }
+function cloudMsg(txt,good){ var e=$("cloudStatus"); e.textContent=txt||""; e.className="muted"+(good?" ok":""); }
+function renderCloud(){
+  var on=!!SY.key;
+  $("cloudOff").hidden=on; $("cloudOnBox").hidden=!on;
+  $("cloudKeyTxt").textContent=SY.key||"";
+  if(!SYNC_URL) cloudMsg(t("cloudNotReady"));
+}
+function collect(since){
+  var out=[];
+  function add(kind){ return function(x){ if((x.u||0)>since) out.push({kind:kind,id:x.id,u:x.u,d:x.d?1:0,data:JSON.stringify(x)}); }; }
+  TRIPS.forEach(add("trip")); EXP.forEach(add("exp"));
+  if((S.u||0)>since) out.push({kind:"settings",id:"s",u:S.u,d:0,data:JSON.stringify(S)});
+  return out;
+}
+function merge(changes){
+  var dirty=false;
+  changes.forEach(function(c){
+    var data; try{ data=JSON.parse(c.data); }catch(e){ return; }
+    if(c.kind==="settings"){
+      if(c.u>(S.u||0)){ S=data; S.u=c.u; save("ab_settings",S); fillSettings(); dirty=true; }
+      return;
+    }
+    var arr=c.kind==="trip"?TRIPS:(c.kind==="exp"?EXP:null); if(!arr) return;
+    data.id=c.id; data.u=c.u; data.d=!!c.d;
+    for(var i=0;i<arr.length;i++){ if(arr[i].id===c.id){ if(c.u>(arr[i].u||0)){ arr[i]=data; dirty=true; } return; } }
+    arr.push(data); dirty=true;
+  });
+  if(dirty){ save("ab_trips",TRIPS); save("ab_exp",EXP); }
+  return dirty;
+}
+async function post(changes,since){
+  var r=await fetch(SYNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:SY.key,since:since,changes:changes})});
+  if(!r.ok) throw new Error("http "+r.status);
+  return r.json();
+}
+async function syncNow(){
+  if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
+  if(!SY.key||syncing) return;
+  syncing=true; cloudMsg(t("cloudWorking"));
+  var t0=Date.now(), since=SY.last, changed=false;
+  try{
+    var all=collect(SY.pushed), chunks=[];
+    for(var i=0;i<all.length;i+=200) chunks.push(all.slice(i,i+200));
+    if(!chunks.length) chunks.push([]);
+    var j, guard=0;
+    for(var c=0;c<chunks.length;c++){            /* push in pieces of 200 */
+      j=await post(chunks[c],since);
+      if(merge(j.changes||[])) changed=true;
+      if(!j.more) since=j.now;
+    }
+    while(j.more && guard++<50){                 /* then pull any remaining pages */
+      j=await post([],j.last);
+      if(merge(j.changes||[])) changed=true;
+      if(!j.more) since=j.now;
+    }
+    SY.last=since; SY.pushed=t0; save("ab_sync",SY);
+    cloudMsg(t("cloudSynced"),true);
+    if(changed) renderAll();
+  }catch(e){ cloudMsg(t("cloudFail")); }
+  syncing=false;
+}
+function scheduleSync(){ if(!SY.key||!SYNC_URL) return; clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,4000); }
+$("cloudOn").onclick=function(){
+  if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
+  SY={key:newKey(),last:0,pushed:0}; save("ab_sync",SY); renderCloud(); syncNow();
+};
+$("cloudRestoreBtn").onclick=function(){
+  if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
+  var k=$("cloudIn").value.trim().toUpperCase().replace(/\s+/g,"");
+  if(!okKey(k)){ cloudMsg(t("cloudBadKey")); return; }
+  SY={key:k,last:0,pushed:0}; save("ab_sync",SY); $("cloudIn").value=""; renderCloud(); syncNow();
+};
+$("cloudNow").onclick=syncNow;
+window.addEventListener("online",scheduleSync);
+
 /* ---------- start ---------- */
+$("xDate").value=dk(Date.now());
 fillSettings(); applyLang();
 if(NATIVE){
   try{
     var rn=JSON.parse(AndroidBridge.getTrip());
     if(rn.active){   /* resume a trip that kept running in the background */
-      trip={native:true,start:rn.start,dist:rn.km*1000,waitSec:rn.waitSec,acc:null};
-      ticker=setInterval(tick,1000); tick(); show("sRun");
+      trip={native:true,start:rn.start,dist:rn.km*1000,waitSec:rn.waitSec,acc:null,pts:[]};
+      ticker=setInterval(tick,1000); tick(); show("sRun"); initMap();
     }
   }catch(e){}
 }
+scheduleSync();
 if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 </script>
 </body>
