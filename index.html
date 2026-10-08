@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Auto Anna</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#F6F4EE; --surface:#fff; --ink:#141414; --muted:#5B5B55; --line:#DDD9CC;
+  --amber:#F5B800; --on-amber:#141414; --good:#0B7A3E; --bad:#C8102E;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#101010;--surface:#1B1B1A;--ink:#F3F1EA;--muted:#A8A69C;--line:#33322E;--good:#4CCB8A;--bad:#FF6B78}
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:19px/1.5 system-ui,-apple-system,"Noto Sans Tamil","Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:#111;color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:1.25rem;font-weight:800}
+header h1 span{color:var(--amber)}
+.lang{min-height:44px;padding:0 14px;border-radius:10px;border:2px solid #444;background:transparent;color:#fff;font:600 1rem inherit;cursor:pointer}
+main{padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.big{font-size:2.6rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:72px;border-radius:18px;border:0;font:800 1.4rem inherit;cursor:pointer;background:var(--amber);color:var(--on-amber)}
+.btn.go{background:var(--good);color:#fff}
+.btn.stop{background:var(--bad);color:#fff}
+.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--ink);font-size:1.05rem;min-height:52px}
+.btn.sm{min-height:58px;font-size:1.1rem}
+summary{min-height:48px;display:flex;align-items:center;font-weight:600;cursor:pointer}
+.btns{display:grid;gap:10px;margin-top:12px}
+.btns.two{grid-template-columns:1fr 1fr}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input{width:100%;min-height:50px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:500 1.1rem inherit}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.warn{border-left:5px solid var(--amber);background:color-mix(in srgb,var(--amber) 14%,var(--surface));padding:12px 14px;border-radius:0 12px 12px 0;margin-bottom:14px}
+.err{color:var(--bad);min-height:1.4em;margin-top:6px}
+.qr{background:#fff;border-radius:12px;padding:10px;width:230px;height:230px;margin:12px auto;display:block}
+.qr svg{width:100%;height:100%;display:block}
+.fare{font-size:3rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+nav{position:fixed;left:0;right:0;bottom:0;background:#111;display:grid;grid-template-columns:repeat(3,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:6}
+nav button{min-height:62px;font-size:1.05rem;border:0;border-radius:12px;background:transparent;color:#bbb;font:600 1rem inherit;cursor:pointer}
+nav button.on{background:var(--amber);color:#141414}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.pulse{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--bad);margin-right:8px;animation:p 1.2s infinite}
+@keyframes p{50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="brand">Auto <span>Anna</span></h1>
+  <button class="lang" id="langBtn" type="button">தமிழ்</button>
+</header>
+
+<main>
+  <!-- TRIP -->
+  <section class="view on" id="vTrip">
+    <div id="needRates" class="warn" hidden></div>
+
+    <div id="sIdle">
+      <div class="card">
+        <div class="muted" data-i="today">Today</div>
+        <div class="big" id="todayTotal">₹0</div>
+        <div class="muted" id="todayTrips"></div>
+      </div>
+      <button class="btn go" id="startBtn" type="button" data-i="start">Start trip</button>
+      <div class="err" id="gpsErr" role="alert"></div>
+    </div>
+
+    <div id="sRun" hidden>
+      <div class="card">
+        <div class="muted"><span class="pulse"></span><span data-i="running">Trip running</span></div>
+        <div class="big"><span id="liveKm">0.00</span> km</div>
+        <div class="row"><span data-i="waiting">Waiting</span><b id="liveWait">0:00</b></div>
+        <div class="row"><span data-i="time">Time</span><b id="liveTime">0:00</b></div>
+        <div class="row"><span data-i="fareNow">Fare so far</span><b id="liveFare">₹0</b></div>
+        <div class="row"><span data-i="gps">GPS signal</span><b id="liveAcc">-</b></div>
+      </div>
+      <div class="warn" id="keepWarn" data-i="keepOn">Keep this screen open while the trip runs.</div>
+      <button class="btn stop" id="endBtn" type="button" data-i="end">End trip and bill</button>
+    </div>
+
+    <div id="sBill" hidden>
+      <div class="card">
+        <div class="muted" data-i="total">Total fare</div>
+        <div class="fare" id="billFare">₹0</div>
+        <div class="grid2">
+          <div><label for="inKm" data-i="km">Distance (km)</label><input id="inKm" inputmode="decimal"></div>
+          <div><label for="inWait" data-i="waitMin">Waiting (min)</label><input id="inWait" inputmode="decimal"></div>
+        </div>
+        <label for="inLug" data-i="luggage">Luggage / extra (₹)</label>
+        <input id="inLug" inputmode="numeric" value="0">
+        <div id="breakdown" style="margin-top:12px"></div>
+      </div>
+      <div class="card" id="qrCard">
+        <div id="qrBox" class="qr" aria-label="UPI QR"></div>
+        <div class="btns">
+          <a class="btn sm ghost" id="upiLink" href="#" data-i="payApp">Pay with UPI app</a>
+        </div>
+        <div class="muted" id="qrNote" style="text-align:center;margin-top:8px"></div>
+      </div>
+      <div class="btns">
+        <button class="btn sm ghost" id="speakBtn" type="button" data-i="speak">Say total</button>
+        <button class="btn sm" id="shareBtn" type="button" data-i="share">Share bill on WhatsApp</button>
+        <div class="btns two">
+          <button class="btn sm go" id="saveCash" type="button" data-i="cash">Got cash</button>
+          <button class="btn sm go" id="saveUpi" type="button" data-i="upi">Got UPI</button>
+        </div>
+        <button class="btn ghost" id="discard" type="button" data-i="discard">Discard trip</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- EARNINGS -->
+  <section class="view" id="vEarn">
+    <div class="card">
+      <div class="muted" data-i="today">Today</div>
+      <div class="big" id="eToday">₹0</div>
+      <div class="row"><span data-i="cashT">Cash</span><b id="eCash">₹0</b></div>
+      <div class="row"><span data-i="upiT">UPI</span><b id="eUpi">₹0</b></div>
+      <div class="row"><span data-i="kmT">Distance</span><b id="eKm">0 km</b></div>
+    </div>
+    <div class="card">
+      <div class="muted" data-i="month">This month</div>
+      <div class="big" id="eMonth">₹0</div>
+    </div>
+    <div class="card" id="payCard" hidden>
+      <div class="muted" data-i="payH">UPI alerts today</div>
+      <div class="big" id="payTotal">₹0</div>
+      <div id="payList" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px" data-i="trips">Today's trips</h3>
+      <div id="tripList"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="vSet">
+    <div class="card">
+      <h3 style="margin:0" data-i="payTo">Where customers pay you</h3>
+      <label for="sName" data-i="name">Your name</label>
+      <input id="sName" autocomplete="off">
+      <label for="sUpi" data-i="upiId">Your UPI ID</label>
+      <input id="sUpi" autocomplete="off" autocapitalize="none" placeholder="name@bank">
+    </div>
+    <div class="card">
+      <h3 style="margin:0" data-i="rates">Your fare rates</h3>
+      <div class="warn" style="margin-top:10px" data-i="helpNote"></div>
+      <p class="muted" style="margin:6px 0 0" data-i="ratesNote">Enter the rates you charge. Check the official fare rules for your area.</p>
+      <div class="grid2">
+        <div><label for="sBase" data-i="base">Base fare (₹)</label><input id="sBase" inputmode="decimal"></div>
+        <div><label for="sBaseKm" data-i="baseKm">Base km included</label><input id="sBaseKm" inputmode="decimal"></div>
+        <div><label for="sPerKm" data-i="perKm">Per km after (₹)</label><input id="sPerKm" inputmode="decimal"></div>
+        <div><label for="sWait" data-i="waitRate">Waiting per min (₹)</label><input id="sWait" inputmode="decimal"></div>
+      </div>
+      <details style="margin-top:14px">
+        <summary data-i="moreRates">Night charge (optional)</summary>
+        <div class="grid2">
+          <div><label for="sNight" data-i="nightPct">Night extra (%)</label><input id="sNight" inputmode="decimal"></div>
+          <div><label for="sNightFrom" data-i="nightFrom">Night from (hour 0-23)</label><input id="sNightFrom" inputmode="numeric"></div>
+        </div>
+        <label for="sNightTo" data-i="nightTo">Night until (hour 0-23)</label>
+        <input id="sNightTo" inputmode="numeric">
+      </details>
+    </div>
+    <div class="card" id="sbCard" hidden>
+      <h3 style="margin:0" data-i="sbH">UPI payment alerts</h3>
+      <p class="muted" style="margin:6px 0 0" id="sbStatus"></p>
+      <p class="muted" style="margin:6px 0 0" data-i="sbHelp"></p>
+      <p class="muted" style="margin:6px 0 0" data-i="sbHelp2"></p>
+      <div class="btns">
+        <button class="btn sm" id="sbEnable" type="button" data-i="sbEnable">Turn on payment alerts</button>
+        <button class="btn sm ghost" id="sbToggle" type="button"></button>
+        <button class="btn sm ghost" id="sbTest" type="button" data-i="sbTest">Test voice</button>
+        <button class="btn sm ghost" id="sbBattery" type="button" data-i="sbBattery">Allow background running</button>
+      </div>
+    </div>
+    <div class="err" id="setErr" role="alert"></div>
+    <button class="btn" id="saveSet" type="button" data-i="save">Save</button>
+    <div class="btns"><button class="btn ghost" id="wipe" type="button" data-i="wipe">Delete all trips</button></div>
+    <p class="muted" style="margin-top:16px" data-i="disclaimer"></p>
+  </section>
+</main>
+
+<nav aria-label="Main">
+  <button class="on" data-v="vTrip" type="button" data-i="nTrip">Trip</button>
+  <button data-v="vEarn" type="button" data-i="nEarn">Earnings</button>
+  <button data-v="vSet" type="button" data-i="nSet">Settings</button>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
+<script>
+/* ===== CONFIG: change the app name here ===== */
+var APP_NAME = "Auto Anna";
+var APP_TA = "ஆட்டோ அண்ணா";
+/* ============================================ */
+var NATIVE = false;
+try { NATIVE = !!(window.AndroidBridge && window.AndroidBridge.isNative && window.AndroidBridge.isNative()); } catch (e) {}
+
+var TXT = {
+ en:{today:"Today",start:"Start trip",running:"Trip running",waiting:"Waiting",time:"Time",fareNow:"Fare so far",gps:"GPS signal",
+  keepOn:"Keep this screen open while the trip runs.",end:"End trip and bill",total:"Total fare",km:"Distance (km)",waitMin:"Waiting (min)",
+  luggage:"Luggage / extra (₹)",payApp:"Pay with UPI app",share:"Share bill on WhatsApp",cash:"Got cash",upi:"Got UPI",discard:"Discard trip",
+  cashT:"Cash",upiT:"UPI",kmT:"Distance",month:"This month",trips:"Today's trips",payTo:"Where customers pay you",name:"Your name",upiId:"Your UPI ID",
+  rates:"Your fare rates",ratesNote:"Enter the rates you charge. Check the official fare rules for your area.",base:"Base fare (₹)",baseKm:"Base km included",
+  perKm:"Per km after (₹)",waitRate:"Waiting per min (₹)",nightPct:"Night extra (%)",nightFrom:"Night from (hour 0-23)",nightTo:"Night until (hour 0-23)",
+  save:"Save",wipe:"Delete all trips",nTrip:"Trip",nEarn:"Earnings",nSet:"Settings",
+  needRates:"Set your UPI ID and fare rates in Settings before your first trip.",
+  noTrips:"No trips yet today.",tripsN:"{n} trips",
+  gpsDenied:"Location permission was denied. Allow location for this app in your phone settings.",gpsNo:"This phone cannot give GPS location.",
+  gpsWeak:"Weak",gpsOk:"Good",gpsWait:"Searching...",
+  fBase:"Base fare",fExtra:"Distance charge",fWait:"Waiting",fNight:"Night extra",fLug:"Luggage / extra",
+  needUpi:"Enter a valid UPI ID in Settings to show the QR.",qrNote:"Customer scans and pays this exact amount.",
+  saved:"Saved.",badUpi:"Enter a valid UPI ID like name@bank.",badNum:"Check the rates. Use numbers only.",
+  confirmWipe:"Delete all saved trips?",
+  billMsg:"{app} bill\nDistance: {km} km\nWaiting: {w} min\nTotal: ₹{fare}\nPay by UPI: {link}",
+  disclaimer:"This app calculates a bill from GPS distance and your own rates. It is not a legal fare meter. Check local transport rules before you rely on it for fares.",
+  cashL:"Cash",upiL:"UPI",speak:"Say total",moreRates:"Night charge (optional)",helpNote:"One-time setup. Fill this with a friend or helper.",
+  sbH:"UPI payment alerts",sbHelp:"The app reads \"money received\" notifications from GPay, PhonePe, Paytm and BHIM on this phone and speaks the amount. Only the amount is saved, on this phone.",
+  sbHelp2:"If the switch is greyed out: phone Settings, Apps, this app, three dots, Allow restricted settings.",
+  sbOnTxt:"Listening for payments.",sbOffTxt:"Not listening. Turn on payment alerts.",sbEnable:"Turn on payment alerts",
+  sbVoiceOn:"Voice: On",sbVoiceOff:"Voice: Off",sbTest:"Test voice",sbBattery:"Allow background running",
+  payH:"UPI alerts today",noPay:"No payments heard today.",keepOnNative:"GPS keeps running if you switch apps.",gpsOff:"Turn on phone location"},
+ ta:{today:"இன்று",start:"பயணத்தைத் தொடங்கு",running:"பயணம் நடக்கிறது",waiting:"காத்திருப்பு",time:"நேரம்",fareNow:"இதுவரை கட்டணம்",gps:"GPS சிக்னல்",
+  keepOn:"பயணம் நடக்கும்போது இந்தத் திரையைத் திறந்தே வைக்கவும்.",end:"பயணம் முடி, பில் போடு",total:"மொத்தக் கட்டணம்",km:"தூரம் (கி.மீ)",waitMin:"காத்திருப்பு (நிமிடம்)",
+  luggage:"லக்கேஜ் / கூடுதல் (₹)",payApp:"UPI செயலியில் செலுத்து",share:"WhatsApp-இல் பில் அனுப்பு",cash:"பணம் வாங்கினேன்",upi:"UPI வந்தது",discard:"பயணத்தை நீக்கு",
+  cashT:"பணம்",upiT:"UPI",kmT:"தூரம்",month:"இந்த மாதம்",trips:"இன்றைய பயணங்கள்",payTo:"வாடிக்கையாளர் உங்களுக்கு எங்கே செலுத்துவார்",name:"உங்கள் பெயர்",upiId:"உங்கள் UPI ID",
+  rates:"உங்கள் கட்டண விகிதங்கள்",ratesNote:"நீங்கள் வசூலிக்கும் விகிதங்களை உள்ளிடுங்கள். உங்கள் பகுதிக்கான அதிகாரப்பூர்வ கட்டண விதிகளைச் சரிபார்க்கவும்.",base:"அடிப்படைக் கட்டணம் (₹)",baseKm:"அடிப்படையில் அடங்கும் கி.மீ",
+  perKm:"அதற்கு மேல் ஒரு கி.மீ (₹)",waitRate:"காத்திருப்பு நிமிடத்திற்கு (₹)",nightPct:"இரவு கூடுதல் (%)",nightFrom:"இரவு தொடக்கம் (மணி 0-23)",nightTo:"இரவு முடிவு (மணி 0-23)",
+  save:"சேமி",wipe:"எல்லா பயணங்களையும் நீக்கு",nTrip:"பயணம்",nEarn:"வருமானம்",nSet:"அமைப்புகள்",
+  needRates:"முதல் பயணத்திற்கு முன் அமைப்புகளில் உங்கள் UPI ID மற்றும் கட்டண விகிதங்களை அமைக்கவும்.",
+  noTrips:"இன்று இன்னும் பயணம் இல்லை.",tripsN:"{n} பயணங்கள்",
+  gpsDenied:"இருப்பிட அனுமதி மறுக்கப்பட்டது. போன் அமைப்புகளில் இந்தச் செயலிக்கு இருப்பிடத்தை அனுமதிக்கவும்.",gpsNo:"இந்த போனில் GPS இருப்பிடம் கிடைக்கவில்லை.",
+  gpsWeak:"பலவீனம்",gpsOk:"நன்று",gpsWait:"தேடுகிறது...",
+  fBase:"அடிப்படைக் கட்டணம்",fExtra:"தூரக் கட்டணம்",fWait:"காத்திருப்பு",fNight:"இரவு கூடுதல்",fLug:"லக்கேஜ் / கூடுதல்",
+  needUpi:"QR காட்ட அமைப்புகளில் சரியான UPI ID உள்ளிடுங்கள்.",qrNote:"வாடிக்கையாளர் ஸ்கேன் செய்து இதே தொகையைச் செலுத்துவார்.",
+  saved:"சேமிக்கப்பட்டது.",badUpi:"name@bank போன்ற சரியான UPI ID உள்ளிடுங்கள்.",badNum:"விகிதங்களைச் சரிபார்க்கவும். எண்கள் மட்டும்.",
+  confirmWipe:"சேமித்த எல்லா பயணங்களையும் நீக்கவா?",
+  billMsg:"{app} பில்\nதூரம்: {km} கி.மீ\nகாத்திருப்பு: {w} நிமிடம்\nமொத்தம்: ₹{fare}\nUPI மூலம் செலுத்த: {link}",
+  disclaimer:"இந்தச் செயலி GPS தூரம் மற்றும் உங்கள் சொந்த விகிதங்களை வைத்து பில் கணக்கிடுகிறது. இது சட்டப்படியான கட்டண மீட்டர் அல்ல. கட்டணத்திற்கு நம்புவதற்கு முன் உள்ளூர் போக்குவரத்து விதிகளைச் சரிபார்க்கவும்.",
+  cashL:"பணம்",upiL:"UPI",speak:"தொகையைச் சொல்",moreRates:"இரவு கூடுதல் (விருப்பம்)",helpNote:"ஒருமுறை மட்டும் அமைக்க வேண்டும். நண்பர் உதவியுடன் நிரப்புங்கள்.",
+  sbH:"UPI பணம் வந்த அறிவிப்பு",sbHelp:"GPay, PhonePe, Paytm, BHIM-இலிருந்து வரும் \"பணம் வந்தது\" அறிவிப்புகளை இந்த போனிலேயே படித்து, தொகையைச் சொல்லும். தொகை மட்டுமே இந்த போனில் சேமிக்கப்படும்.",
+  sbHelp2:"சுவிட்ச் சாம்பல் நிறத்தில் இருந்தால்: போன் Settings, Apps, இந்தச் செயலி, மூன்று புள்ளிகள், Allow restricted settings.",
+  sbOnTxt:"பணம் வருவதைக் கேட்டுக்கொண்டிருக்கிறது.",sbOffTxt:"கேட்கவில்லை. பணம் வந்த அறிவிப்பை இயக்கவும்.",sbEnable:"அறிவிப்பை இயக்கு",
+  sbVoiceOn:"குரல்: இயக்கம்",sbVoiceOff:"குரல்: நிறுத்தம்",sbTest:"குரல் சோதனை",sbBattery:"பின்னணியில் இயங்க அனுமதி",
+  payH:"இன்றைய UPI அறிவிப்புகள்",noPay:"இன்று பணம் வந்த அறிவிப்பு இல்லை.",keepOnNative:"வேறு செயலிக்குச் சென்றாலும் GPS இயங்கும்.",gpsOff:"போன் இருப்பிடத்தை இயக்கவும்"}
+};
+
+var ICON = {start:"🟢 ",end:"🔴 ",share:"📲 ",cash:"💵 ",upi:"📱 ",discard:"❌ ",speak:"🔊 ",nTrip:"🚖 ",nEarn:"💰 ",nSet:"⚙️ ",save:"✅ ",sbEnable:"🔔 ",sbTest:"🔊 ",sbBattery:"🔋 ",payApp:"📱 "};
+var DEF = {name:"",upi:"",base:"",baseKm:"",perKm:"",wait:"",night:"0",nightFrom:"23",nightTo:"5",saved:false};
+var S = load("ab_settings", DEF), TRIPS = load("ab_trips", []);
+var lang = (function(){ try{var l=localStorage.getItem("ab_lang"); if(l) return l;}catch(e){} return "ta"; })();
+
+function load(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return v||d; }catch(e){ return d; } }
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function t(k,v){ var s=(TXT[lang]&&TXT[lang][k])||TXT.en[k]||k; if(v) for(var x in v) s=s.replace(new RegExp("\\{"+x+"\\}","g"),v[x]); return s; }
+function $(id){ return document.getElementById(id); }
+function inr(n){ return "₹"+Math.round(n).toLocaleString("en-IN"); }
+function num(v){ var n=parseFloat(String(v).replace(/,/g,"")); return isNaN(n)?0:n; }
+function fmt(sec){ sec=Math.floor(sec); var m=Math.floor(sec/60), s=sec%60; return m+":"+(s<10?"0":"")+s; }
+
+/* ---------- fare ---------- */
+function isNight(h){
+  var p=num(S.night); if(p<=0) return false;
+  var a=num(S.nightFrom), b=num(S.nightTo);
+  return a>b ? (h>=a||h<b) : (h>=a&&h<b);
+}
+function fare(km, waitMin, lug, when){
+  var base=num(S.base), extraKm=Math.max(0,km-num(S.baseKm)), extra=extraKm*num(S.perKm);
+  var w=waitMin*num(S.wait);
+  var sub=base+extra+w;
+  var night=isNight((when||new Date()).getHours()) ? sub*num(S.night)/100 : 0;
+  var total=Math.ceil(sub+night+lug);
+  return {base:base,extra:extra,wait:w,night:night,lug:lug,total:total};
+}
+
+/* ---------- views / i18n ---------- */
+function applyLang(){
+  document.documentElement.lang=lang;
+  $("langBtn").textContent = lang==="en" ? "தமிழ்" : "English";
+  var nm = lang==="ta" ? APP_TA : APP_NAME;
+  $("brand").innerHTML = nm.replace(/(\S+)$/,"<span>$1</span>");
+  document.title = nm;
+  document.querySelectorAll("[data-i]").forEach(function(el){ var k=el.getAttribute("data-i"); el.textContent=(ICON[k]||"")+t(k); });
+  if(NATIVE){
+    try{ AndroidBridge.setLang(lang); }catch(e){}
+    $("keepWarn").textContent=t("keepOnNative");
+    $("sbCard").hidden=false; $("payCard").hidden=false;
+  }
+  renderHome(); renderEarn(); renderBill(); renderSound();
+}
+$("langBtn").onclick=function(){ lang=lang==="en"?"ta":"en"; try{localStorage.setItem("ab_lang",lang);}catch(e){} applyLang(); };
+document.querySelectorAll("nav button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("nav button").forEach(function(x){x.classList.toggle("on",x===b);});
+    document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("on",v.id===b.dataset.v);});
+    if(b.dataset.v==="vEarn") renderEarn();
+  };
+});
+
+/* ---------- settings ---------- */
+function fillSettings(){
+  $("sName").value=S.name; $("sUpi").value=S.upi; $("sBase").value=S.base; $("sBaseKm").value=S.baseKm;
+  $("sPerKm").value=S.perKm; $("sWait").value=S.wait; $("sNight").value=S.night; $("sNightFrom").value=S.nightFrom; $("sNightTo").value=S.nightTo;
+}
+$("saveSet").onclick=function(){
+  var upi=$("sUpi").value.trim();
+  if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)){ $("setErr").textContent=t("badUpi"); return; }
+  var vals=["sBase","sBaseKm","sPerKm","sWait","sNight","sNightFrom","sNightTo"].map(function(i){return $(i).value.trim();});
+  if(!vals[0]||!vals[1]||!vals[2]||vals.some(function(v){return v!==""&&isNaN(num(v));})){ $("setErr").textContent=t("badNum"); return; }
+  S={name:$("sName").value.trim(),upi:upi,base:vals[0],baseKm:vals[1],perKm:vals[2],wait:vals[3]||"0",night:vals[4]||"0",nightFrom:vals[5]||"23",nightTo:vals[6]||"5",saved:true};
+  save("ab_settings",S); $("setErr").textContent=""; $("setErr").style.color="var(--good)"; $("setErr").textContent=t("saved");
+  setTimeout(function(){ $("setErr").textContent=""; $("setErr").style.color=""; },2000);
+  renderHome();
+};
+$("wipe").onclick=function(){ if(confirm(t("confirmWipe"))){ TRIPS=[]; save("ab_trips",TRIPS); renderEarn(); renderHome(); } };
+
+/* ---------- earnings ---------- */
+function sameDay(a,b){ return a.toDateString()===b.toDateString(); }
+function todayTrips(){ var n=new Date(); return TRIPS.filter(function(x){return sameDay(new Date(x.t),n);}); }
+function renderHome(){
+  var tt=todayTrips(), sum=tt.reduce(function(a,x){return a+x.fare;},0);
+  $("todayTotal").textContent=inr(sum);
+  $("todayTrips").textContent=t("tripsN",{n:tt.length});
+  var need=$("needRates"); need.hidden=!!S.saved; need.textContent=t("needRates");
+}
+function renderEarn(){
+  renderPays();
+  var tt=todayTrips(), now=new Date();
+  var sum=tt.reduce(function(a,x){return a+x.fare;},0);
+  var cash=tt.filter(function(x){return x.mode==="cash";}).reduce(function(a,x){return a+x.fare;},0);
+  var km=tt.reduce(function(a,x){return a+x.km;},0);
+  var month=TRIPS.filter(function(x){var d=new Date(x.t);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce(function(a,x){return a+x.fare;},0);
+  $("eToday").textContent=inr(sum); $("eCash").textContent=inr(cash); $("eUpi").textContent=inr(sum-cash);
+  $("eKm").textContent=km.toFixed(1)+" km"; $("eMonth").textContent=inr(month);
+  var list=$("tripList"); list.innerHTML="";
+  if(!tt.length){ list.textContent=t("noTrips"); return; }
+  tt.slice().reverse().forEach(function(x){
+    var d=new Date(x.t), r=document.createElement("div"); r.className="row";
+    var a=document.createElement("span"); a.textContent=d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+"  "+x.km.toFixed(1)+" km  "+(x.mode==="cash"?t("cashL"):t("upiL"));
+    var b=document.createElement("b"); b.textContent=inr(x.fare);
+    r.appendChild(a); r.appendChild(b); list.appendChild(r);
+  });
+}
+
+/* ---------- GPS trip ---------- */
+var trip=null, watchId=null, ticker=null, wakeLock=null;
+function hav(a,b){
+  var R=6371000, r=Math.PI/180, dLat=(b.lat-a.lat)*r, dLon=(b.lon-a.lon)*r;
+  var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+function onPos(p){
+  if(!trip) return;
+  var acc=p.coords.accuracy, pt={lat:p.coords.latitude,lon:p.coords.longitude,ts:p.timestamp};
+  trip.acc=acc;
+  if(acc>30) return;                               /* ignore weak fixes */
+  if(!trip.last){ trip.last=pt; trip.lastTs=pt.ts; return; }
+  var d=hav(trip.last,pt), dt=(pt.ts-trip.lastTs)/1000;
+  if(dt<=0) return;
+  if(d/dt>45){ trip.last=pt; trip.lastTs=pt.ts; return; }     /* GPS jump (>160 km/h): skip */
+  if(d<Math.max(8,acc*0.5)){ trip.waitSec+=dt; trip.lastTs=pt.ts; return; }  /* stopped: count waiting, ignore drift */
+  trip.dist+=d; trip.last=pt; trip.lastTs=pt.ts;
+}
+function tick(){
+  if(!trip) return;
+  if(trip.native){
+    var n={}; try{ n=JSON.parse(AndroidBridge.getTrip()); }catch(e){}
+    if(n.denied){
+      stopWatch(); try{ AndroidBridge.endTrip(); }catch(e){}
+      trip=null; show("sIdle"); $("gpsErr").textContent=t("gpsDenied"); return;
+    }
+    if(n.active){ trip.dist=n.km*1000; trip.waitSec=n.waitSec; trip.acc=n.acc<0?null:n.acc; trip.gpsOn=n.gpsOn; if(n.start) trip.start=n.start; }
+  }
+  var km=trip.dist/1000, wm=trip.waitSec/60;
+  $("liveKm").textContent=km.toFixed(2);
+  $("liveWait").textContent=fmt(trip.waitSec);
+  $("liveTime").textContent=fmt((Date.now()-trip.start)/1000);
+  $("liveFare").textContent=inr(fare(km,wm,0,new Date()).total);
+  $("liveAcc").textContent=(trip.native&&trip.gpsOn===false)?t("gpsOff"):(trip.acc==null?t("gpsWait"):(trip.acc>30?t("gpsWeak"):t("gpsOk"))+" ("+Math.round(trip.acc)+" m)");
+}
+$("startBtn").onclick=function(){
+  $("gpsErr").textContent="";
+  if(!S.saved){ document.querySelector('nav button[data-v="vSet"]').click(); return; }
+  if(NATIVE){
+    trip={native:true,start:Date.now(),dist:0,waitSec:0,acc:null};
+    try{ AndroidBridge.startTrip(); }catch(e){}
+    ticker=setInterval(tick,1000); tick(); show("sRun"); return;
+  }
+  if(!navigator.geolocation){ $("gpsErr").textContent=t("gpsNo"); return; }
+  trip={start:Date.now(),dist:0,waitSec:0,last:null,lastTs:0,acc:null};
+  watchId=navigator.geolocation.watchPosition(onPos,function(e){
+    $("gpsErr").textContent = e.code===1 ? t("gpsDenied") : t("gpsNo");
+    if(e.code===1) stopWatch();
+  },{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+  try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(function(w){wakeLock=w;}).catch(function(){}); }catch(e){}
+  ticker=setInterval(tick,1000); tick();
+  show("sRun");
+};
+function stopWatch(){
+  if(watchId!=null){ navigator.geolocation.clearWatch(watchId); watchId=null; }
+  clearInterval(ticker); ticker=null;
+  try{ if(wakeLock){ wakeLock.release(); wakeLock=null; } }catch(e){}
+}
+function show(id){ ["sIdle","sRun","sBill"].forEach(function(s){ $(s).hidden=(s!==id); }); }
+
+/* ---------- bill ---------- */
+var bill=null;
+$("endBtn").onclick=function(){
+  if(!trip) return;
+  stopWatch();
+  if(trip.native){
+    try{ var r=JSON.parse(AndroidBridge.endTrip()); trip.dist=r.km*1000; trip.waitSec=r.waitSec; if(r.start) trip.start=r.start; }catch(e){}
+  }
+  bill={km:trip.dist/1000, wait:trip.waitSec/60, start:trip.start};
+  trip=null;
+  $("inKm").value=bill.km.toFixed(2); $("inWait").value=Math.round(bill.wait); $("inLug").value="0";
+  show("sBill"); renderBill(); speakFare();
+};
+["inKm","inWait","inLug"].forEach(function(i){ $(i).addEventListener("input",renderBill); });
+function drawQr(text){
+  var box=$("qrBox"); box.innerHTML="";
+  if(typeof qrcode!=="function") return false;
+  try{
+    var q=qrcode(0,"M"); q.addData(text); q.make();
+    var n=q.getModuleCount(), p="";
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(q.isDark(r,c)) p+="M"+c+" "+r+"h1v1h-1z";
+    box.innerHTML='<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges"><path d="'+p+'" fill="#000"/></svg>';
+    return true;
+  }catch(e){ return false; }
+}
+function currentBill(){
+  var km=num($("inKm").value), w=num($("inWait").value), lug=num($("inLug").value);
+  return {km:km,w:w,lug:lug,f:fare(km,w,lug,new Date(bill?bill.start:Date.now()))};
+}
+function upiUrl(amount){
+  return "upi://pay?pa="+encodeURIComponent(S.upi)+"&pn="+encodeURIComponent(S.name||APP_NAME)+"&am="+amount+"&cu=INR&tn="+encodeURIComponent("Auto fare");
+}
+function renderBill(){
+  if(!bill) return;
+  var b=currentBill(), f=b.f;
+  $("billFare").textContent=inr(f.total);
+  var rows=[[t("fBase"),f.base],[t("fExtra"),f.extra],[t("fWait"),f.wait]];
+  if(f.night>0) rows.push([t("fNight"),f.night]);
+  if(f.lug>0) rows.push([t("fLug"),f.lug]);
+  var el=$("breakdown"); el.innerHTML="";
+  rows.forEach(function(r){ var d=document.createElement("div"); d.className="row"; var a=document.createElement("span"); a.textContent=r[0]; var c=document.createElement("b"); c.textContent=inr(r[1]); d.appendChild(a); d.appendChild(c); el.appendChild(d); });
+  var url=upiUrl(f.total.toFixed(2));
+  $("upiLink").href=url;
+  var ok=drawQr(url);
+  $("qrNote").textContent = ok ? t("qrNote") : t("needUpi");
+}
+function speakFare(){
+  var f=currentBill().f.total;
+  var ta="மொத்தம் "+f+" ரூபாய்", en="Total "+f+" rupees";
+  if(NATIVE){ try{ AndroidBridge.speak(ta,en); }catch(e){} }
+  else if("speechSynthesis" in window){
+    try{ var u=new SpeechSynthesisUtterance(lang==="ta"?ta:en); u.lang=lang==="ta"?"ta-IN":"en-IN"; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
+  }
+}
+$("speakBtn").onclick=speakFare;
+$("shareBtn").onclick=function(){
+  var b=currentBill();
+  var msg=t("billMsg",{app:(lang==="ta"?APP_TA:APP_NAME),km:b.km.toFixed(1),w:Math.round(b.w),fare:b.f.total,link:upiUrl(b.f.total.toFixed(2))});
+  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+};
+function finish(mode){
+  var b=currentBill();
+  TRIPS.push({t:Date.now(),km:b.km,wait:b.w,fare:b.f.total,mode:mode});
+  save("ab_trips",TRIPS); bill=null; show("sIdle"); renderHome(); renderEarn();
+}
+$("saveCash").onclick=function(){ finish("cash"); };
+$("saveUpi").onclick=function(){ finish("upi"); };
+$("discard").onclick=function(){ bill=null; show("sIdle"); };
+
+/* ---------- native soundbox (Android app only) ---------- */
+function renderSound(){
+  if(!NATIVE) return;
+  try{
+    $("sbStatus").textContent = AndroidBridge.isListenerOn() ? t("sbOnTxt") : t("sbOffTxt");
+    $("sbToggle").textContent = AndroidBridge.isSoundOn() ? t("sbVoiceOn") : t("sbVoiceOff");
+  }catch(e){}
+}
+function renderPays(){
+  if(!NATIVE) return;
+  var list=$("payList"); list.innerHTML="";
+  var arr=[]; try{ arr=JSON.parse(AndroidBridge.getPayments()); }catch(e){}
+  var now=new Date();
+  arr=arr.filter(function(x){ return sameDay(new Date(x.ts),now); });
+  $("payTotal").textContent=inr(arr.reduce(function(a,x){return a+x.amt;},0));
+  if(!arr.length){ list.textContent=t("noPay"); return; }
+  arr.slice().reverse().forEach(function(x){
+    var r=document.createElement("div"); r.className="row";
+    var a=document.createElement("span"); a.textContent=new Date(x.ts).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+"  "+x.app;
+    var b=document.createElement("b"); b.textContent=inr(x.amt);
+    r.appendChild(a); r.appendChild(b); list.appendChild(r);
+  });
+}
+if(NATIVE){
+  $("sbEnable").onclick=function(){ AndroidBridge.openListenerSettings(); };
+  $("sbBattery").onclick=function(){ AndroidBridge.openBatterySettings(); };
+  $("sbTest").onclick=function(){ AndroidBridge.testSpeak(); };
+  $("sbToggle").onclick=function(){ AndroidBridge.setSoundOn(!AndroidBridge.isSoundOn()); renderSound(); };
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden){ renderSound(); renderPays(); } });
+}
+
+/* ---------- start ---------- */
+fillSettings(); applyLang();
+if(NATIVE){
+  try{
+    var rn=JSON.parse(AndroidBridge.getTrip());
+    if(rn.active){   /* resume a trip that kept running in the background */
+      trip={native:true,start:rn.start,dist:rn.km*1000,waitSec:rn.waitSec,acc:null};
+      ticker=setInterval(tick,1000); tick(); show("sRun");
+    }
+  }catch(e){}
+}
+if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+</script>
+</body>
+</html>
