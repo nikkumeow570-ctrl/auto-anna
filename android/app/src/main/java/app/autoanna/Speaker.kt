@@ -15,7 +15,7 @@ object Speaker {
 
     /** Money received alert. */
     fun announce(ctx: Context, amount: String) =
-        say(ctx, "$amount ரூபாய் வந்தது", "Rupees $amount received")
+        say(ctx, "$amount ரூபா வந்துச்சு", "Rupees $amount received")
 
     /** Speak any line, with a Tamil and an English version. The saved language decides which is used. */
     fun say(ctx: Context, ta: String, en: String) {
