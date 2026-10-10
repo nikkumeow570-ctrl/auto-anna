@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Auto Anna</string>
+    <string name="trip_running">Trip running</string>
+    <string name="trip_channel">Trip tracking</string>
+</resources>

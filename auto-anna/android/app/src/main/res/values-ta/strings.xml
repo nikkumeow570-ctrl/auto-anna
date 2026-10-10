@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ஆட்டோ அண்ணா</string>
+    <string name="trip_running">பயணம் போயிட்டு இருக்கு</string>
+    <string name="trip_channel">பயணக் கண்காணிப்பு</string>
+</resources>

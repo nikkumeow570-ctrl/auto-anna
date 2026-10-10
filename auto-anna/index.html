@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14110C">
+<title>Auto Anna</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#E9ECE8; --surface:#fff; --ink:#14110C; --muted:#586058; --line:#D3D8D2;
+  --amber:#FFC20E; --on-amber:#14110C; --good:#0B7A3E; --bad:#C8102E;
+  --meter:#14110C; --meter-ink:#FFC20E; --navh:76px;
+  --f:system-ui,-apple-system,"Noto Sans Tamil","Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0E100E;--surface:#1A1D1A;--ink:#F2F1EA;--muted:#A5AAA2;--line:#30352F;--good:#38C27C;--bad:#FF6B78;--meter:#050605}
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:18px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,input,a.btn{font-family:var(--f)}
+header{position:sticky;top:0;z-index:5;background:var(--meter);color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--amber)}
+header h1{margin:0;font-size:1.25rem;font-weight:800}
+header h1 span{color:var(--amber)}
+.lang{min-height:44px;padding:0 16px;border-radius:999px;border:2px solid #555;background:transparent;color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
+main{padding:14px 16px calc(var(--navh) + 100px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+.big{font-size:2.6rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+/* the meter window: the one bold element */
+.meter{background:var(--meter);color:#fff;border-radius:22px;padding:18px 18px 14px;margin-bottom:12px;border:3px solid #2A2620;box-shadow:inset 0 0 0 2px #000}
+.meter .mlab{color:#C9C5B8;font-size:1rem;font-weight:600}
+.meter .mnum{color:var(--meter-ink);font-size:3.6rem;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.meter .msub{color:#C9C5B8;font-size:1rem;margin-top:2px}
+.mstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed #4A453A}
+.mstats small{display:block;color:#C9C5B8;font-size:.9rem}
+.mstats b{font-size:1.4rem;font-variant-numeric:tabular-nums}
+.mstats .pos{color:#5FE0A0}.mstats .neg{color:#FF8E99}
+.live{margin-bottom:12px}
+.meter .row{border-color:#3A352B}
+.meter .muted{color:#C9C5B8}
+.live .big{color:var(--meter-ink)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:68px;border-radius:18px;border:0;font-size:1.35rem;font-weight:800;cursor:pointer;background:var(--amber);color:var(--on-amber);text-decoration:none}
+.btn svg{width:1.3em;height:1.3em;flex:none}
+.btn:active{transform:scale(.98)}
+.btn.go{background:var(--good);color:#fff}
+.btn.stop{background:var(--bad);color:#fff}
+.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--ink);font-size:1.05rem;min-height:52px}
+.btn.sm{min-height:58px;font-size:1.1rem}
+.btn.alt{background:var(--surface);border:2px solid var(--ink);color:var(--ink)}
+.btns{display:grid;gap:10px;margin-top:12px}
+.btns.two{grid-template-columns:1fr 1fr}
+/* sticky action dock above the nav */
+.dock{position:fixed;left:0;right:0;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px));z-index:4;padding:10px 16px;background:linear-gradient(to top,var(--bg) 70%,transparent);display:grid;gap:10px;max-width:560px;margin:0 auto}
+.dock.two{grid-template-columns:1fr 1fr}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input{width:100%;min-height:54px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.15rem;font-weight:500}
+summary{min-height:52px;display:flex;align-items:center;font-weight:700;cursor:pointer}
+details.adj{margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.warn{border-left:5px solid var(--amber);background:color-mix(in srgb,var(--amber) 16%,var(--surface));padding:12px 14px;border-radius:0 12px 12px 0;margin-bottom:12px}
+.err{color:var(--bad);min-height:1.4em;margin-top:6px}
+.ok{color:var(--good)}
+.qr{background:#fff;border-radius:14px;padding:10px;width:230px;height:230px;margin:10px auto;display:block}
+.qr svg{width:100%;height:100%;display:block}
+.fare{font-size:3.2rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.meter .fare{color:var(--meter-ink)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--meter);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:6;min-height:var(--navh)}
+nav button{min-height:62px;border:0;border-radius:14px;background:transparent;color:#C9C5B8;font-size:.9rem;font-weight:700;line-height:1.15;cursor:pointer;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+nav button svg{width:26px;height:26px}
+nav button.on{background:var(--amber);color:#14110C}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.pulse{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--bad);margin-right:8px;animation:p 1.2s infinite}
+@keyframes p{50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none}.btn:active{transform:none}}
+body:not([data-st="sIdle"]) #insWarn,body:not([data-st="sIdle"]) #needRates{display:none!important}
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;flex:none}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin-bottom:12px}
+.seg button{min-height:52px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:1rem;font-weight:700;cursor:pointer}
+.seg button.on{background:var(--amber);border-color:var(--amber);color:#14110C}
+.nav2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.nav2 button{min-height:52px;min-width:56px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.3rem;font-weight:700;cursor:pointer}
+.nav2 b{font-size:1.15rem;text-align:center;flex:1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{text-align:center;font-size:.85rem;color:var(--muted)}
+.cal button{min-height:54px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:.95rem;font-weight:600;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;line-height:1.15}
+.cal button small{font-size:.7rem;color:var(--good);font-weight:700}
+.cal button.blank{visibility:hidden}
+.cal button.today{border:2px solid var(--amber)}
+.cal button.has{background:color-mix(in srgb,var(--amber) 16%,var(--surface))}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border:0;border-bottom:1px solid var(--line);min-height:56px;background:none;width:100%;text-align:left;color:inherit;font:inherit}
+button.item{cursor:pointer}
+.item:last-child{border-bottom:0}
+.item .l{flex:1;min-width:0;overflow-wrap:anywhere}
+.x{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--bad);font-size:1.3rem;cursor:pointer}
+h3.sec{margin:14px 0 4px;font-size:1.1rem}
+#map,#emap{height:170px;border-radius:14px;margin-bottom:8px;background:#cfd8d6}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:92%;overflow:auto}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chipb{min-height:52px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-size:1rem;font-weight:600;cursor:pointer}
+.chipb.on{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 25%,var(--surface))}
+.keybox{font:800 1.4rem/1.3 ui-monospace,Menlo,monospace;letter-spacing:.06em;background:var(--surface);border:2px dashed var(--amber);border-radius:12px;padding:12px;text-align:center;user-select:all;margin:8px 0}
+.neg{color:var(--bad)}
+#auth{position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto}
+.authbox{max-width:560px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(48px + env(safe-area-inset-bottom,0px))}
+.authtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.authtop b{font-size:1.3rem}.authtop b span{color:#B88A00}
+.pin{letter-spacing:.5em;text-align:center;font-size:1.8rem}
+.res{display:block;width:100%;text-align:left;min-height:56px;padding:10px 12px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer;overflow-wrap:anywhere}
+.res:last-child{border-bottom:0}
+</style>
+</head>
+<body data-st="sIdle">
+
+<header>
+  <h1 id="brand">Auto <span>Anna</span></h1>
+  <button class="lang" id="langBtn" type="button">English</button>
+</header>
+
+<div id="auth" hidden>
+  <div class="authbox">
+    <div class="authtop"><b id="aBrand">Auto <span>Anna</span></b><button class="lang" id="aLang" type="button" style="border-color:var(--line);color:var(--ink)">English</button></div>
+
+    <div id="aSign" hidden>
+      <h2 style="margin:0 0 6px" data-i="aSignup">Sign up</h2>
+      <p class="muted" style="margin:0 0 6px" data-i="aWelcome"></p>
+      <label for="gName" data-i="name">Your name</label><input id="gName" autocomplete="name" maxlength="40">
+      <label for="gMob" data-i="pMobile">Mobile number</label><input id="gMob" class="digits" inputmode="numeric" maxlength="10" autocomplete="tel">
+      <label for="gPin" data-i="aPin">Make a 4-digit PIN</label><input id="gPin" class="digits pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
+      <label for="gPin2" data-i="aPin2">Type the PIN again</label><input id="gPin2" class="digits pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
+      <p class="muted" style="margin:6px 0 0" data-i="aPinNote"></p>
+      <details style="margin-top:14px"><summary data-i="aVeh">Auto details (optional)</summary><div id="gVeh"></div></details>
+      <div class="err" id="gErr" role="alert"></div>
+      <div class="btns">
+        <button class="btn" id="gGo" type="button" data-i="aSignup">Sign up</button>
+        <button class="btn sm ghost" id="gHave" type="button" data-i="aHave">I already have a backup key</button>
+      </div>
+    </div>
+
+    <div id="aRest" hidden>
+      <h2 style="margin:0 0 6px" data-i="aRestT">Restore from backup</h2>
+      <label for="rKey" data-i="cloudKey">Your backup key</label>
+      <input id="rKey" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX">
+      <div class="err" id="rErr" role="alert"></div>
+      <div class="btns">
+        <button class="btn" id="rGo" type="button" data-i="restore">Restore</button>
+        <button class="btn sm ghost" id="rBack" type="button" data-i="estBack">Back</button>
+      </div>
+    </div>
+
+    <div id="aSetPin" hidden>
+      <h2 style="margin:0 0 6px" data-i="aSetPinT">Set a new PIN</h2>
+      <label for="nPin" data-i="aPin">Make a 4-digit PIN</label><input id="nPin" class="digits pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
+      <label for="nPin2" data-i="aPin2">Type the PIN again</label><input id="nPin2" class="digits pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
+      <div class="err" id="nErr" role="alert"></div>
+      <div class="btns">
+        <button class="btn" id="nGo" type="button" data-i="save">Save</button>
+        <button class="btn sm ghost" id="nCancel" type="button" data-i="cancel">Cancel</button>
+      </div>
+    </div>
+
+    <div id="aLock" hidden>
+      <h2 style="margin:0 0 6px" id="lHello"></h2>
+      <label for="lPin" data-i="aLockT">Enter your PIN</label>
+      <input id="lPin" class="digits pin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password">
+      <div class="err" id="lErr" role="alert"></div>
+      <div class="btns"><button class="btn sm ghost" id="lForgot" type="button" data-i="aForgot">Forgot PIN?</button></div>
+    </div>
+
+    <div id="aForgot" hidden>
+      <h2 style="margin:0 0 6px" data-i="aForgotT">Forgot PIN</h2>
+      <p data-i="aForgotTxt"></p>
+      <div class="btns">
+        <button class="btn sm ghost" id="fErase" type="button" data-i="aErase" style="color:var(--bad)">Erase this phone's data</button>
+        <button class="btn sm ghost" id="fBack" type="button" data-i="estBack">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- ============ TRIP ============ -->
+  <section class="view on" id="vTrip">
+    <div id="needRates" class="warn" hidden></div>
+    <div id="insWarn" class="warn" style="border-left-color:var(--bad)" hidden></div>
+
+    <div id="sIdle">
+      <div class="meter">
+        <div class="mlab" data-i="today">Today</div>
+        <div class="mnum" id="todayTotal">₹0</div>
+        <div class="msub" id="todayTrips"></div>
+        <div class="mstats">
+          <div><small data-i="exp">Expense</small><b id="todayExp">₹0</b></div>
+          <div><small data-i="profit">Profit</small><b id="todayNet">₹0</b></div>
+        </div>
+      </div>
+      <div class="btns two"><button class="btn sm alt" id="estBtn" type="button" data-i="est">Fare estimate</button>
+        <button class="btn sm alt" id="manualBtn" type="button" data-i="manual">Manual bill</button></div>
+      <div class="err" id="gpsErr" role="alert"></div>
+      <div class="dock"><button class="btn go" id="startBtn" type="button" data-i="start">Start trip</button></div>
+    </div>
+
+    <div id="sEst" hidden>
+      <div class="card">
+        <label for="eQ" data-i="estWhere" style="margin-top:0">Where to?</label>
+        <input id="eQ" autocomplete="off" enterkeyhint="search" maxlength="80">
+        <div class="btns"><button class="btn sm" id="eGo" type="button" data-i="estSearch">Search</button></div>
+        <div class="muted" id="eMsg" role="status" style="margin-top:8px"></div>
+        <div id="eList"></div>
+      </div>
+      <div id="emap" aria-label="Map" hidden></div>
+      <div class="card" id="eRes" hidden>
+        <div class="muted" data-i="estFare">Estimated fare</div>
+        <div class="fare" id="eFare">₹0</div>
+        <div class="row"><span data-i="estDist">Distance</span><b id="eKm">-</b></div>
+        <div class="row"><span data-i="estTime">Road time</span><b id="eMin">-</b></div>
+        <div class="muted" style="margin-top:8px" data-i="estNote"></div>
+        <div class="btns"><button class="btn go" id="eStart" type="button" data-i="start">Start trip</button></div>
+      </div>
+      <div class="btns"><button class="btn sm ghost" id="eBack" type="button" data-i="estBack">Back</button></div>
+    </div>
+
+    <div id="sRun" hidden>
+      <div id="map" aria-label="Map"></div>
+      <div class="muted" id="mapNote" style="margin-bottom:10px"></div>
+      <div class="meter live">
+        <div class="mlab"><span class="pulse"></span><span data-i="running">Trip running</span></div>
+        <div class="mnum"><span id="liveKm">0.00</span> km</div>
+        <div class="row"><span data-i="waiting">Waiting</span><b id="liveWait">0:00</b></div>
+        <div class="row"><span data-i="time">Time</span><b id="liveTime">0:00</b></div>
+        <div class="row"><span data-i="fareNow">Fare so far</span><b id="liveFare">₹0</b></div>
+        <div class="row"><span data-i="gps">GPS signal</span><b id="liveAcc">-</b></div>
+      </div>
+      <div class="warn" id="keepWarn" data-i="keepOn">Keep this screen open while the trip runs.</div>
+      <div class="dock"><button class="btn stop" id="endBtn" type="button" data-i="end">End trip and bill</button></div>
+    </div>
+
+    <div id="sBill" hidden>
+      <div class="meter">
+        <div class="mlab" data-i="total">Total fare</div>
+        <div class="fare" id="billFare">₹0</div>
+      </div>
+      <div class="card" id="qrCard">
+        <div id="qrBox" class="qr" aria-label="UPI QR"></div>
+        <div class="btns">
+          <a class="btn sm ghost" id="upiLink" href="#" data-i="payApp">Pay with UPI app</a>
+        </div>
+        <div class="muted" id="qrNote" style="text-align:center;margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <details class="adj" id="adj">
+          <summary data-i="adjust">Adjust</summary>
+          <div class="grid2">
+            <div><label for="inKm" data-i="km">Distance (km)</label><input id="inKm" inputmode="decimal"></div>
+            <div><label for="inWait" data-i="waitMin">Waiting (min)</label><input id="inWait" inputmode="decimal"></div>
+          </div>
+          <div class="btns two" style="align-items:center">
+            <button class="btn sm ghost" id="waitBtn" type="button"></button>
+            <b id="waitClock" class="muted" style="text-align:center"></b>
+          </div>
+          <label for="inLug" data-i="luggage">Luggage / extra (₹)</label>
+          <input id="inLug" inputmode="numeric" value="0">
+        </details>
+        <div class="err" id="billErr" role="alert"></div>
+        <div id="breakdown" style="margin-top:6px"></div>
+      </div>
+      <div class="btns two">
+        <button class="btn sm ghost" id="speakBtn" type="button" data-i="speak">Say total</button>
+        <button class="btn sm ghost" id="shareBtn" type="button" data-i="share">Share bill on WhatsApp</button>
+      </div>
+      <div class="btns"><button class="btn ghost" id="discard" type="button" data-i="discard">Discard trip</button></div>
+      <div class="dock two">
+        <button class="btn go" id="saveCash" type="button" data-i="cash">Got cash</button>
+        <button class="btn go" id="saveUpi" type="button" data-i="upi">Got UPI</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EARNINGS + HISTORY ============ -->
+  <section class="view" id="vEarn">
+    <div class="seg" id="period">
+      <button type="button" data-p="day" data-i="dayT">Day</button>
+      <button type="button" data-p="month" data-i="monthT">Month</button>
+      <button type="button" data-p="year" data-i="yearT">Year</button>
+    </div>
+    <div class="nav2">
+      <button id="pPrev" type="button" aria-label="Previous">◀</button>
+      <b id="pTitle"></b>
+      <button id="pNext" type="button" aria-label="Next">▶</button>
+    </div>
+    <div class="card">
+      <div class="muted" data-i="inc">Income</div>
+      <div class="big" id="sInc">₹0</div>
+      <div class="row"><span data-i="exp">Expense</span><b id="sExp">₹0</b></div>
+      <div class="row"><span data-i="profit">Profit</span><b id="sPro">₹0</b></div>
+      <div class="row"><span data-i="kmT">Distance</span><b id="sKm">0</b></div>
+    </div>
+    <div id="pBody"></div>
+    <div class="card" id="payCard" hidden>
+      <div class="muted" data-i="payH">UPI alerts today</div>
+      <div class="big" id="payTotal">₹0</div>
+      <div id="payList" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- ============ EXPENSES ============ -->
+  <section class="view" id="vExp">
+    <div class="card">
+      <h3 style="margin:0" data-i="addExp">Add expense</h3>
+      <div class="chips" id="expTypes"></div>
+      <label for="xAmt" data-i="amountL">Amount (₹)</label>
+      <input id="xAmt" inputmode="decimal">
+      <label for="xNote" data-i="noteL">Note (optional)</label>
+      <input id="xNote" autocomplete="off" maxlength="40">
+      <label for="xDate" data-i="dateL">Date</label>
+      <input id="xDate" type="date">
+      <div class="err" id="xErr" role="alert"></div>
+      <div class="btns"><button class="btn sm go" id="xAdd" type="button" data-i="addExp">Add expense</button></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0" data-i="expH">Expenses</h3>
+      <div class="muted" id="xTotal"></div>
+      <div id="xList"></div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="view" id="vSet">
+    <div class="card" id="profCard">
+      <h3 style="margin:0" data-i="pH">Profile</h3>
+      <label for="pName" data-i="name">Your name</label><input id="pName" autocomplete="off" maxlength="40">
+      <label for="pMob" data-i="pMobile">Mobile number</label><input id="pMob" class="digits" inputmode="numeric" maxlength="10">
+      <div id="pVeh"></div>
+      <div class="err" id="pErr" role="alert"></div>
+      <div class="btns">
+        <button class="btn sm" id="pSave" type="button" data-i="save">Save</button>
+        <button class="btn sm ghost" id="pLockBtn" type="button"></button>
+        <button class="btn sm ghost" id="pChange" type="button" data-i="pChange">Change PIN</button>
+        <button class="btn sm ghost" id="pLockNow" type="button" data-i="pLockNow">Lock now</button>
+        <button class="btn sm ghost" id="pOut" type="button" data-i="pOut" style="color:var(--bad)">Erase data and sign out</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0" data-i="payTo">Where customers pay you</h3>
+      <label for="sUpi" data-i="upiId">Your UPI ID</label>
+      <input id="sUpi" autocomplete="off" autocapitalize="none" placeholder="name@bank">
+    </div>
+    <div class="card">
+      <h3 style="margin:0" data-i="rates">Your fare rates</h3>
+      <div class="warn" style="margin-top:10px" data-i="helpNote"></div>
+      <div class="grid2">
+        <div><label for="sBase" data-i="base">Base fare (₹)</label><input id="sBase" inputmode="decimal"></div>
+        <div><label for="sBaseKm" data-i="baseKm">Base km included</label><input id="sBaseKm" inputmode="decimal"></div>
+        <div><label for="sPerKm" data-i="perKm">Per km after (₹)</label><input id="sPerKm" inputmode="decimal"></div>
+        <div><label for="sWait" data-i="waitRate">Waiting per min (₹)</label><input id="sWait" inputmode="decimal"></div>
+      </div>
+      <details style="margin-top:14px">
+        <summary data-i="moreRates">Night charge (optional)</summary>
+        <div class="grid2">
+          <div><label for="sNight" data-i="nightPct">Night extra (%)</label><input id="sNight" inputmode="decimal"></div>
+          <div><label for="sNightFrom" data-i="nightFrom">Night from (hour 0-23)</label><input id="sNightFrom" inputmode="numeric"></div>
+        </div>
+        <label for="sNightTo" data-i="nightTo">Night until (hour 0-23)</label>
+        <input id="sNightTo" inputmode="numeric">
+      </details>
+    </div>
+
+    <div class="card" id="sbCard" hidden>
+      <h3 style="margin:0" data-i="sbH">UPI payment alerts</h3>
+      <p class="muted" style="margin:6px 0 0" id="sbStatus"></p>
+      <p class="muted" style="margin:6px 0 0" data-i="sbHelp"></p>
+      <p class="muted" style="margin:6px 0 0" data-i="sbHelp2"></p>
+      <div class="btns">
+        <button class="btn sm" id="sbEnable" type="button" data-i="sbEnable">Turn on payment alerts</button>
+        <button class="btn sm ghost" id="sbToggle" type="button"></button>
+        <button class="btn sm ghost" id="sbTest" type="button" data-i="sbTest">Test voice</button>
+        <button class="btn sm ghost" id="sbBattery" type="button" data-i="sbBattery">Allow background running</button>
+      </div>
+    </div>
+
+    <div class="card" id="cloudCard">
+      <h3 style="margin:0" data-i="cloudH">Cloud backup</h3>
+      <p class="muted" style="margin:6px 0 0" data-i="cloudHelp"></p>
+      <div id="cloudOff">
+        <div class="btns"><button class="btn sm" id="cloudOn" type="button" data-i="cloudOn">Turn on backup</button></div>
+        <label for="cloudIn" data-i="cloudRestore">Restore with a key</label>
+        <input id="cloudIn" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX">
+        <div class="btns"><button class="btn sm ghost" id="cloudRestoreBtn" type="button" data-i="restore">Restore</button></div>
+      </div>
+      <div id="cloudOnBox" hidden>
+        <div class="muted" style="margin-top:10px" data-i="cloudKey">Your backup key</div>
+        <div class="keybox" id="cloudKeyTxt"></div>
+        <div class="warn" data-i="cloudKeyNote"></div>
+        <div class="btns"><button class="btn sm" id="cloudNow" type="button" data-i="cloudNow">Sync now</button></div>
+      </div>
+      <div class="muted" id="cloudStatus" style="margin-top:8px"></div>
+    </div>
+
+    <div class="err" id="setErr" role="alert"></div>
+    <button class="btn" id="saveSet" type="button" data-i="save">Save</button>
+    <div class="btns"><button class="btn ghost" id="wipe" type="button" data-i="wipe">Delete all trips</button></div>
+    <p class="muted" style="margin-top:16px" data-i="disclaimer"></p>
+  </section>
+</main>
+
+<!-- edit trip -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <h3 id="mTitle" style="margin:0" data-i="editTrip">Edit trip</h3>
+    <label for="mFare" data-i="fareL">Fare (₹)</label>
+    <input id="mFare" inputmode="decimal">
+    <div class="grid2">
+      <div><label for="mKm" data-i="km">Distance (km)</label><input id="mKm" inputmode="decimal"></div>
+      <div><label for="mWait" data-i="waitMin">Waiting (min)</label><input id="mWait" inputmode="decimal"></div>
+    </div>
+    <label data-i="modeL">Paid by</label>
+    <div class="seg" id="mMode">
+      <button type="button" data-m="cash" data-i="cashT">Cash</button>
+      <button type="button" data-m="upi" data-i="upiT">UPI</button>
+    </div>
+    <div class="err" id="mErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn sm go" id="mSave" type="button" data-i="save">Save</button>
+      <button class="btn sm ghost" id="mDel" type="button" data-i="delete" style="color:var(--bad)">Delete</button>
+      <button class="btn sm ghost" id="mCancel" type="button" data-i="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<nav aria-label="Main">
+  <button class="on" data-v="vTrip" type="button" data-i="nTrip">Trip</button>
+  <button data-v="vEarn" type="button" data-i="nEarn">Earnings</button>
+  <button data-v="vExp" type="button" data-i="nExp">Expenses</button>
+  <button data-v="vSet" type="button" data-i="nSet">Settings</button>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
+<script>
+/* ===== CONFIG ===== */
+var APP_NAME = "Auto Anna";
+var APP_TA = "ஆட்டோ அண்ணா";
+/* After you deploy the sync server (see server/README.md), put its address here:
+   var SYNC_URL = "https://your-project.vercel.app/api/sync"; */
+var SYNC_URL = "";
+/* ================== */
+
+var NATIVE = false;
+try { NATIVE = !!(window.AndroidBridge && window.AndroidBridge.isNative && window.AndroidBridge.isNative()); } catch (e) {}
+
+var TXT = {
+ en:{adjust:"Change distance / wait",today:"Today",start:"Start trip",manual:"Manual bill",running:"Trip running",waiting:"Waiting",time:"Time",fareNow:"Fare so far",gps:"GPS signal",
+  keepOn:"Keep this screen open while the trip runs.",keepOnNative:"GPS keeps running if you switch apps.",
+  end:"End trip and bill",total:"Total fare",km:"Distance (km)",waitMin:"Waiting (min)",
+  luggage:"Luggage / extra (₹)",payApp:"Pay with UPI app",share:"Share bill on WhatsApp",speak:"Say total",cash:"Got cash",upi:"Got UPI",discard:"Discard trip",
+  cashT:"Cash",upiT:"UPI",kmT:"Distance",inc:"Income",exp:"Expense",profit:"Profit",dayT:"Day",monthT:"Month",yearT:"Year",
+  tripsH:"Trips",expH:"Expenses",tripsN:"{n} trips",noTrips:"No trips.",noExp:"No expenses.",
+  payTo:"Where customers pay you",name:"Your name",upiId:"Your UPI ID",
+  rates:"Your fare rates",helpNote:"One-time setup. Fill this with a friend or helper.",base:"Base fare (₹)",baseKm:"Base km included",
+  perKm:"Per km after (₹)",waitRate:"Waiting per min (₹)",moreRates:"Night charge (optional)",nightPct:"Night extra (%)",nightFrom:"Night from (hour 0-23)",nightTo:"Night until (hour 0-23)",
+  save:"Save",wipe:"Delete all trips",nTrip:"Trip",nEarn:"Earnings",nExp:"Expenses",nSet:"Settings",
+  needRates:"Set your UPI ID and fare rates in Settings before your first trip.",
+  gpsDenied:"Location permission was denied. Allow location for this app in your phone settings.",gpsNo:"This phone cannot give GPS location.",
+  gpsWeak:"Weak",gpsOk:"Good",gpsWait:"Searching...",gpsOff:"Turn on phone location",
+  fBase:"Base fare",fExtra:"Distance charge",fWait:"Waiting",fNight:"Night extra",fLug:"Luggage / extra",
+  needUpi:"Enter a valid UPI ID in Settings to show the QR.",qrNote:"Customer scans and pays this exact amount.",
+  saved:"Saved.",badUpi:"Enter a valid UPI ID like name@bank.",badNum:"Check the rates. Use numbers only.",badBig:"One of the numbers is too large.",
+  badNeg:"Enter a number above 0.",confirmWipe:"Delete all saved trips?",confirmDel:"Delete this?",
+  billMsg:"{app} bill\n{date}\nDistance: {km} km\nWaiting: {w} min\nTotal: ₹{fare}\nPay by UPI: {link}",
+  disclaimer:"This app calculates a bill from GPS distance and your own rates. It is not a legal fare meter. Check local transport rules before you rely on it for fares.",
+  cashL:"Cash",upiL:"UPI",
+  waitStart:"Start waiting timer",waitStop:"Stop timer",mapOffline:"The map needs internet. The route line still works.",
+  editTrip:"Edit trip",fareL:"Fare (₹)",modeL:"Paid by",delete:"Delete",cancel:"Cancel",
+  addExp:"Add expense",amountL:"Amount (₹)",noteL:"Note (optional)",dateL:"Date",
+  x_fuel:"Fuel",x_rent:"Rent",x_repair:"Repair",x_food:"Food",x_other:"Other",
+  cloudH:"Cloud backup",cloudHelp:"Save your trips, expenses, rates and UPI ID online, and restore them on a new phone with your backup key.",
+  cloudOn:"Turn on backup",cloudRestore:"Restore with a key",restore:"Restore",cloudKey:"Your backup key",
+  cloudKeyNote:"Write this key down. It is the only way to restore your data.",cloudNow:"Sync now",
+  cloudSynced:"Synced.",cloudFail:"Could not sync. Check internet.",cloudNotReady:"Cloud backup is not set up yet.",cloudBadKey:"That key looks wrong.",cloudWorking:"Syncing...",
+  sbH:"UPI payment alerts",sbHelp:"The app reads \"money received\" notifications from GPay, PhonePe, Paytm and BHIM on this phone and speaks the amount. Only the amount is saved, on this phone.",
+  sbHelp2:"If the switch is greyed out: phone Settings, Apps, this app, three dots, Allow restricted settings.",
+  sbOnTxt:"Listening for payments.",sbOffTxt:"Not listening. Turn on payment alerts.",sbEnable:"Turn on payment alerts",
+  sbVoiceOn:"Voice: On",sbVoiceOff:"Voice: Off",sbTest:"Test voice",sbBattery:"Allow background running",
+  payH:"UPI alerts today",noPay:"No payments heard today.",
+  est:"Fare estimate",estWhere:"Where to?",estSearch:"Search",estFare:"Estimated fare",estDist:"Distance",estTime:"Road time",estBack:"Back",
+  estNote:"This is an estimate from the road distance. Traffic, waiting and detours can change the final bill.",
+  estType:"Type the place name.",estSearching:"Searching...",estNone:"No place found. Try a bigger name or add the town.",estFail:"Could not search. Check internet.",
+  estPick:"Tap the right place:",estLocating:"Finding your location...",estNoLoc:"Could not get your location. Turn on phone location.",estRouting:"Finding the road...",estNoRoute:"No road route found.",estMin:"{n} min",
+  pH:"Profile",pMobile:"Mobile number",pChange:"Change PIN",pLockNow:"Lock now",pOut:"Erase data and sign out",pLockOn:"PIN lock: On",pLockOff:"PIN lock: Off",
+  aSignup:"Sign up",aWelcome:"Sign up once. Your details stay on this phone.",aPin:"Make a 4-digit PIN",aPin2:"Type the PIN again",
+  aPinNote:"The PIN only stops other people from opening this app on this phone.",aVeh:"Auto details (optional)",
+  vAuto:"Auto number",vRc:"RC number",vInsCo:"Insurance company",vInsNo:"Insurance policy number",vInsExp:"Insurance valid till",
+  aHave:"I already have a backup key",aRestT:"Restore from backup",aSetPinT:"Set a new PIN",aLockT:"Enter your PIN",aHello:"Hello, {n}",
+  aForgot:"Forgot PIN?",aForgotT:"Forgot PIN",
+  aForgotTxt:"Your data on this phone is locked. The only way is to erase this phone's data and start again. If you turned on cloud backup, you can restore everything with your backup key.",
+  aErase:"Erase this phone's data",aEraseSure:"Erase all trips, expenses and settings on this phone?",
+  aBadName:"Enter your name.",aBadMob:"Enter a 10-digit mobile number that starts with 6, 7, 8 or 9.",aBadPin:"The PIN must be 4 numbers.",aPinMatch:"The two PINs are not the same.",
+  aBadAuto:"Check the auto number. Example: TN 45 AB 1234.",aBadDate:"Check the insurance date.",aWrong:"Wrong PIN. {n} tries left.",aWait:"Too many tries. Wait {n} min.",
+  aNoProfile:"No profile found in this backup. Please fill in the sign up form.",
+  insSoon:"Insurance ends in {n} days",insToday:"Insurance ends today",insEnded:"Insurance has expired",rcptAuto:"Auto: {n}",
+  total_say:"Total {n} rupees"},
+ ta:{
+  today:"இன்னைக்கு",
+  adjust:"தூரம் / காத்திருப்பு மாத்து",
+  start:"பயணத்தை தொடங்கு",
+  manual:"கையால பில்",
+  running:"பயணம் போயிட்டு இருக்கு",
+  waiting:"வெயிட்டிங்",
+  time:"நேரம்",
+  fareNow:"இதுவரை பில்",
+  gps:"GPS சிக்னல்",
+  keepOn:"பயணம் முடியுற வரை இந்த திரையை திறந்தே வையுங்க",
+  keepOnNative:"வேற ஆப்புக்கு போனாலும் GPS ஓடும்",
+  end:"பயணம் முடி, பில் போடு",
+  total:"மொத்த பில்",
+  km:"தூரம் (கி.மீ)",
+  waitMin:"வெயிட்டிங் (நிமிஷம்)",
+  luggage:"லக்கேஜ் / கூடுதல் (₹)",
+  payApp:"UPI ஆப்பில் கட்டு",
+  share:"WhatsApp-ல பில் அனுப்பு",
+  speak:"தொகையை சொல்லு",
+  cash:"பணம் வாங்கிட்டேன்",
+  upi:"UPI வந்துடுச்சு",
+  discard:"பயணத்தை அழி",
+  cashT:"பணம்",
+  upiT:"UPI",
+  kmT:"தூரம்",
+  inc:"வரவு",
+  exp:"செலவு",
+  profit:"லாபம்",
+  dayT:"நாள்",
+  monthT:"மாசம்",
+  yearT:"வருஷம்",
+  tripsH:"பயணங்கள்",
+  expH:"செலவுகள்",
+  tripsN:"{n} பயணம்",
+  noTrips:"பயணம் இல்லை",
+  noExp:"செலவு இல்லை",
+  payTo:"கஸ்டமர் உங்களுக்கு எங்கே பணம் தருவாங்க",
+  name:"உங்க பேரு",
+  upiId:"உங்க UPI ID",
+  rates:"உங்க பில் கணக்கு",
+  helpNote:"ஒரு தடவை மட்டும் செட் பண்ணனும். தெரிஞ்சவங்க கிட்ட கேட்டு நிரப்புங்க",
+  base:"ஆரம்பக் கட்டணம் (₹)",
+  baseKm:"ஆரம்பத்துல எத்தனை கி.மீ",
+  perKm:"அதுக்கு மேல ஒரு கி.மீக்கு (₹)",
+  waitRate:"வெயிட்டிங் ஒரு நிமிஷத்துக்கு (₹)",
+  moreRates:"இரவு கூடுதல் (வேணும்னா)",
+  nightPct:"இரவு கூடுதல் (%)",
+  nightFrom:"இரவு ஆரம்பம் (மணி 0-23)",
+  nightTo:"இரவு முடிவு (மணி 0-23)",
+  save:"சேமி",
+  wipe:"எல்லா பயணத்தையும் அழி",
+  nTrip:"பயணம்",
+  nEarn:"வரவு",
+  nExp:"செலவு",
+  nSet:"செட்டிங்ஸ்",
+  needRates:"முதல் பயணத்துக்கு முன்னாடி செட்டிங்ஸ்ல UPI ID-யும் பில் கணக்கையும் செட் பண்ணுங்க",
+  gpsDenied:"லொகேஷன் அனுமதி இல்லை. போன் செட்டிங்ஸ்ல இந்த ஆப்புக்கு லொகேஷனை ஆன் பண்ணுங்க",
+  gpsNo:"இந்த போன்ல GPS கிடைக்கல",
+  gpsWeak:"வீக்கா இருக்கு",
+  gpsOk:"நல்லா இருக்கு",
+  gpsWait:"தேடுது...",
+  gpsOff:"போன் லொகேஷனை ஆன் பண்ணுங்க",
+  fBase:"ஆரம்பக் கட்டணம்",
+  fExtra:"தூரத்துக்கு",
+  fWait:"வெயிட்டிங்",
+  fNight:"இரவு கூடுதல்",
+  fLug:"லக்கேஜ் / கூடுதல்",
+  needUpi:"QR காட்ட செட்டிங்ஸ்ல சரியான UPI ID போடுங்க",
+  qrNote:"கஸ்டமர் ஸ்கேன் பண்ணி இதே தொகையை கட்டுவார்",
+  saved:"சேவ் ஆயிடுச்சு",
+  badUpi:"name@bank மாதிரி சரியான UPI ID போடுங்க",
+  badNum:"கணக்கை செக் பண்ணுங்க. நம்பர் மட்டும் போடுங்க",
+  badBig:"ஒரு நம்பர் ரொம்ப பெருசா இருக்கு",
+  badNeg:"0-க்கு மேல நம்பர் போடுங்க",
+  confirmWipe:"சேவ் பண்ண எல்லா பயணத்தையும் அழிக்கவா?",
+  confirmDel:"இதை அழிக்கவா?",
+  billMsg:"{app} பில்\n{date}\nதூரம்: {km} கி.மீ\nவெயிட்டிங்: {w} நிமிஷம்\nமொத்தம்: ₹{fare}\nUPI-ல கட்ட: {link}",
+  disclaimer:"இந்த ஆப் GPS தூரம், உங்க சொந்த பில் கணக்கை வச்சு பில் போடுது. இது அரசாங்க மீட்டர் இல்லை. பில் போடுறதுக்கு முன்னாடி உங்க ஊர் ரூல்ஸை செக் பண்ணுங்க",
+  cashL:"பணம்",
+  upiL:"UPI",
+  waitStart:"வெயிட்டிங் ஆரம்பி",
+  waitStop:"நிறுத்து",
+  mapOffline:"மேப்புக்கு நெட் வேணும். பாதைக் கோடு தெரியும்",
+  editTrip:"பயணத்தை மாத்து",
+  fareL:"பில் (₹)",
+  modeL:"எப்படி கட்டினாங்க",
+  delete:"அழி",
+  cancel:"வேணாம்",
+  addExp:"செலவு சேர்",
+  amountL:"தொகை (₹)",
+  noteL:"குறிப்பு (வேணும்னா)",
+  dateL:"தேதி",
+  x_fuel:"பெட்ரோல் / டீசல்",
+  x_rent:"வாடகை",
+  x_repair:"ரிப்பேர்",
+  x_food:"சாப்பாடு",
+  x_other:"மற்றது",
+  cloudH:"கிளவுட் பேக்அப்",
+  cloudHelp:"உங்க பயணம், செலவு, பில் கணக்கு, UPI ID எல்லாம் நெட்ல சேவ் ஆகும். புது போன்ல உங்க பேக்அப் கீயால திரும்ப எடுத்துக்கலாம்",
+  cloudOn:"பேக்அப் ஆன் பண்ணு",
+  cloudRestore:"கீயால திரும்ப எடு",
+  restore:"திரும்ப எடு",
+  cloudKey:"உங்க பேக்அப் கீ",
+  cloudKeyNote:"இந்த கீயை எழுதி வச்சுக்குங்க. இது இல்லாம திரும்ப எடுக்க முடியாது",
+  cloudNow:"இப்போ சிங்க் பண்ணு",
+  cloudSynced:"சிங்க் ஆயிடுச்சு",
+  cloudFail:"சிங்க் பண்ண முடியல. நெட் இருக்கான்னு பாருங்க",
+  cloudNotReady:"கிளவுட் பேக்அப் இன்னும் செட் பண்ணல",
+  cloudBadKey:"இந்த கீ தப்பா இருக்கு",
+  cloudWorking:"சிங்க் பண்ணுது...",
+  sbH:"UPI பணம் வந்த அறிவிப்பு",
+  sbHelp:"GPay, PhonePe, Paytm, BHIM-ல இருந்து \"பணம் வந்தது\"னு வரும் நோட்டிஃபிகேஷனை இந்த போன்லயே படிச்சு தொகையை சொல்லும். தொகை மட்டும் தான் இந்த போன்ல சேவ் ஆகும்",
+  sbHelp2:"சுவிட்ச் சாம்பல் கலர்ல இருந்தா: போன் Settings, Apps, இந்த ஆப், மூணு புள்ளி, Allow restricted settings",
+  sbOnTxt:"பணம் வருதான்னு கேட்டுட்டு இருக்கு",
+  sbOffTxt:"கேட்கல. பணம் வந்த அறிவிப்பை ஆன் பண்ணுங்க",
+  sbEnable:"அறிவிப்பை ஆன் பண்ணு",
+  sbVoiceOn:"குரல்: ஆன்",
+  sbVoiceOff:"குரல்: ஆஃப்",
+  sbTest:"குரலை சோதி",
+  sbBattery:"பின்னாடி ஓட அனுமதி",
+  payH:"இன்னைக்கு UPI அறிவிப்பு",
+  noPay:"இன்னைக்கு பணம் வந்த அறிவிப்பு இல்லை",
+  est:"பில் மதிப்பீடு",
+  estWhere:"எங்கே போகணும்?",
+  estSearch:"தேடு",
+  estFare:"மதிப்பீட்டு பில்",
+  estDist:"தூரம்",
+  estTime:"ரோட்டு நேரம்",
+  estBack:"பின்னாடி",
+  estNote:"இது ரோட்டு தூரத்தை வச்சு போட்ட மதிப்பீடு. டிராஃபிக், வெயிட்டிங், சுத்தி போறதுனால இறுதி பில் மாறலாம்",
+  estType:"இடத்தோட பேரை டைப் பண்ணுங்க",
+  estSearching:"தேடுது...",
+  estNone:"இடம் கிடைக்கல. பெரிய பேரா போடுங்க, இல்ல ஊர் பேரையும் சேர்த்து போடுங்க",
+  estFail:"தேட முடியல. நெட் இருக்கான்னு பாருங்க",
+  estPick:"சரியான இடத்தை தொடுங்க:",
+  estLocating:"உங்க லொகேஷனை தேடுது...",
+  estNoLoc:"லொகேஷன் கிடைக்கல. போன் லொகேஷனை ஆன் பண்ணுங்க",
+  estRouting:"ரோட்டை தேடுது...",
+  estNoRoute:"ரோடு கிடைக்கல",
+  estMin:"{n} நிமிஷம்",
+  pH:"என் விவரம்",
+  pMobile:"மொபைல் நம்பர்",
+  pChange:"PIN மாத்து",
+  pLockNow:"இப்போ லாக் பண்ணு",
+  pOut:"டேட்டாவை அழிச்சிட்டு வெளிய போ",
+  pLockOn:"PIN லாக்: ஆன்",
+  pLockOff:"PIN லாக்: ஆஃப்",
+  aSignup:"சைன் அப்",
+  aWelcome:"ஒருமுறை சைன் அப் பண்ணுங்க. உங்க விவரம் இந்த போன்லயே இருக்கும்",
+  aPin:"4 நம்பர் PIN வைங்க",
+  aPin2:"PIN-ஐ திரும்ப போடுங்க",
+  aPinNote:"இந்த PIN, இந்த போன்ல மத்தவங்க ஆப்பை திறக்காம மட்டும் தடுக்கும்",
+  aVeh:"ஆட்டோ விவரம் (வேணும்னா)",
+  vAuto:"ஆட்டோ நம்பர்",
+  vRc:"RC நம்பர்",
+  vInsCo:"இன்சூரன்ஸ் கம்பெனி",
+  vInsNo:"இன்சூரன்ஸ் பாலிசி நம்பர்",
+  vInsExp:"இன்சூரன்ஸ் முடியுற தேதி",
+  aHave:"எங்கிட்ட பேக்அப் கீ இருக்கு",
+  aRestT:"பேக்அப்ல இருந்து எடு",
+  aSetPinT:"புது PIN வைங்க",
+  aLockT:"உங்க PIN-ஐ போடுங்க",
+  aHello:"வணக்கம், {n}",
+  aForgot:"PIN மறந்துட்டீங்களா?",
+  aForgotT:"PIN மறந்துட்டேன்",
+  aForgotTxt:"இந்த போன்ல இருக்கிற டேட்டா லாக் ஆயிருக்கு. இந்த போன் டேட்டாவை அழிச்சிட்டு திரும்ப ஆரம்பிக்கிறது மட்டும் தான் வழி. கிளவுட் பேக்அப் ஆன்ல இருந்தா, பேக்அப் கீயால எல்லாத்தையும் திரும்ப எடுக்கலாம்",
+  aErase:"இந்த போன் டேட்டாவை அழி",
+  aEraseSure:"இந்த போன்ல இருக்கிற எல்லா பயணம், செலவு, செட்டிங்ஸையும் அழிக்கவா?",
+  aBadName:"உங்க பேரை போடுங்க",
+  aBadMob:"6, 7, 8 அல்லது 9-ல ஆரம்பிக்கிற 10 நம்பர் மொபைல் நம்பர் போடுங்க",
+  aBadPin:"PIN 4 நம்பரா இருக்கணும்",
+  aPinMatch:"ரெண்டு PIN-ம் ஒண்ணா இல்ல",
+  aBadAuto:"ஆட்டோ நம்பரை செக் பண்ணுங்க. உதாரணம்: TN 45 AB 1234",
+  aBadDate:"இன்சூரன்ஸ் தேதியை செக் பண்ணுங்க",
+  aWrong:"PIN தப்பு. இன்னும் {n} தடவை முயற்சி பண்ணலாம்",
+  aWait:"ரொம்ப தடவை தப்பா போட்டுட்டீங்க. {n} நிமிஷம் காத்திருங்க",
+  aNoProfile:"இந்த பேக்அப்ல விவரம் இல்ல. சைன் அப் பாரத்தை நிரப்புங்க",
+  insSoon:"இன்சூரன்ஸ் {n} நாள்ல முடியுது",
+  insToday:"இன்சூரன்ஸ் இன்னைக்கு முடியுது",
+  insEnded:"இன்சூரன்ஸ் முடிஞ்சிடுச்சு",
+  rcptAuto:"ஆட்டோ: {n}",
+  total_say:"மொத்தம் {n} ரூபா"}
+};
+var SVGI = {nTrip:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 15l2-6h9l4 4h3v2\"/><circle cx=\"7\" cy=\"17\" r=\"2\"/><circle cx=\"17\" cy=\"17\" r=\"2\"/><path d=\"M9 9V6h4\"/></svg>",nEarn:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/></svg>",nExp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 3h12v18l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 8h6M9 12h6\"/></svg>",nSet:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1\"/></svg>",start:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 4l13 8-13 8z\"/></svg>",end:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"/></svg>",est:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z\"/><path d=\"M9 4v14M15 6v14\"/></svg>",manual:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20h4L19 9l-4-4L4 16z\"/></svg>",cash:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"2\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",upi:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",share:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/><circle cx=\"18\" cy=\"19\" r=\"3\"/><path d=\"M8.6 10.7l6.8-4.4M8.6 13.3l6.8 4.4\"/></svg>",speak:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9z\"/><path d=\"M16 9a4 4 0 010 6\"/></svg>",payApp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",estSearch:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M21 21l-5-5\"/></svg>",pLockNow:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V8a4 4 0 018 0v3\"/></svg>"};
+var ICON = {};
+function setLabel(el,k){
+  el.textContent="";
+  if(SVGI[k]){ el.insertAdjacentHTML("afterbegin",SVGI[k]); var sp=document.createElement("span"); sp.textContent=t(k); el.appendChild(sp); }
+  else el.textContent=t(k);
+}
+var EXPTYPES = ["fuel","rent","repair","food","other"];
+var EXPICON = {fuel:"⛽",rent:"🏠",repair:"🔧",food:"🍽️",other:"🧾"};
+var WD = {en:["S","M","T","W","T","F","S"], ta:["ஞா","தி","செ","பு","வி","வெ","ச"]};
+
+/* ---------- storage + helpers ---------- */
+function load(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return v||d; }catch(e){ return d; } }
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function $(id){ return document.getElementById(id); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function p2(n){ return n<10?"0"+n:""+n; }
+function dk(ms){ var d=new Date(ms); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
+function inr(n){ return (n<0?"-":"")+"₹"+Math.abs(Math.round(n)).toLocaleString("en-IN"); }
+function num(v){ var n=parseFloat(String(v).replace(/,/g,"")); return isNaN(n)?0:n; }
+function clean(v,max){ return Math.min(max, Math.max(0, num(v))); }
+function fmt(sec){ sec=Math.floor(sec); var m=Math.floor(sec/60), s=sec%60; return m+":"+(s<10?"0":"")+s; }
+function live(a){ return a.filter(function(x){ return !x.d; }); }
+function dateText(d,o){ return d.toLocaleDateString(lang==="ta"?"ta-IN":"en-IN",o); }
+function timeText(ms){ return new Date(ms).toLocaleTimeString(lang==="ta"?"ta-IN":"en-IN",{hour:"2-digit",minute:"2-digit"}); }
+function short(n){ return n>=1000 ? (n/1000).toFixed(n>=10000?0:1).replace(".0","")+"k" : String(Math.round(n)); }
+
+var lang = (function(){ try{ var l=localStorage.getItem("ab_lang"); if(l==="en"||l==="ta") return l; }catch(e){} return "ta"; })();
+function t(k,v){ var s=(TXT[lang]&&TXT[lang][k])||TXT.en[k]||k; if(v) for(var x in v) s=s.replace(new RegExp("\\{"+x+"\\}","g"),v[x]); return s; }
+
+var DEF = {name:"",upi:"",base:"",baseKm:"",perKm:"",wait:"",night:"0",nightFrom:"23",nightTo:"5",saved:false,u:0};
+var S = load("ab_settings", DEF), TRIPS = load("ab_trips", []), EXP = load("ab_exp", []);
+TRIPS.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
+EXP.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
+function saveData(){ save("ab_trips",TRIPS); save("ab_exp",EXP); scheduleSync(); }
+
+/* numeric inputs: digits and one dot only, never negative */
+document.querySelectorAll("input[inputmode]").forEach(function(el){
+  el.addEventListener("input",function(){
+    var v=el.value.replace(/[^0-9.]/g,""), i=v.indexOf(".");
+    if(i>=0) v=v.slice(0,i+1)+v.slice(i+1).replace(/\./g,"");
+    if(v!==el.value) el.value=v;
+  });
+});
+
+/* ---------- fare ---------- */
+function isNight(h){
+  var p=num(S.night); if(p<=0) return false;
+  var a=num(S.nightFrom), b=num(S.nightTo);
+  return a>b ? (h>=a||h<b) : (h>=a&&h<b);
+}
+function fare(km, waitMin, lug, when){
+  var base=num(S.base), extra=Math.max(0,km-num(S.baseKm))*num(S.perKm);
+  var w=waitMin*num(S.wait), sub=base+extra+w;
+  var night=isNight((when||new Date()).getHours()) ? sub*num(S.night)/100 : 0;
+  return {base:base,extra:extra,wait:w,night:night,lug:lug,total:Math.ceil(sub+night+lug)};
+}
+
+/* ---------- language + navigation ---------- */
+function applyLang(){
+  document.documentElement.lang=lang;
+  $("langBtn").textContent = lang==="en" ? "தமிழ்" : "English"; $("aLang").textContent=$("langBtn").textContent;
+  var nm = lang==="ta" ? APP_TA : APP_NAME;
+  $("brand").innerHTML = nm.replace(/(\S+)$/,"<span>$1</span>");
+  document.title = nm;
+  document.querySelectorAll("[data-i]").forEach(function(el){ setLabel(el,el.getAttribute("data-i")); });
+  if(NATIVE){
+    try{ AndroidBridge.setLang(lang); }catch(e){}
+    $("keepWarn").textContent=t("keepOnNative");
+    $("sbCard").hidden=false; $("payCard").hidden=false;
+  } else { $("payCard").hidden=true; }
+  buildExpTypes(); setWaitBtn(!!wTimer); renderAll(); renderSound(); renderCloud(); renderProfileText();
+}
+$("langBtn").onclick=function(){ lang=lang==="en"?"ta":"en"; try{localStorage.setItem("ab_lang",lang);}catch(e){} applyLang(); };
+document.querySelectorAll("nav button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("nav button").forEach(function(x){x.classList.toggle("on",x===b);});
+    document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("on",v.id===b.dataset.v);});
+    window.scrollTo(0,0); renderAll();
+  };
+});
+function goTab(v){ document.querySelector('nav button[data-v="'+v+'"]').click(); }
+
+/* ---------- settings ---------- */
+function fillSettings(){
+  $("sUpi").value=S.upi; $("sBase").value=S.base; $("sBaseKm").value=S.baseKm;
+  $("sPerKm").value=S.perKm; $("sWait").value=S.wait; $("sNight").value=S.night; $("sNightFrom").value=S.nightFrom; $("sNightTo").value=S.nightTo;
+}
+$("saveSet").onclick=function(){
+  var e=$("setErr"); e.className="err";
+  var upi=$("sUpi").value.trim();
+  if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi)){ e.textContent=t("badUpi"); return; }
+  var v=["sBase","sBaseKm","sPerKm","sWait","sNight","sNightFrom","sNightTo"].map(function(i){return $(i).value.trim();});
+  if(!v[0]||!v[1]||!v[2]){ e.textContent=t("badNum"); return; }
+  if(num(v[0])>5000||num(v[1])>100||num(v[2])>1000||num(v[3])>1000||num(v[4])>300||num(v[5])>23||num(v[6])>23){ e.textContent=t("badBig"); return; }
+  S={name:S.name||"",upi:upi,base:v[0],baseKm:v[1],perKm:v[2],wait:v[3]||"0",night:v[4]||"0",nightFrom:v[5]||"23",nightTo:v[6]||"5",saved:true,u:Date.now()};
+  save("ab_settings",S); scheduleSync();
+  e.className="err ok"; e.textContent=t("saved");
+  setTimeout(function(){ e.textContent=""; e.className="err"; },2000);
+  renderHome();
+};
+$("wipe").onclick=function(){
+  if(!confirm(t("confirmWipe"))) return;
+  var now=Date.now(); TRIPS.forEach(function(x){ x.d=true; x.u=now; }); saveData(); renderAll();
+};
+
+/* ---------- aggregation ---------- */
+function buildIndex(){
+  var m={};
+  function g(ms){ var k=dk(ms); return m[k]||(m[k]={inc:0,exp:0,km:0,cash:0,trips:[],exps:[]}); }
+  live(TRIPS).forEach(function(x){ var o=g(x.t); o.inc+=x.fare; o.km+=x.km||0; if(x.mode==="cash") o.cash+=x.fare; o.trips.push(x); });
+  live(EXP).forEach(function(x){ var o=g(x.t); o.exp+=x.amt; o.exps.push(x); });
+  return m;
+}
+function sumRange(idx,pred){
+  var s={inc:0,exp:0,km:0,n:0};
+  for(var k in idx){ if(pred(k)){ var o=idx[k]; s.inc+=o.inc; s.exp+=o.exp; s.km+=o.km; s.n+=o.trips.length; } }
+  return s;
+}
+function renderAll(){ renderHome(); renderEarn(); renderExp(); if(bill) renderBill(); }
+
+function renderHome(){
+  var o=buildIndex()[dk(Date.now())]||{inc:0,trips:[]};
+  $("todayTotal").textContent=inr(o.inc);
+  $("todayTrips").textContent=t("tripsN",{n:o.trips.length});
+  var ex=o.exp||0, net=(o.inc||0)-ex;
+  $("todayExp").textContent=inr(ex); $("todayNet").textContent=inr(net); $("todayNet").className=net<0?"neg":"pos";
+  var need=$("needRates"); need.hidden=!!S.saved; need.textContent=t("needRates");
+  var iw=$("insWarn"), d=insDays();
+  if(d!==null && d<=30){ iw.hidden=false; iw.textContent=d<0?t("insEnded"):(d===0?t("insToday"):t("insSoon",{n:d})); } else iw.hidden=true;
+}
+
+/* ---------- earnings / history ---------- */
+var EV={mode:"day",cur:new Date()};
+function mkRow(left,right,cls,onClick){
+  var el=document.createElement(onClick?"button":"div"); if(onClick) el.type="button";
+  el.className="item"; var a=document.createElement("span"); a.className="l"; a.textContent=left;
+  var b=document.createElement("b"); b.textContent=right; if(cls) b.className=cls;
+  el.appendChild(a); el.appendChild(b); if(onClick) el.onclick=onClick; return el;
+}
+function expRow(x){
+  var el=document.createElement("div"); el.className="item";
+  var a=document.createElement("span"); a.className="l";
+  a.textContent=EXPICON[x.type]+" "+t("x_"+(EXPICON[x.type]?x.type:"other"))+(x.note?" - "+x.note:"");
+  var b=document.createElement("b"); b.textContent=inr(x.amt);
+  var d=document.createElement("button"); d.type="button"; d.className="x"; d.textContent="✕"; d.setAttribute("aria-label",t("delete"));
+  d.onclick=function(){ if(confirm(t("confirmDel"))){ x.d=true; x.u=Date.now(); saveData(); renderAll(); } };
+  el.appendChild(a); el.appendChild(b); el.appendChild(d); return el;
+}
+function h3(txt){ var h=document.createElement("h3"); h.className="sec"; h.textContent=txt; return h; }
+
+function renderDay(o,body){
+  body.appendChild(h3(t("tripsH")));
+  var card=document.createElement("div"); card.className="card";
+  if(!o.trips.length){ card.textContent=t("noTrips"); card.className="card muted"; }
+  o.trips.slice().sort(function(a,b){return b.t-a.t;}).forEach(function(x){
+    card.appendChild(mkRow(timeText(x.t)+"  "+(x.km||0).toFixed(1)+" km  "+(x.mode==="cash"?t("cashT"):t("upiT")),inr(x.fare),"",function(){ openEdit(x.id); }));
+  });
+  body.appendChild(card);
+  body.appendChild(h3(t("expH")));
+  var c2=document.createElement("div"); c2.className="card";
+  if(!o.exps.length){ c2.textContent=t("noExp"); c2.className="card muted"; }
+  o.exps.slice().sort(function(a,b){return b.t-a.t;}).forEach(function(x){ c2.appendChild(expRow(x)); });
+  body.appendChild(c2);
+}
+function renderMonth(idx,body){
+  var d=EV.cur, y=d.getFullYear(), m=d.getMonth(), first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  var card=document.createElement("div"); card.className="card";
+  var g=document.createElement("div"); g.className="cal";
+  WD[lang].forEach(function(w){ var s=document.createElement("div"); s.className="wd"; s.textContent=w; g.appendChild(s); });
+  for(var i=0;i<first;i++){ var bl=document.createElement("button"); bl.className="blank"; bl.disabled=true; g.appendChild(bl); }
+  var todayKey=dk(Date.now());
+  for(var day=1;day<=days;day++){
+    (function(day){
+      var key=y+"-"+p2(m+1)+"-"+p2(day), o=idx[key];
+      var b=document.createElement("button"); b.type="button";
+      b.appendChild(document.createTextNode(String(day)));
+      if(o&&o.inc>0){ var sm=document.createElement("small"); sm.textContent=short(o.inc); b.appendChild(sm); b.classList.add("has"); }
+      if(key===todayKey) b.classList.add("today");
+      b.onclick=function(){ EV.cur=new Date(y,m,day); EV.mode="day"; renderEarn(); };
+      g.appendChild(b);
+    })(day);
+  }
+  card.appendChild(g); body.appendChild(card);
+}
+function renderYear(idx,body){
+  var y=EV.cur.getFullYear(), card=document.createElement("div"); card.className="card";
+  for(var mo=0;mo<12;mo++){
+    (function(mo){
+      var pre=y+"-"+p2(mo+1), s=sumRange(idx,function(k){return k.indexOf(pre)===0;});
+      var name=dateText(new Date(y,mo,1),{month:"long"});
+      var r=mkRow(name+"  "+inr(s.inc)+" / "+inr(s.exp), inr(s.inc-s.exp), (s.inc-s.exp)<0?"neg":"", function(){ EV.cur=new Date(y,mo,1); EV.mode="month"; renderEarn(); });
+      card.appendChild(r);
+    })(mo);
+  }
+  body.appendChild(card);
+}
+function renderEarn(){
+  renderPays();
+  var idx=buildIndex(), d=EV.cur, body=$("pBody"); body.innerHTML="";
+  document.querySelectorAll("#period button").forEach(function(b){ b.classList.toggle("on",b.dataset.p===EV.mode); });
+  var s, title;
+  if(EV.mode==="day"){
+    var key=dk(d.getTime()); s=sumRange(idx,function(k){return k===key;});
+    title=dateText(d,{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+    renderDay(idx[key]||{trips:[],exps:[]},body);
+  } else if(EV.mode==="month"){
+    var pre=d.getFullYear()+"-"+p2(d.getMonth()+1); s=sumRange(idx,function(k){return k.indexOf(pre)===0;});
+    title=dateText(d,{month:"long",year:"numeric"}); renderMonth(idx,body);
+  } else {
+    var yr=String(d.getFullYear()); s=sumRange(idx,function(k){return k.indexOf(yr+"-")===0;});
+    title=yr; renderYear(idx,body);
+  }
+  $("pTitle").textContent=title;
+  $("sInc").textContent=inr(s.inc); $("sExp").textContent=inr(s.exp);
+  var pro=s.inc-s.exp; $("sPro").textContent=inr(pro); $("sPro").className=pro<0?"neg":"";
+  $("sKm").textContent=s.km.toFixed(1)+" km, "+t("tripsN",{n:s.n});
+}
+document.querySelectorAll("#period button").forEach(function(b){ b.onclick=function(){ EV.mode=b.dataset.p; renderEarn(); }; });
+function step(dir){
+  var d=EV.cur;
+  if(EV.mode==="day") EV.cur=new Date(d.getFullYear(),d.getMonth(),d.getDate()+dir);
+  else if(EV.mode==="month") EV.cur=new Date(d.getFullYear(),d.getMonth()+dir,1);
+  else EV.cur=new Date(d.getFullYear()+dir,0,1);
+  renderEarn();
+}
+$("pPrev").onclick=function(){ step(-1); };
+$("pNext").onclick=function(){ step(1); };
+
+/* ---------- edit / delete trip ---------- */
+var editId=null, editMode="cash";
+function setMode(m){ editMode=m; document.querySelectorAll("#mMode button").forEach(function(b){ b.classList.toggle("on",b.dataset.m===m); }); }
+document.querySelectorAll("#mMode button").forEach(function(b){ b.onclick=function(){ setMode(b.dataset.m); }; });
+function findTrip(id){ for(var i=0;i<TRIPS.length;i++) if(TRIPS[i].id===id) return TRIPS[i]; return null; }
+function openEdit(id){
+  var x=findTrip(id); if(!x) return; editId=id;
+  $("mFare").value=x.fare; $("mKm").value=(x.km||0).toFixed(2); $("mWait").value=Math.round(x.wait||0);
+  setMode(x.mode==="upi"?"upi":"cash"); $("mErr").textContent="";
+  $("modal").classList.add("on");
+}
+function closeEdit(){ $("modal").classList.remove("on"); editId=null; }
+$("mCancel").onclick=closeEdit;
+$("modal").addEventListener("click",function(e){ if(e.target===$("modal")) closeEdit(); });
+$("mSave").onclick=function(){
+  var x=findTrip(editId); if(!x) return closeEdit();
+  var f=clean($("mFare").value,100000);
+  if(!(f>0)){ $("mErr").textContent=t("badNeg"); return; }
+  x.fare=Math.round(f); x.km=clean($("mKm").value,500); x.wait=clean($("mWait").value,600); x.mode=editMode; x.u=Date.now();
+  saveData(); closeEdit(); renderAll();
+};
+$("mDel").onclick=function(){
+  var x=findTrip(editId); if(!x) return closeEdit();
+  if(!confirm(t("confirmDel"))) return;
+  x.d=true; x.u=Date.now(); saveData(); closeEdit(); renderAll();
+};
+
+/* ---------- expenses ---------- */
+var xType="fuel";
+function buildExpTypes(){
+  var box=$("expTypes"); box.innerHTML="";
+  EXPTYPES.forEach(function(k){
+    var b=document.createElement("button"); b.type="button"; b.className="chipb"+(k===xType?" on":"");
+    b.textContent=EXPICON[k]+" "+t("x_"+k);
+    b.onclick=function(){ xType=k; buildExpTypes(); };
+    box.appendChild(b);
+  });
+}
+function dateToMs(v){
+  if(!v) return Date.now();
+  var p=v.split("-"), d=new Date(+p[0],+p[1]-1,+p[2],12);
+  if(isNaN(d.getTime())) return Date.now();
+  return dk(d.getTime())===dk(Date.now()) ? Date.now() : d.getTime();
+}
+$("xAdd").onclick=function(){
+  var amt=clean($("xAmt").value,1000000);
+  if(!(amt>0)){ $("xErr").textContent=t("badNeg"); $("xAmt").focus(); return; }
+  $("xErr").textContent="";
+  EXP.push({id:uid(),t:dateToMs($("xDate").value),type:xType,amt:Math.round(amt*100)/100,note:$("xNote").value.trim().slice(0,40),u:Date.now()});
+  $("xAmt").value=""; $("xNote").value=""; saveData(); renderAll();
+};
+function renderExp(){
+  if(!$("xDate").value) $("xDate").value=dk(Date.now());
+  var all=live(EXP).sort(function(a,b){return b.t-a.t;});
+  var pre=dk(Date.now()).slice(0,7), tot=0;
+  all.forEach(function(x){ if(dk(x.t).indexOf(pre)===0) tot+=x.amt; });
+  $("xTotal").textContent=t("exp")+": "+inr(tot);
+  var list=$("xList"); list.innerHTML="";
+  if(!all.length){ list.textContent=t("noExp"); return; }
+  all.slice(0,30).forEach(function(x){
+    var r=expRow(x);
+    r.firstChild.textContent=dateText(new Date(x.t),{day:"numeric",month:"short"})+"  "+r.firstChild.textContent;
+    list.appendChild(r);
+  });
+}
+
+/* ---------- map ---------- */
+var map=null, line=null, dot=null;
+function loadLeaflet(cb){
+  if(window.L) return cb();
+  var c=document.createElement("link"); c.rel="stylesheet"; c.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(c);
+  var s=document.createElement("script"); s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+  s.onload=cb; s.onerror=function(){ $("mapNote").textContent=t("mapOffline"); };
+  document.head.appendChild(s);
+}
+function initMap(){
+  $("mapNote").textContent="";
+  loadLeaflet(function(){
+    if(!trip||map) return;
+    map=L.map("map",{zoomControl:false}).setView([10.8,78.7],7);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
+    line=L.polyline([],{color:"#F5B800",weight:6}).addTo(map);
+    dot=L.circleMarker([10.8,78.7],{radius:8,color:"#fff",weight:3,fillColor:"#0B7A3E",fillOpacity:1});
+    setTimeout(function(){ if(map) map.invalidateSize(); },200);
+    if(trip.pts&&trip.pts.length){ line.setLatLngs(trip.pts); dot.addTo(map).setLatLng(trip.pts[trip.pts.length-1]); map.setView(trip.pts[trip.pts.length-1],17); }
+  });
+}
+function killMap(){ if(map){ try{ map.remove(); }catch(e){} } map=null; line=null; dot=null; }
+function addPoint(lat,lon){
+  if(!trip||!trip.pts) return;
+  var last=trip.pts[trip.pts.length-1];
+  if(last && hav({lat:last[0],lon:last[1]},{lat:lat,lon:lon})<5) return;
+  trip.pts.push([lat,lon]);
+  if(trip.pts.length>600){ var keep=trip.pts[trip.pts.length-1]; trip.pts=trip.pts.filter(function(_,i){return i%2===0;}); trip.pts.push(keep); }
+  if(map&&line){ line.setLatLngs(trip.pts); if(!map.hasLayer(dot)) dot.addTo(map); dot.setLatLng([lat,lon]); map.setView([lat,lon],Math.max(map.getZoom(),16)); }
+}
+
+/* ---------- GPS trip ---------- */
+var trip=null, watchId=null, ticker=null, wakeLock=null;
+function hav(a,b){
+  var R=6371000, r=Math.PI/180, dLat=(b.lat-a.lat)*r, dLon=(b.lon-a.lon)*r;
+  var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+function onPos(p){
+  if(!trip) return;
+  var acc=p.coords.accuracy, pt={lat:p.coords.latitude,lon:p.coords.longitude,ts:p.timestamp};
+  trip.acc=acc;
+  if(acc>30) return;
+  addPoint(pt.lat,pt.lon);
+  if(!trip.last){ trip.last=pt; trip.lastTs=pt.ts; return; }
+  var d=hav(trip.last,pt), dt=(pt.ts-trip.lastTs)/1000;
+  if(dt<=0) return;
+  if(d/dt>45){ trip.last=pt; trip.lastTs=pt.ts; return; }
+  if(d<Math.max(8,acc*0.5)){ trip.waitSec+=dt; trip.lastTs=pt.ts; return; }
+  trip.dist+=d; trip.last=pt; trip.lastTs=pt.ts;
+}
+function tick(){
+  if(!trip) return;
+  if(trip.native){
+    var n={}; try{ n=JSON.parse(AndroidBridge.getTrip()); }catch(e){}
+    if(n.denied){
+      stopWatch(); try{ AndroidBridge.endTrip(); }catch(e){}
+      trip=null; killMap(); show("sIdle"); $("gpsErr").textContent=t("gpsDenied"); return;
+    }
+    if(n.active){
+      trip.dist=n.km*1000; trip.waitSec=n.waitSec; trip.acc=n.acc<0?null:n.acc; trip.gpsOn=n.gpsOn; if(n.start) trip.start=n.start;
+      if(n.hasFix) addPoint(n.lat,n.lon);
+    }
+  }
+  var km=trip.dist/1000, wm=trip.waitSec/60;
+  $("liveKm").textContent=km.toFixed(2);
+  $("liveWait").textContent=fmt(trip.waitSec);
+  $("liveTime").textContent=fmt((Date.now()-trip.start)/1000);
+  $("liveFare").textContent=inr(fare(km,wm,0,new Date()).total);
+  $("liveAcc").textContent=(trip.native&&trip.gpsOn===false)?t("gpsOff"):(trip.acc==null?t("gpsWait"):(trip.acc>30?t("gpsWeak"):t("gpsOk"))+" ("+Math.round(trip.acc)+" m)");
+}
+function needSetup(){
+  if(!S.saved){ goTab("vSet"); return true; }
+  return false;
+}
+$("startBtn").onclick=function(){
+  $("gpsErr").textContent="";
+  if(needSetup()) return;
+  if(NATIVE){
+    trip={native:true,start:Date.now(),dist:0,waitSec:0,acc:null,pts:[]};
+    try{ AndroidBridge.startTrip(); }catch(e){}
+    ticker=setInterval(tick,1000); tick(); show("sRun"); initMap(); return;
+  }
+  if(!navigator.geolocation){ $("gpsErr").textContent=t("gpsNo"); return; }
+  trip={start:Date.now(),dist:0,waitSec:0,last:null,lastTs:0,acc:null,pts:[]};
+  watchId=navigator.geolocation.watchPosition(onPos,function(e){
+    $("gpsErr").textContent = e.code===1 ? t("gpsDenied") : t("gpsNo");
+    if(e.code===1){ stopWatch(); trip=null; killMap(); show("sIdle"); $("gpsErr").textContent=t("gpsDenied"); }
+  },{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+  try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(function(w){wakeLock=w;}).catch(function(){}); }catch(e){}
+  ticker=setInterval(tick,1000); tick(); show("sRun"); initMap();
+};
+function stopWatch(){
+  if(watchId!=null){ navigator.geolocation.clearWatch(watchId); watchId=null; }
+  clearInterval(ticker); ticker=null;
+  try{ if(wakeLock){ wakeLock.release(); wakeLock=null; } }catch(e){}
+}
+function show(id){ document.body.setAttribute("data-st",id); window.scrollTo(0,0); if(id!=="sEst") killEst(); ["sIdle","sRun","sBill","sEst"].forEach(function(s){ $(s).hidden=(s!==id); }); }
+
+
+/* ---------- fare estimate: Nominatim search -> GPS -> OSRM route -> fare ---------- */
+var NOMINATIM="https://nominatim.openstreetmap.org/search", OSRM="https://router.project-osrm.org/route/v1/driving/";
+var emap=null, eline=null, epin=null, emark=null, eHere=null, lastSearchAt=0, estBusy=false, estSeq=0;
+function killEst(){ estSeq++; estBusy=false; if(emap){ try{ emap.remove(); }catch(e){} } emap=null; eline=null; epin=null; emark=null; }
+function eMsg(k,v){ $("eMsg").textContent=k?t(k,v):""; }
+function estReset(){ $("eList").innerHTML=""; $("eRes").hidden=true; $("emap").hidden=true; killEst(); eMsg(""); }
+$("estBtn").onclick=function(){ if(needSetup()) return; estReset(); $("eQ").value=""; show("sEst"); eMsg("estType"); setTimeout(function(){ $("eQ").focus(); },100); };
+$("eBack").onclick=function(){ estReset(); show("sIdle"); };
+$("eStart").onclick=function(){ estReset(); $("startBtn").click(); };
+function getHere(){
+  return new Promise(function(ok,no){
+    if(eHere && Date.now()-eHere.ts<60000) return ok(eHere);
+    if(!navigator.geolocation) return no(new Error("nogps"));
+    navigator.geolocation.getCurrentPosition(function(p){ eHere={lat:p.coords.latitude,lon:p.coords.longitude,ts:Date.now()}; ok(eHere); },
+      function(e){ no(e); },{enableHighAccuracy:false,maximumAge:30000,timeout:15000});
+  });
+}
+function placeName(r){ var a=String(r.display_name||"").split(","); return a.slice(0,3).join(",").trim()+(a.length>3?", "+a[a.length-1].trim():""); }
+async function doSearch(){
+  var q=$("eQ").value.trim();
+  if(q.length<3){ eMsg("estType"); return; }
+  if(estBusy) return; estBusy=true; $("eGo").disabled=true;
+  var seq=++estSeq;
+  $("eList").innerHTML=""; $("eRes").hidden=true; eMsg("estSearching");
+  try{
+    var wait=1100-(Date.now()-lastSearchAt); if(wait>0) await new Promise(function(r){ setTimeout(r,wait); });   /* Nominatim allows 1 request per second */
+    lastSearchAt=Date.now();
+    var url=NOMINATIM+"?format=jsonv2&limit=6&countrycodes=in&accept-language="+(lang==="ta"?"ta,en":"en")+"&q="+encodeURIComponent(q);
+    if(eHere){ var d=0.4; url+="&viewbox="+(eHere.lon-d)+","+(eHere.lat+d)+","+(eHere.lon+d)+","+(eHere.lat-d); }   /* prefer places near the driver */
+    var r=await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!r.ok) throw new Error("http "+r.status);
+    var arr=await r.json();
+    if(seq!==estSeq) return;
+    if(!Array.isArray(arr)||!arr.length){ eMsg("estNone"); return; }
+    eMsg("estPick");
+    arr.forEach(function(x){
+      var b=document.createElement("button"); b.type="button"; b.className="res"; b.textContent=placeName(x);
+      b.onclick=function(){ pickPlace(parseFloat(x.lat),parseFloat(x.lon),placeName(x)); };
+      $("eList").appendChild(b);
+    });
+  }catch(e){ if(seq===estSeq) eMsg("estFail"); }
+  finally{ estBusy=false; $("eGo").disabled=false; }
+}
+$("eGo").onclick=doSearch;
+$("eQ").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); doSearch(); } });
+
+function initEmap(cb){
+  loadLeaflet(function(){
+    if(emap||$("sEst").hidden) return cb&&cb();
+    $("emap").hidden=false;
+    emap=L.map("emap",{zoomControl:false}).setView([10.8,78.7],7);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(emap);
+    setTimeout(function(){ if(emap) emap.invalidateSize(); },150);
+    cb&&cb();
+  });
+}
+async function pickPlace(lat,lon,name){
+  if(!isFinite(lat)||!isFinite(lon)) return;
+  var seq=++estSeq;
+  $("eList").innerHTML=""; $("eRes").hidden=true; eMsg("estLocating");
+  var here;
+  try{ here=await getHere(); }catch(e){ if(seq===estSeq) eMsg("estNoLoc"); return; }
+  if(seq!==estSeq) return;
+  eMsg("estRouting");
+  try{
+    var r=await fetch(OSRM+here.lon+","+here.lat+";"+lon+","+lat+"?overview=full&geometries=geojson");
+    if(!r.ok) throw new Error("http "+r.status);
+    var j=await r.json();
+    if(seq!==estSeq) return;
+    if(!j.routes||!j.routes.length){ eMsg("estNoRoute"); return; }
+    var rt=j.routes[0], km=rt.distance/1000, mins=Math.max(1,Math.round(rt.duration/60));
+    var f=fare(km,0,0,new Date()).total;
+    $("eFare").textContent=inr(f); $("eKm").textContent=km.toFixed(1)+" km"; $("eMin").textContent=t("estMin",{n:mins});
+    $("eRes").hidden=false; eMsg("");
+    var pts=(rt.geometry&&rt.geometry.coordinates||[]).map(function(c){ return [c[1],c[0]]; });
+    initEmap(function(){
+      if(!emap||seq!==estSeq) return;
+      if(eline){ emap.removeLayer(eline); } if(epin){ emap.removeLayer(epin); } if(emark){ emap.removeLayer(emark); }
+      eline=L.polyline(pts,{color:"#F5B800",weight:6}).addTo(emap);
+      emark=L.circleMarker([here.lat,here.lon],{radius:8,color:"#fff",weight:3,fillColor:"#0B7A3E",fillOpacity:1}).addTo(emap);
+      epin=L.circleMarker([lat,lon],{radius:8,color:"#fff",weight:3,fillColor:"#C8102E",fillOpacity:1}).addTo(emap).bindTooltip(name);
+      emap.fitBounds(eline.getBounds(),{padding:[20,20]});
+    });
+    $("eRes").scrollIntoView({block:"nearest"});
+  }catch(e){ if(seq===estSeq) eMsg("estFail"); }
+}
+
+/* manual bill (no GPS) */
+$("manualBtn").onclick=function(){
+  if(needSetup()) return;
+  bill={km:0,wait:0,start:Date.now()};
+  $("inKm").value=""; $("inWait").value=""; $("inLug").value="0"; $("billErr").textContent="";
+  $("adj").open=true; show("sBill"); renderBill();
+};
+
+/* ---------- bill ---------- */
+var bill=null, wTimer=null, wStart=0;
+document.addEventListener("click",function(e){ var b=e.target.closest&&e.target.closest(".btn.go,.btn.stop"); if(b&&navigator.vibrate){ try{ navigator.vibrate(25); }catch(x){} } });
+$("endBtn").onclick=function(){
+  if(!trip) return;
+  stopWatch(); killMap();
+  if(trip.native){
+    try{ var r=JSON.parse(AndroidBridge.endTrip()); trip.dist=r.km*1000; trip.waitSec=r.waitSec; if(r.start) trip.start=r.start; }catch(e){}
+  }
+  bill={km:trip.dist/1000, wait:trip.waitSec/60, start:trip.start};
+  trip=null;
+  $("inKm").value=bill.km.toFixed(2); $("inWait").value=Math.round(bill.wait); $("inLug").value="0"; $("billErr").textContent="";
+  $("adj").open=false; show("sBill"); renderBill(); speakFare();
+};
+["inKm","inWait","inLug"].forEach(function(i){ $(i).addEventListener("input",renderBill); });
+
+function setWaitBtn(running){
+  $("waitBtn").textContent=(running?"⏹️ ":"⏱️ ")+t(running?"waitStop":"waitStart");
+  if(!running) $("waitClock").textContent="";
+}
+$("waitBtn").onclick=function(){
+  if(wTimer){
+    clearInterval(wTimer); wTimer=null;
+    var mins=(Date.now()-wStart)/60000;
+    $("inWait").value=(Math.round((num($("inWait").value)+mins)*100)/100).toString();
+    setWaitBtn(false); renderBill();
+  } else {
+    wStart=Date.now(); setWaitBtn(true);
+    wTimer=setInterval(function(){ $("waitClock").textContent=fmt((Date.now()-wStart)/1000); },1000);
+  }
+};
+function resetWait(){ if(wTimer){ clearInterval(wTimer); wTimer=null; } setWaitBtn(false); }
+
+function drawQr(text){
+  var box=$("qrBox"); box.innerHTML="";
+  if(typeof qrcode!=="function") return false;
+  try{
+    var q=qrcode(0,"M"); q.addData(text); q.make();
+    var n=q.getModuleCount(), p="";
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(q.isDark(r,c)) p+="M"+c+" "+r+"h1v1h-1z";
+    box.innerHTML='<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges"><path d="'+p+'" fill="#000"/></svg>';
+    return true;
+  }catch(e){ return false; }
+}
+function currentBill(){
+  var km=clean($("inKm").value,500), w=clean($("inWait").value,600), lug=clean($("inLug").value,5000);
+  return {km:km,w:w,lug:lug,f:fare(km,w,lug,new Date(bill?bill.start:Date.now()))};
+}
+function upiUrl(amount){
+  return "upi://pay?pa="+encodeURIComponent(S.upi)+"&pn="+encodeURIComponent((PROFILE&&PROFILE.name)||S.name||(lang==="ta"?APP_TA:APP_NAME))+"&am="+amount+"&cu=INR&tn="+encodeURIComponent("Auto fare");
+}
+function renderBill(){
+  if(!bill) return;
+  var b=currentBill(), f=b.f;
+  $("billErr").textContent = (num($("inKm").value)>500||num($("inWait").value)>600||num($("inLug").value)>5000) ? t("badBig") : "";
+  $("billFare").textContent=inr(f.total);
+  var rows=[[t("fBase"),f.base],[t("fExtra"),f.extra],[t("fWait"),f.wait]];
+  if(f.night>0) rows.push([t("fNight"),f.night]);
+  if(f.lug>0) rows.push([t("fLug"),f.lug]);
+  var el=$("breakdown"); el.innerHTML="";
+  rows.forEach(function(r){ el.appendChild(mkRow(r[0],inr(r[1]),"")); el.lastChild.className="row"; });
+  var url=upiUrl(f.total.toFixed(2));
+  $("upiLink").href=url;
+  var ok=drawQr(url);
+  $("qrNote").textContent = ok ? t("qrNote") : t("needUpi");
+}
+function speakFare(){
+  if(!bill) return;
+  var f=currentBill().f.total;
+  var ta=TXT.ta.total_say.replace("{n}",f), en=TXT.en.total_say.replace("{n}",f);
+  if(NATIVE){ try{ AndroidBridge.speak(ta,en); }catch(e){} }
+  else if("speechSynthesis" in window){
+    try{ var u=new SpeechSynthesisUtterance(lang==="ta"?ta:en); u.lang=lang==="ta"?"ta-IN":"en-IN"; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
+  }
+}
+$("speakBtn").onclick=speakFare;
+$("shareBtn").onclick=function(){
+  var b=currentBill();
+  var msg=t("billMsg",{app:(lang==="ta"?APP_TA:APP_NAME),date:dateText(new Date(),{day:"numeric",month:"short",year:"numeric"})+" "+timeText(Date.now()),
+    km:b.km.toFixed(1),w:Math.round(b.w),fare:b.f.total,link:upiUrl(b.f.total.toFixed(2))});
+  if(PROFILE&&PROFILE.autoNo){ var ls=msg.split("\n"); ls.splice(1,0,t("rcptAuto",{n:fmtAuto(PROFILE.autoNo)})); msg=ls.join("\n"); }
+  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+};
+function finish(mode){
+  var b=currentBill();
+  if(!(b.f.total>0)){ $("billErr").textContent=t("badNeg"); return; }
+  TRIPS.push({id:uid(),t:Date.now(),km:b.km,wait:b.w,fare:b.f.total,mode:mode,u:Date.now()});
+  saveData(); resetWait(); bill=null; show("sIdle"); renderAll();
+}
+$("saveCash").onclick=function(){ finish("cash"); };
+$("saveUpi").onclick=function(){ finish("upi"); };
+$("discard").onclick=function(){ resetWait(); bill=null; show("sIdle"); };
+
+/* ---------- native soundbox (Android app only) ---------- */
+function renderSound(){
+  if(!NATIVE) return;
+  try{
+    $("sbStatus").textContent = AndroidBridge.isListenerOn() ? t("sbOnTxt") : t("sbOffTxt");
+    $("sbToggle").textContent = AndroidBridge.isSoundOn() ? t("sbVoiceOn") : t("sbVoiceOff");
+  }catch(e){}
+}
+function renderPays(){
+  if(!NATIVE) return;
+  var list=$("payList"); list.innerHTML="";
+  var arr=[]; try{ arr=JSON.parse(AndroidBridge.getPayments()); }catch(e){}
+  var today=dk(Date.now());
+  arr=arr.filter(function(x){ return dk(x.ts)===today; });
+  $("payTotal").textContent=inr(arr.reduce(function(a,x){return a+x.amt;},0));
+  if(!arr.length){ list.textContent=t("noPay"); return; }
+  arr.slice().reverse().forEach(function(x){ list.appendChild(mkRow(timeText(x.ts)+"  "+x.app,inr(x.amt),"")); list.lastChild.className="row"; });
+}
+if(NATIVE){
+  $("sbEnable").onclick=function(){ AndroidBridge.openListenerSettings(); };
+  $("sbBattery").onclick=function(){ AndroidBridge.openBatterySettings(); };
+  $("sbTest").onclick=function(){ AndroidBridge.testSpeak(); };
+  $("sbToggle").onclick=function(){ AndroidBridge.setSoundOn(!AndroidBridge.isSoundOn()); renderSound(); };
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden){ renderSound(); renderPays(); } });
+}
+
+/* ---------- cloud backup (Turso, through your sync server) ---------- */
+var SY = load("ab_sync",{key:"",last:0,pushed:0});
+var syncing=false, syncTimer=null;
+function newKey(){
+  var a="ABCDEFGHJKMNPQRSTUVWXYZ23456789", s="", r=new Uint8Array(16);
+  crypto.getRandomValues(r);
+  for(var i=0;i<16;i++){ s+=a[r[i]%a.length]; if(i%4===3&&i<15) s+="-"; }
+  return s;
+}
+function okKey(k){ return /^[A-Z2-9]{4}(-[A-Z2-9]{4}){3}$/.test(k); }
+function cloudMsg(txt,good){ var e=$("cloudStatus"); e.textContent=txt||""; e.className="muted"+(good?" ok":""); }
+function renderCloud(){
+  var on=!!SY.key;
+  $("cloudOff").hidden=on; $("cloudOnBox").hidden=!on;
+  $("cloudKeyTxt").textContent=SY.key||"";
+  if(!SYNC_URL) cloudMsg(t("cloudNotReady"));
+}
+function collect(since){
+  var out=[];
+  function add(kind){ return function(x){ if((x.u||0)>since) out.push({kind:kind,id:x.id,u:x.u,d:x.d?1:0,data:JSON.stringify(x)}); }; }
+  TRIPS.forEach(add("trip")); EXP.forEach(add("exp"));
+  if((S.u||0)>since) out.push({kind:"settings",id:"s",u:S.u,d:0,data:JSON.stringify(S)});
+  if(PROFILE&&(PROFILE.u||0)>since) out.push({kind:"settings",id:"p",u:PROFILE.u,d:0,data:JSON.stringify(profileForSync())});
+  return out;
+}
+function merge(changes){
+  var dirty=false;
+  changes.forEach(function(c){
+    var data; try{ data=JSON.parse(c.data); }catch(e){ return; }
+    if(c.kind==="settings"&&c.id==="p"){
+      if(c.u>((PROFILE&&PROFILE.u)||0)){
+        var keep=PROFILE||{};
+        PROFILE=Object.assign({},data,{pinH:keep.pinH,salt:keep.salt,lock:keep.lock!==false}); PROFILE.u=c.u;
+        save("ab_profile",PROFILE); fillProfile(); dirty=true;
+      }
+      return;
+    }
+    if(c.kind==="settings"){
+      if(c.u>(S.u||0)){ S=data; S.u=c.u; save("ab_settings",S); fillSettings(); dirty=true; }
+      return;
+    }
+    var arr=c.kind==="trip"?TRIPS:(c.kind==="exp"?EXP:null); if(!arr) return;
+    data.id=c.id; data.u=c.u; data.d=!!c.d;
+    for(var i=0;i<arr.length;i++){ if(arr[i].id===c.id){ if(c.u>(arr[i].u||0)){ arr[i]=data; dirty=true; } return; } }
+    arr.push(data); dirty=true;
+  });
+  if(dirty){ save("ab_trips",TRIPS); save("ab_exp",EXP); }
+  return dirty;
+}
+async function post(changes,since){
+  var r=await fetch(SYNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:SY.key,since:since,changes:changes})});
+  if(!r.ok) throw new Error("http "+r.status);
+  return r.json();
+}
+async function syncNow(){
+  if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return false; }
+  if(!SY.key||syncing) return false;
+  syncing=true; cloudMsg(t("cloudWorking"));
+  var t0=Date.now(), since=SY.last, changed=false;
+  try{
+    var all=collect(SY.pushed), chunks=[];
+    for(var i=0;i<all.length;i+=200) chunks.push(all.slice(i,i+200));
+    if(!chunks.length) chunks.push([]);
+    var j, guard=0;
+    for(var c=0;c<chunks.length;c++){            /* push in pieces of 200 */
+      j=await post(chunks[c],since);
+      if(merge(j.changes||[])) changed=true;
+      if(!j.more) since=j.now;
+    }
+    while(j.more && guard++<50){                 /* then pull any remaining pages */
+      j=await post([],j.last);
+      if(merge(j.changes||[])) changed=true;
+      if(!j.more) since=j.now;
+    }
+    SY.last=since; SY.pushed=t0; save("ab_sync",SY);
+    cloudMsg(t("cloudSynced"),true);
+    if(changed) renderAll();
+    syncing=false; return true;
+  }catch(e){ cloudMsg(t("cloudFail")); }
+  syncing=false; return false;
+}
+function scheduleSync(){ if(!SY.key||!SYNC_URL) return; clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,4000); }
+$("cloudOn").onclick=function(){
+  if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
+  SY={key:newKey(),last:0,pushed:0}; save("ab_sync",SY); renderCloud(); syncNow();
+};
+$("cloudRestoreBtn").onclick=function(){
+  if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
+  var k=$("cloudIn").value.trim().toUpperCase().replace(/\s+/g,"");
+  if(!okKey(k)){ cloudMsg(t("cloudBadKey")); return; }
+  SY={key:k,last:0,pushed:0}; save("ab_sync",SY); $("cloudIn").value=""; renderCloud(); syncNow();
+};
+$("cloudNow").onclick=syncNow;
+window.addEventListener("online",scheduleSync);
+
+
+/* ---------- profile, sign up and PIN lock ---------- */
+var PROFILE=load("ab_profile",null), hiddenAt=0, LOCK_AFTER=10*60*1000;
+function profileForSync(){ var o=Object.assign({},PROFILE); delete o.pinH; delete o.salt; delete o.lock; return o; }
+function saveProfile(){ PROFILE.u=Date.now(); save("ab_profile",PROFILE); scheduleSync(); }
+async function hashPin(pin,salt){
+  var s=salt+":"+pin;
+  try{ if(window.crypto&&crypto.subtle){ var b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(function(x){ return ("0"+x.toString(16)).slice(-2); }).join(""); } }catch(e){}
+  var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return "x"+(h>>>0).toString(16);
+}
+function normAuto(v){ return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
+function fmtAuto(c){ var m=String(c||"").match(/^([A-Z]{2})(\d{1,2})([A-Z]{1,3})(\d{1,4})$/); return m?m[1]+" "+m[2]+" "+m[3]+" "+m[4]:(c||""); }
+function okAuto(c){ return !c||(c.length>=6&&c.length<=12&&/[A-Z]/.test(c)&&/\d/.test(c)); }
+function vehHTML(p){
+  return '<label for="'+p+'Auto" data-i="vAuto"></label><input id="'+p+'Auto" autocomplete="off" autocapitalize="characters" maxlength="14" placeholder="TN 45 AB 1234">'
+   +'<label for="'+p+'Rc" data-i="vRc"></label><input id="'+p+'Rc" autocomplete="off" autocapitalize="characters" maxlength="24">'
+   +'<label for="'+p+'InsCo" data-i="vInsCo"></label><input id="'+p+'InsCo" autocomplete="off" maxlength="40">'
+   +'<label for="'+p+'InsNo" data-i="vInsNo"></label><input id="'+p+'InsNo" autocomplete="off" autocapitalize="characters" maxlength="30">'
+   +'<label for="'+p+'InsExp" data-i="vInsExp"></label><input id="'+p+'InsExp" type="date">';
+}
+$("gVeh").innerHTML=vehHTML("g"); $("pVeh").innerHTML=vehHTML("p");
+function readVeh(p){
+  var auto=normAuto($(p+"Auto").value), exp=$(p+"InsExp").value;
+  if(!okAuto(auto)) return {err:"aBadAuto"};
+  if(exp&&!/^\d{4}-\d{2}-\d{2}$/.test(exp)) return {err:"aBadDate"};
+  return {vals:{autoNo:auto,rcNo:$(p+"Rc").value.trim().toUpperCase().slice(0,24),insCo:$(p+"InsCo").value.trim().slice(0,40),insNo:$(p+"InsNo").value.trim().toUpperCase().slice(0,30),insExp:exp}};
+}
+function putVeh(p,pr){
+  pr=pr||{}; $(p+"Auto").value=pr.autoNo?fmtAuto(pr.autoNo):""; $(p+"Rc").value=pr.rcNo||""; $(p+"InsCo").value=pr.insCo||"";
+  $(p+"InsNo").value=pr.insNo||""; $(p+"InsExp").value=pr.insExp||"";
+}
+function insDays(){
+  if(!PROFILE||!PROFILE.insExp) return null;
+  var m=PROFILE.insExp.split("-"); if(m.length!==3) return null;
+  var e=new Date(+m[0],+m[1]-1,+m[2]), n=new Date(); n=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+  if(isNaN(e.getTime())) return null;
+  return Math.round((e-n)/86400000);
+}
+document.querySelectorAll(".digits").forEach(function(el){ el.addEventListener("input",function(){ var v=el.value.replace(/\D/g,""); if(v!==el.value) el.value=v; }); });
+
+function fillProfile(){
+  var pr=PROFILE||{}; $("pName").value=pr.name||""; $("pMob").value=pr.mobile||""; putVeh("p",pr);
+}
+function renderProfileText(){
+  $("pLockBtn").textContent=(PROFILE&&PROFILE.lock===false)?t("pLockOff"):t("pLockOn");
+  if(PROFILE) $("lHello").textContent=t("aHello",{n:PROFILE.name||""});
+}
+var PANELS=["aSign","aRest","aSetPin","aLock","aForgot"];
+function showAuth(id){
+  $("auth").hidden=false; PANELS.forEach(function(x){ $(x).hidden=(x!==id); });
+  ["gErr","rErr","nErr","lErr"].forEach(function(e){ $(e).textContent=""; });
+  renderProfileText(); window.scrollTo(0,0);
+  var f={aSign:"gName",aRest:"rKey",aSetPin:"nPin",aLock:"lPin"}[id]; if(f) setTimeout(function(){ try{ $(f).focus(); }catch(e){} },80);
+}
+function hideAuth(){ $("auth").hidden=true; renderAll(); }
+function lockNow(){ if(PROFILE&&PROFILE.pinH&&PROFILE.lock!==false){ $("lPin").value=""; showAuth("aLock"); } }
+function bootAuth(){
+  if(!PROFILE){ showAuth("aSign"); return; }
+  if(!PROFILE.pinH){ $("nCancel").hidden=true; showAuth("aSetPin"); return; }
+  if(PROFILE.lock!==false) lockNow();
+}
+$("aLang").onclick=function(){ $("langBtn").click(); };
+
+/* sign up */
+$("gGo").onclick=async function(){
+  var e=$("gErr"), name=$("gName").value.trim(), mob=$("gMob").value.trim(), pin=$("gPin").value, pin2=$("gPin2").value;
+  if(name.length<2){ e.textContent=t("aBadName"); return; }
+  if(!/^[6-9]\d{9}$/.test(mob)){ e.textContent=t("aBadMob"); return; }
+  if(!/^\d{4}$/.test(pin)){ e.textContent=t("aBadPin"); return; }
+  if(pin!==pin2){ e.textContent=t("aPinMatch"); return; }
+  var v=readVeh("g"); if(v.err){ e.textContent=t(v.err); return; }
+  var salt=uid();
+  PROFILE=Object.assign({name:name,mobile:mob,salt:salt,pinH:await hashPin(pin,salt),lock:true},v.vals);
+  saveProfile(); ["gPin","gPin2"].forEach(function(i){ $(i).value=""; });
+  fillProfile(); hideAuth();
+};
+/* restore with a backup key (new phone) */
+$("gHave").onclick=function(){ $("rKey").value=""; showAuth("aRest"); };
+$("rBack").onclick=function(){ showAuth("aSign"); };
+$("rGo").onclick=async function(){
+  var e=$("rErr"), k=$("rKey").value.trim().toUpperCase().replace(/\s+/g,"");
+  if(!SYNC_URL){ e.textContent=t("cloudNotReady"); return; }
+  if(!okKey(k)){ e.textContent=t("cloudBadKey"); return; }
+  e.textContent=t("cloudWorking"); SY={key:k,last:0,pushed:0}; save("ab_sync",SY); renderCloud();
+  var ok=await syncNow();
+  if(!ok){ e.textContent=t("cloudFail"); return; }
+  if(PROFILE){ fillProfile(); if(PROFILE.pinH){ hideAuth(); } else { $("nCancel").hidden=true; showAuth("aSetPin"); } }
+  else { showAuth("aSign"); $("gName").value=S.name||""; $("gErr").textContent=t("aNoProfile"); }
+  fillSettings(); renderAll();
+};
+/* set or change the PIN */
+$("nGo").onclick=async function(){
+  var e=$("nErr"), pin=$("nPin").value, pin2=$("nPin2").value;
+  if(!/^\d{4}$/.test(pin)){ e.textContent=t("aBadPin"); return; }
+  if(pin!==pin2){ e.textContent=t("aPinMatch"); return; }
+  var salt=uid(); PROFILE.salt=salt; PROFILE.pinH=await hashPin(pin,salt); if(PROFILE.lock===undefined) PROFILE.lock=true;
+  save("ab_profile",PROFILE); $("nPin").value=""; $("nPin2").value=""; hideAuth();
+};
+$("nCancel").onclick=function(){ $("nPin").value=""; $("nPin2").value=""; hideAuth(); };
+/* unlock */
+async function tryUnlock(){
+  var f=load("ab_fail",{n:0,until:0}), e=$("lErr");
+  if(Date.now()<f.until){ e.textContent=t("aWait",{n:Math.ceil((f.until-Date.now())/60000)}); $("lPin").value=""; return; }
+  var pin=$("lPin").value; if(pin.length<4) return;
+  var hh=await hashPin(pin,PROFILE.salt);
+  if(hh===PROFILE.pinH){ save("ab_fail",{n:0,until:0}); $("lPin").value=""; hideAuth(); return; }
+  f.n=(f.n||0)+1;
+  if(f.n>=5){ f.n=0; f.until=Date.now()+5*60000; e.textContent=t("aWait",{n:5}); } else e.textContent=t("aWrong",{n:5-f.n});
+  save("ab_fail",f); $("lPin").value="";
+}
+$("lPin").addEventListener("input",tryUnlock);
+$("lForgot").onclick=function(){ showAuth("aForgot"); };
+$("fBack").onclick=function(){ $("lPin").value=""; showAuth("aLock"); };
+function eraseAll(){
+  if(!confirm(t("aEraseSure"))) return;
+  ["ab_trips","ab_exp","ab_settings","ab_profile","ab_sync","ab_fail"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+  location.reload();
+}
+$("fErase").onclick=eraseAll; $("pOut").onclick=eraseAll;
+/* profile card in Settings */
+$("pSave").onclick=function(){
+  var e=$("pErr"); e.className="err";
+  if(!PROFILE){ return; }
+  var name=$("pName").value.trim(), mob=$("pMob").value.trim();
+  if(name.length<2){ e.textContent=t("aBadName"); return; }
+  if(!/^[6-9]\d{9}$/.test(mob)){ e.textContent=t("aBadMob"); return; }
+  var v=readVeh("p"); if(v.err){ e.textContent=t(v.err); return; }
+  PROFILE=Object.assign(PROFILE,{name:name,mobile:mob},v.vals); saveProfile(); putVeh("p",PROFILE);
+  e.className="err ok"; e.textContent=t("saved"); setTimeout(function(){ e.textContent=""; e.className="err"; },2000);
+  renderHome();
+};
+$("pLockBtn").onclick=function(){ if(!PROFILE) return; PROFILE.lock=(PROFILE.lock===false); save("ab_profile",PROFILE); renderProfileText(); };
+$("pChange").onclick=function(){ if(!PROFILE) return; $("nPin").value=""; $("nPin2").value=""; $("nCancel").hidden=false; showAuth("aSetPin"); };
+$("pLockNow").onclick=function(){ if(PROFILE&&PROFILE.pinH){ $("lPin").value=""; showAuth("aLock"); } };
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden){ hiddenAt=Date.now(); return; }
+  if(hiddenAt&&Date.now()-hiddenAt>LOCK_AFTER&&!trip&&!bill&&$("auth").hidden) lockNow();
+});
+
+/* ---------- start ---------- */
+$("xDate").value=dk(Date.now());
+fillSettings(); fillProfile(); applyLang(); bootAuth();
+if(NATIVE){
+  try{
+    var rn=JSON.parse(AndroidBridge.getTrip());
+    if(rn.active){   /* resume a trip that kept running in the background */
+      trip={native:true,start:rn.start,dist:rn.km*1000,waitSec:rn.waitSec,acc:null,pts:[]};
+      ticker=setInterval(tick,1000); tick(); show("sRun"); initMap();
+    }
+  }catch(e){}
+}
+scheduleSync();
+if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+</script>
+</body>
+</html>
