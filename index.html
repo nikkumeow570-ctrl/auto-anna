@@ -27,7 +27,7 @@ header{position:sticky;top:0;z-index:5;background:var(--meter);color:#fff;paddin
 header h1{margin:0;font-size:1.25rem;font-weight:800}
 header h1 span{color:var(--amber)}
 .lang{min-height:44px;padding:0 16px;border-radius:999px;border:2px solid #555;background:transparent;color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
-main{padding:14px 16px calc(var(--navh) + 100px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+main{padding:14px 16px calc(var(--navh) + 150px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
 .view{display:none}.view.on{display:block}
 .card{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
 .big{font-size:2.6rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
@@ -39,7 +39,7 @@ main{padding:14px 16px calc(var(--navh) + 100px + env(safe-area-inset-bottom,0px
 .meter .mlab{color:#C9C5B8;font-size:1rem;font-weight:600}
 .meter .mnum{color:var(--meter-ink);font-size:3.6rem;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:.01em}
 .meter .msub{color:#C9C5B8;font-size:1rem;margin-top:2px}
-.mstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed #4A453A}
+.mstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed #4A453A}
 .mstats small{display:block;color:#C9C5B8;font-size:.9rem}
 .mstats b{font-size:1.4rem;font-variant-numeric:tabular-nums}
 .mstats .pos{color:#5FE0A0}.mstats .neg{color:#FF8E99}
@@ -48,7 +48,13 @@ main{padding:14px 16px calc(var(--navh) + 100px + env(safe-area-inset-bottom,0px
 .meter .muted{color:#C9C5B8}
 .live .big{color:var(--meter-ink)}
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:68px;border-radius:18px;border:0;font-size:1.35rem;font-weight:800;cursor:pointer;background:var(--amber);color:var(--on-amber);text-decoration:none}
+.btn{min-width:0;padding:0 12px;text-align:center;line-height:1.2}
+.btn span{min-width:0;overflow-wrap:anywhere}
 .btn svg{width:1.3em;height:1.3em;flex:none}
+.dock.two .btn{font-size:1.1rem;padding:0 8px;gap:8px}
+@media(max-width:400px){.dock.stk{grid-template-columns:minmax(0,1fr)!important;gap:8px}.dock.stk .btn{min-height:56px}}
+@media(max-width:360px){.btns.stk{grid-template-columns:minmax(0,1fr)!important}}
+body.kb .dock,body.kb nav{display:none}
 .btn:active{transform:scale(.98)}
 .btn.go{background:var(--good);color:#fff}
 .btn.stop{background:var(--bad);color:#fff}
@@ -56,15 +62,15 @@ main{padding:14px 16px calc(var(--navh) + 100px + env(safe-area-inset-bottom,0px
 .btn.sm{min-height:58px;font-size:1.1rem}
 .btn.alt{background:var(--surface);border:2px solid var(--ink);color:var(--ink)}
 .btns{display:grid;gap:10px;margin-top:12px}
-.btns.two{grid-template-columns:1fr 1fr}
+.btns.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 /* sticky action dock above the nav */
 .dock{position:fixed;left:0;right:0;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px));z-index:4;padding:10px 16px;background:linear-gradient(to top,var(--bg) 70%,transparent);display:grid;gap:10px;max-width:560px;margin:0 auto}
-.dock.two{grid-template-columns:1fr 1fr}
+.dock.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 label{display:block;font-weight:600;margin:12px 0 4px}
 input{width:100%;min-height:54px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.15rem;font-weight:500}
 summary{min-height:52px;display:flex;align-items:center;font-weight:700;cursor:pointer}
 details.adj{margin-top:6px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .warn{border-left:5px solid var(--amber);background:color-mix(in srgb,var(--amber) 16%,var(--surface));padding:12px 14px;border-radius:0 12px 12px 0;margin-bottom:12px}
 .err{color:var(--bad);min-height:1.4em;margin-top:6px}
 .ok{color:var(--good)}
@@ -204,9 +210,9 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
           <div><small data-i="profit">Profit</small><b id="todayNet">₹0</b></div>
         </div>
       </div>
-      <div class="btns two"><button class="btn sm alt" id="estBtn" type="button" data-i="est">Fare estimate</button>
+      <div class="btns two stk"><button class="btn sm alt" id="estBtn" type="button" data-i="est">Fare estimate</button>
         <button class="btn sm alt" id="manualBtn" type="button" data-i="manual">Manual bill</button></div>
-      <div class="btns two"><button class="btn sm ghost" id="shareRideBtn" type="button" data-i="shareRide">Share ride</button>
+      <div class="btns two stk"><button class="btn sm ghost" id="shareRideBtn" type="button" data-i="shareRide">Share ride</button>
         <button class="btn sm ghost" id="takeRideBtn" type="button" data-i="takeRide">Take ride</button></div>
       <div class="card" id="rideCard" hidden style="margin-top:12px"><h3 class="sec" data-i="rList" style="margin:0 0 4px">Shared rides</h3><div id="rideList"></div></div>
       <div class="err" id="gpsErr" role="alert"></div>
@@ -277,12 +283,12 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
         <div class="err" id="billErr" role="alert"></div>
         <div id="breakdown" style="margin-top:6px"></div>
       </div>
-      <div class="btns two">
+      <div class="btns two stk">
         <button class="btn sm ghost" id="speakBtn" type="button" data-i="speak">Say total</button>
         <button class="btn sm ghost" id="shareBtn" type="button" data-i="share">Share bill on WhatsApp</button>
       </div>
       <div class="btns"><button class="btn ghost" id="discard" type="button" data-i="discard">Discard trip</button></div>
-      <div class="dock two">
+      <div class="dock two stk">
         <button class="btn go" id="saveCash" type="button" data-i="cash">Got cash</button>
         <button class="btn go" id="saveUpi" type="button" data-i="upi">Got UPI</button>
       </div>
@@ -495,7 +501,7 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
 var APP_NAME = "Auto Anna";
 var APP_TA = "ஆட்டோ அண்ணா";
 /* After you deploy the sync server (see server/README.md), put its address here:
-   var SYNC_URL = "https://auto-anna-sync.nikkumeow570.workers.dev"; */
+   var SYNC_URL = "https://auto-anna-sync.yourname.workers.dev"; */
 var SYNC_URL = "https://auto-anna-sync.nikkumeow570.workers.dev";
 /* ================== */
 
@@ -1245,6 +1251,19 @@ $("manualBtn").onclick=function(){
 
 /* ---------- bill ---------- */
 var bill=null, wTimer=null, wStart=0;
+/* Hide the fixed bottom bars only while the on-screen keyboard really shrinks the screen. */
+(function(){
+  var baseH=window.innerHeight;
+  function typing(){ var a=document.activeElement; return !!a&&/^(INPUT|TEXTAREA)$/.test(a.tagName); }
+  function upd(){
+    var h=window.innerHeight; if(h>baseH) baseH=h;
+    document.body.classList.toggle("kb", typing() && baseH-h>150);
+  }
+  window.addEventListener("resize",upd);
+  window.addEventListener("orientationchange",function(){ setTimeout(function(){ baseH=window.innerHeight; upd(); },300); });
+  document.addEventListener("focusin",function(){ setTimeout(upd,350); });
+  document.addEventListener("focusout",function(){ setTimeout(upd,150); });
+})();
 document.addEventListener("click",function(e){ var b=e.target.closest&&e.target.closest(".btn.go,.btn.stop"); if(b&&navigator.vibrate){ try{ navigator.vibrate(25); }catch(x){} } });
 $("endBtn").onclick=function(){
   if(!trip) return;

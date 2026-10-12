@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 # One-command setup of the Auto Anna sync server on Cloudflare (Worker + D1 database).
 # Uses only curl + node (no wrangler, which does not run on Android).
+#
+#   export CLOUDFLARE_API_TOKEN="..."      # token with: Workers Scripts Edit + D1 Edit
+#   export CLOUDFLARE_ACCOUNT_ID="..."
+#   cd ~/auto-anna/server && bash deploy.sh
 set -euo pipefail
 cd "$(dirname "$0")"
-: "${CLOUDFLARE_API_TOKEN:?Set CLOUDFLARE_API_TOKEN first}"
-: "${CLOUDFLARE_ACCOUNT_ID:?Set CLOUDFLARE_ACCOUNT_ID first}"
+: "${CLOUDFLARE_API_TOKEN:?Set CLOUDFLARE_API_TOKEN first (see server/README.md)}"
+: "${CLOUDFLARE_ACCOUNT_ID:?Set CLOUDFLARE_ACCOUNT_ID first (see server/README.md)}"
 NAME="auto-anna-sync"
 API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
 command -v node >/dev/null || { echo "Install node first:  pkg install nodejs -y"; exit 1; }
 
 cf() { curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$@"; }
+# jget 'result.0.uuid'  -> prints that value from JSON on stdin ('' if missing)
 jget() { node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{let v;try{v=JSON.parse(s);for(const k of process.argv[1].split("."))v=v==null?v:v[k]}catch(e){v=""}console.log(v==null?"":(typeof v=="object"?JSON.stringify(v):v))})' "$1"; }
 fail() { echo "ERROR: $1"; [ -n "${2:-}" ] && echo "Cloudflare said: $2" | cut -c1-600; exit 1; }
 

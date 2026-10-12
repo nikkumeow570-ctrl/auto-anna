@@ -3,13 +3,20 @@
 Stores each driver's trips, expenses and settings so they can be restored on a new phone.
 Everything is on Cloudflare. No GitHub link, no Vercel, no Turso, no database password.
 
-## Fastest: one command from Termux (wrangler already logged in)
+## Fastest: one command from Termux (no wrangler, it does not run on Android)
+
+1. Cloudflare website > My Profile > API Tokens > Create Token > template **Edit Cloudflare Workers**. Add one more permission: **Account > D1 > Edit**. Create it and copy the token.
+2. Copy your **Account ID** (Workers & Pages overview, right side).
+3. In Termux:
 
 ```bash
+export CLOUDFLARE_API_TOKEN="paste-token"
+export CLOUDFLARE_ACCOUNT_ID="paste-account-id"
 cd ~/auto-anna/server && bash deploy.sh
 ```
 
-It creates the D1 database and tables, deploys the Worker, saves a random KEY_PEPPER in `~/.auto-anna-pepper`, tests the server, and writes the address into `index.html`. Safe to run again.
+If it says your account has no workers.dev name yet, run `SUBDOMAIN=yourname bash deploy.sh`.
+It creates the D1 database, uploads the Worker with its binding and secret, saves a random KEY_PEPPER in `~/.auto-anna-pepper`, tests the server, and writes the address into `index.html`. Safe to run again.
 
 ## Or set it up from a phone browser
 
