@@ -1,3 +1,0 @@
-{
-  "functions": { "api/sync.js": { "maxDuration": 15 } }
-}

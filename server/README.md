@@ -1,35 +1,40 @@
-# Auto Anna sync server (Turso + Vercel)
+# Auto Anna sync server (Cloudflare Workers + D1)
 
 Stores each driver's trips, expenses and settings so they can be restored on a new phone.
-The Turso token stays on this server. The app only holds a random backup key.
+Everything is on Cloudflare. No GitHub link, no Vercel, no Turso, no database password.
 
-## Set it up from a phone browser (no computer needed)
+## Fastest: one command from Termux (wrangler already logged in)
 
-1. **Turso:** sign in at turso.tech, create a database named `auto-anna`.
-   Copy its **URL** (starts with `libsql://`) and create a **token** with read and write access.
-2. **Vercel:** sign in at vercel.com with GitHub, choose **Add New, Project**, and import your `auto-anna` repo.
-   - Set **Root Directory** to `server`.
-   - Add these **Environment Variables**:
-     - `TURSO_DATABASE_URL` = the libsql URL
-     - `TURSO_AUTH_TOKEN` = the token
-     - `KEY_PEPPER` = any long random text (optional, adds protection)
-   - Press **Deploy**. The tables are created automatically on the first request.
-3. Your endpoint is `https://YOUR-PROJECT.vercel.app/api/sync`.
-4. In `index.html` near the top, set:
-   `var SYNC_URL = "https://YOUR-PROJECT.vercel.app/api/sync";`
-   then commit and push. The new APK is built automatically.
+```bash
+cd ~/auto-anna/server && bash deploy.sh
+```
+
+It creates the D1 database and tables, deploys the Worker, saves a random KEY_PEPPER in `~/.auto-anna-pepper`, tests the server, and writes the address into `index.html`. Safe to run again.
+
+## Or set it up from a phone browser
+
+1. **Database:** dash.cloudflare.com > Storage & Databases > D1 SQL Database > Create. Name it `auto-anna`.
+2. **Worker:** Workers & Pages > Create > Create Worker. Name it `auto-anna-sync`, press Deploy.
+3. Press **Edit code**, delete everything, paste all of `worker.js`, press **Deploy**.
+4. Worker > **Settings > Bindings > Add > D1 database**. Variable name must be exactly `DB`. Pick `auto-anna`. Save.
+5. Worker > **Settings > Variables and Secrets > Add**: `KEY_PEPPER` (type Secret) = long random text.
+   Write it down and never change it, or every backup key stops matching.
+6. Your address is `https://auto-anna-sync.YOURNAME.workers.dev` (shown on the Worker page).
+7. In `index.html` set `var SYNC_URL = "https://auto-anna-sync.YOURNAME.workers.dev";`, commit, push.
+
+The two tables are created automatically on the first request.
+
+Test: `curl -s -X POST URL -H 'Content-Type: application/json' -d '{"key":"K7M2-QX4P-9TRW-3ZHD","since":0,"changes":[]}'`
 
 ## How it works
-
-- The phone makes a random backup key like `K7M2-QX4P-9TRW-3ZHD`. The server stores only a SHA-256 hash of it.
+- The phone makes a random backup key like `K7M2-QX4P-9TRW-3ZHD`. The server stores only a SHA-256 hash of it (with the pepper).
 - Each trip, expense and the settings are separate records with an updated-time. The newest edit wins.
 - Deletes are kept as markers, so a deletion on one phone reaches the others.
-- `POST /api/sync` with `{ key, since, changes[] }` returns `{ now, changes[], more, last }`.
+- `POST` with `{ key, since, changes[] }` returns `{ now, changes[], more, last }`.
 
-## Limits and honest notes
-
-- Anyone who has a driver's key can read that driver's data, so the key must be kept private.
-  If a key is lost, the data cannot be recovered. There is no phone number or password reset.
+## Notes
+- Tested here against a local SQLite stand-in for D1 (two devices, deletes, stale edits, wrong key, paging). Not yet tested on real Cloudflare.
+- Anyone with a driver's key can read that driver's data. A lost key cannot be recovered.
 - The backup includes the driver's UPI ID and name, because they are part of the settings.
-- There is no rate limiting beyond Vercel's own platform limits. Add one (for example Upstash) before a large launch.
-- Turso and Vercel free plans have limits that can change. Check their current pricing pages.
+- There is no rate limiting beyond Cloudflare's platform limits. Add one before a large launch.
+- Cloudflare free-plan limits change. Check their pricing page.

@@ -1,0 +1,5 @@
+# Used by deploy.sh. The [[d1_databases]] block is added by deploy.sh after it creates the database.
+name = "auto-anna-sync"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true

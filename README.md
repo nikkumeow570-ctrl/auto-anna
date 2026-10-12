@@ -31,7 +31,7 @@ Tamil speech needs a Tamil voice on the phone (Settings, Language, Text-to-speec
 - **PIN lock:** the app locks after 10 minutes in the background or with "Lock now". Five wrong PINs give a 5-minute wait. "Forgot PIN" erases this phone's data, which can then be restored with the cloud backup key. The PIN only stops other people from opening the app on this phone. It is not strong encryption.
 - **Restore on a new phone:** "I already have a backup key" on the sign-up screen brings back the profile, trips, expenses and rates. The PIN is never copied, so a new PIN is set on the new phone.
 - **Checks on typing:** numbers only, no negatives, and limits on very large values.
-- **Cloud backup (Turso):** optional. A random backup key restores trips, expenses and settings on a new phone. See `server/README.md`.
+- **Cloud backup (Cloudflare D1):** optional. A random backup key restores trips, expenses and settings on a new phone. See `server/README.md`.
 - Tamil first, English with one tap. Installable PWA. Works offline.
 
 ## Run it
@@ -112,4 +112,4 @@ Add these repository secrets (Settings, Secrets and variables, Actions): `KEYSTO
 
 ## Privacy
 
-Trips, expenses, rates and UPI ID are stored on the phone. Nothing is sent anywhere unless the driver turns on **Cloud backup**. Then the same data is stored in your Turso database, under a random backup key. Anyone with that key can read that driver's data, and a lost key cannot be recovered. The backup includes the driver's name, mobile number, auto number, RC number and insurance details. The PIN is not uploaded.
+Trips, expenses, rates and UPI ID are stored on the phone. Nothing is sent anywhere unless the driver turns on **Cloud backup**. Then the same data is stored in your Cloudflare D1 database, under a random backup key. Anyone with that key can read that driver's data, and a lost key cannot be recovered. The backup includes the driver's name, mobile number, auto number, RC number and insurance details. The PIN is not uploaded.

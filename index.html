@@ -495,8 +495,8 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
 var APP_NAME = "Auto Anna";
 var APP_TA = "ஆட்டோ அண்ணா";
 /* After you deploy the sync server (see server/README.md), put its address here:
-   var SYNC_URL = "https://your-project.vercel.app/api/sync"; */
-var SYNC_URL = "";
+   var SYNC_URL = "https://auto-anna-sync.nikkumeow570.workers.dev"; */
+var SYNC_URL = "https://auto-anna-sync.nikkumeow570.workers.dev";
 /* ================== */
 
 var NATIVE = false;
@@ -1363,7 +1363,7 @@ if(NATIVE){
   document.addEventListener("visibilitychange",function(){ if(!document.hidden){ renderSound(); renderPays(); } });
 }
 
-/* ---------- cloud backup (Turso, through your sync server) ---------- */
+/* ---------- cloud backup (Cloudflare D1, through your sync Worker) ---------- */
 var SY = load("ab_sync",{key:"",last:0,pushed:0});
 var syncing=false, syncTimer=null;
 function newKey(){

@@ -1,6 +1,7 @@
--- Created automatically by api/sync.js on first request. Kept here for reference.
+-- Created automatically by worker.js on first request. Kept here for reference
+-- (you can also paste it in the D1 database Console).
 CREATE TABLE IF NOT EXISTS drivers (
-  kh      TEXT PRIMARY KEY,          -- sha256 of the backup key (the key itself is never stored)
+  kh      TEXT PRIMARY KEY,          -- sha256 of the backup key + pepper (the key itself is never stored)
   created INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS records (
