@@ -206,6 +206,9 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
       </div>
       <div class="btns two"><button class="btn sm alt" id="estBtn" type="button" data-i="est">Fare estimate</button>
         <button class="btn sm alt" id="manualBtn" type="button" data-i="manual">Manual bill</button></div>
+      <div class="btns two"><button class="btn sm ghost" id="shareRideBtn" type="button" data-i="shareRide">Share ride</button>
+        <button class="btn sm ghost" id="takeRideBtn" type="button" data-i="takeRide">Take ride</button></div>
+      <div class="card" id="rideCard" hidden style="margin-top:12px"><h3 class="sec" data-i="rList" style="margin:0 0 4px">Shared rides</h3><div id="rideList"></div></div>
       <div class="err" id="gpsErr" role="alert"></div>
       <div class="dock"><button class="btn go" id="startBtn" type="button" data-i="start">Start trip</button></div>
     </div>
@@ -438,6 +441,47 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
   </div>
 </div>
 
+<div class="modal" id="rideM" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div id="rShare">
+      <h3 style="margin:0" data-i="shareRide">Share ride</h3>
+      <label for="rFrom" data-i="rFrom">Pickup</label><input id="rFrom" maxlength="60" autocomplete="off">
+      <label for="rTo" data-i="rTo">Drop</label><input id="rTo" maxlength="60" autocomplete="off">
+      <div class="grid2">
+        <div><label for="rFare" data-i="fareL">Fare (₹)</label><input id="rFare" inputmode="numeric" maxlength="5"></div>
+        <div><label for="rComm" data-i="rComm">Your commission (₹)</label><input id="rComm" inputmode="numeric" maxlength="4"></div>
+      </div>
+      <div class="err" id="rdErr" role="alert"></div>
+      <div class="btns"><button class="btn go" id="rdGo" type="button" data-i="rdGo">Share on WhatsApp</button></div>
+    </div>
+    <div id="rPaste" hidden>
+      <h3 style="margin:0" data-i="takeRide">Take ride</h3>
+      <label for="rCode" data-i="rPasteL">Paste the ride link or code</label><input id="rCode" autocomplete="off">
+      <div class="err" id="rPErr" role="alert"></div>
+      <div class="btns"><button class="btn go" id="rOpen" type="button" data-i="rOpen">Open ride</button></div>
+    </div>
+    <div id="rView" hidden>
+      <h3 style="margin:0" data-i="rvTitle">Ride offer</h3>
+      <div class="card" style="margin-top:10px">
+        <div class="muted" id="rvBy"></div>
+        <div style="font-weight:700;font-size:1.2rem;margin:6px 0" id="rvRoute"></div>
+        <div class="row"><span data-i="fareL">Fare (₹)</span><b id="rvFare"></b></div>
+        <div class="row"><span data-i="rComm">Commission</span><b id="rvComm"></b></div>
+      </div>
+      <div class="muted" data-i="rvNote"></div>
+      <div class="btns"><button class="btn go" id="rvTake" type="button" data-i="rvTake">I'll take it</button></div>
+    </div>
+    <div id="rPay" hidden>
+      <h3 style="margin:0" data-i="rPayTitle">Pay commission</h3>
+      <div class="fare" id="rpAmt"></div>
+      <div class="muted" id="rpTo" style="text-align:center"></div>
+      <div id="rqBox" class="qr" aria-label="UPI QR"></div>
+      <div class="btns"><a class="btn sm ghost" id="rpLink" href="#" data-i="payApp">Pay with UPI app</a>
+        <button class="btn go" id="rpPaid" type="button" data-i="rPaid">Paid</button></div>
+    </div>
+    <div class="btns"><button class="btn ghost" id="rClose" type="button" data-i="rLater">Later</button></div>
+  </div>
+</div>
 <nav aria-label="Main">
   <button class="on" data-v="vTrip" type="button" data-i="nTrip">Trip</button>
   <button data-v="vEarn" type="button" data-i="nEarn">Earnings</button>
@@ -459,7 +503,14 @@ var NATIVE = false;
 try { NATIVE = !!(window.AndroidBridge && window.AndroidBridge.isNative && window.AndroidBridge.isNative()); } catch (e) {}
 
 var TXT = {
- en:{adjust:"Change distance / wait",today:"Today",start:"Start trip",manual:"Manual bill",running:"Trip running",waiting:"Waiting",time:"Time",fareNow:"Fare so far",gps:"GPS signal",
+ en:{shareRide:"Share ride",takeRide:"Take ride",rList:"Shared rides",rFrom:"Pickup",rTo:"Drop",rComm:"Your commission (₹)",rdGo:"Share on WhatsApp",
+  rBad:"Fill pickup, drop and fare.",rBadComm:"Commission must be less than the fare.",rPasteL:"Paste the ride link or code",rOpen:"Open ride",rBadLink:"This link is not valid.",
+  rvTitle:"Ride offer",rvBy:"From {n}",rvTake:"I'll take it",rvNote:"Start your trip and bill as usual. After the trip you will pay the commission to the driver who shared it.",
+  rMsg:"{app} ride offer\n{from} to {to}\nFare: ₹{fare}\nCommission: ₹{comm} to {name}\nTake it: {link}",
+  rTaken:"I will take your ride: {from} to {to}. - {name}",
+  stShared:"Waiting for commission ₹{c}",stTaken:"You took this ride. Start trip.",stOwed:"Pay commission ₹{c}",stPaid:"Done",
+  rGot:"Got commission",rPayTitle:"Pay commission",rPaid:"Paid",rDrop:"Drop ride",rLater:"Later",rPayBtn:"Pay now",rSetName:"Set your name in Settings first.",
+  adjust:"Change distance / wait",today:"Today",start:"Start trip",manual:"Manual bill",running:"Trip running",waiting:"Waiting",time:"Time",fareNow:"Fare so far",gps:"GPS signal",
   keepOn:"Keep this screen open while the trip runs.",keepOnNative:"GPS keeps running if you switch apps.",
   end:"End trip and bill",total:"Total fare",km:"Distance (km)",waitMin:"Waiting (min)",
   luggage:"Luggage / extra (₹)",payApp:"Pay with UPI app",share:"Share bill on WhatsApp",speak:"Say total",cash:"Got cash",upi:"Got UPI",discard:"Discard trip",
@@ -510,97 +561,105 @@ var TXT = {
   insSoon:"Insurance ends in {n} days",insToday:"Insurance ends today",insEnded:"Insurance has expired",rcptAuto:"Auto: {n}",
   total_say:"Total {n} rupees"},
  ta:{
-  today:"இன்னைக்கு",
-  adjust:"தூரம் / காத்திருப்பு மாத்து",
-  start:"பயணத்தை தொடங்கு",
-  manual:"கையால பில்",
-  running:"பயணம் போயிட்டு இருக்கு",
-  waiting:"வெயிட்டிங்",
+  today:"இன்னைக்குங்கோ",
+
+  shareRide:"சவாரியை பகிருங்கோ",takeRide:"சவாரியை எடுத்துக்கோங்கோ",rList:"பகிர்ந்த சவாரிகள்",rFrom:"எங்கிருந்துங்கோ",rTo:"எங்கே போகணும்ங்கோ",rComm:"உங்களுக்கான கமிஷன் (₹)",rdGo:"WhatsApp-ல் பகிருங்கோ",
+  rBad:"எங்கிருந்து, எங்கே போகணும், கட்டணத்தை போடுங்கோ",rBadComm:"கமிஷன் கட்டணத்தை விட குறைவாகத்தான் இருக்கணும்ங்கோ",rPasteL:"சவாரி லிங்க் / கோடை ஒட்டுங்கோ",rOpen:"சவாரியை பாருங்கோ",rBadLink:"இந்த லிங்க் சரியில்லீங்கோ",
+  rvTitle:"சவாரி வந்திருக்குங்கோ",rvBy:"{n} அவர்களிடமிருந்து",rvTake:"நான் எடுத்துக்கறேன்ங்கோ",rvNote:"வழக்கம் போல பயணத்தை தொடங்கி பில் போடுங்கோ. முடிஞ்சதும் சவாரி கொடுத்தவங்களுக்கு கமிஷனை கொடுத்துடுங்கோ.",
+  rMsg:"{app} சவாரி\n{from} லிருந்து {to} வரை\nகட்டணம்: ₹{fare}\nகமிஷன்: ₹{comm} ({name}) அவர்களுக்கு\nஎடுக்க: {link}",
+  rTaken:"உங்க சவாரியை நான் எடுத்துக்கறேன்: {from} லிருந்து {to} வரை. - {name}",
+  stShared:"கமிஷன் ₹{c} வரணும்ங்கோ",stTaken:"சவாரி எடுத்தாச்சுங்கோ. பயணத்தை தொடங்குங்கோ.",stOwed:"கமிஷன் ₹{c} கொடுக்கணும்ங்கோ",stPaid:"முடிஞ்சதுங்கோ",
+  rGot:"கமிஷன் வந்திருச்சுங்கோ",rPayTitle:"கமிஷன் கொடுங்கோ",rPaid:"கொடுத்துட்டேன்ங்கோ",rDrop:"சவாரி வேண்டாம்ங்கோ",rLater:"பிறகு பார்க்கலாம்ங்கோ",rPayBtn:"இப்போ கொடுங்கோ",rSetName:"முதல்ல செட்டிங்ஸ்ல உங்க பேரை போடுங்கோ",
+  adjust:"தூரம் / காத்திருப்பை மாத்துங்கோ",
+  start:"பயணத்தை தொடங்குங்கோ",
+  manual:"கையால் பில் போடுங்கோ",
+  running:"பயணம் போய்க்கிட்டு இருக்குதுங்கோ",
+  waiting:"காத்திருப்பு",
   time:"நேரம்",
-  fareNow:"இதுவரை பில்",
+  fareNow:"இதுவரைக்குமான பில்",
   gps:"GPS சிக்னல்",
-  keepOn:"பயணம் முடியுற வரை இந்த திரையை திறந்தே வையுங்க",
-  keepOnNative:"வேற ஆப்புக்கு போனாலும் GPS ஓடும்",
-  end:"பயணம் முடி, பில் போடு",
+  keepOn:"பயணம் முடியுற வரைக்கும் இந்த திரையை திறந்தே வைங்கோ",
+  keepOnNative:"வேற ஆப்புக்கு போனாலும் GPS ஓடிக்கிட்டே இருக்கும்ங்கோ",
+  end:"பயணத்தை முடிச்சு பில் போடுங்கோ",
   total:"மொத்த பில்",
   km:"தூரம் (கி.மீ)",
-  waitMin:"வெயிட்டிங் (நிமிஷம்)",
+  waitMin:"காத்திருப்பு (நிமிஷம்)",
   luggage:"லக்கேஜ் / கூடுதல் (₹)",
-  payApp:"UPI ஆப்பில் கட்டு",
-  share:"WhatsApp-ல பில் அனுப்பு",
-  speak:"தொகையை சொல்லு",
-  cash:"பணம் வாங்கிட்டேன்",
-  upi:"UPI வந்துடுச்சு",
-  discard:"பயணத்தை அழி",
-  cashT:"பணம்",
+  payApp:"UPI ஆப்பில் கட்ட வைங்கோ",
+  share:"WhatsApp-ல் பில் அனுப்புங்கோ",
+  speak:"தொகையை சொல்லுங்கோ",
+  cash:"பணத்தை வாங்கிட்டேன்ங்கோ",
+  upi:"UPI வந்திருச்சுங்கோ",
+  discard:"பயணத்தை அழிச்சிருங்கோ",
+  cashT:"ரொக்கம்",
   upiT:"UPI",
   kmT:"தூரம்",
   inc:"வரவு",
   exp:"செலவு",
   profit:"லாபம்",
   dayT:"நாள்",
-  monthT:"மாசம்",
+  monthT:"மாதம்",
   yearT:"வருஷம்",
   tripsH:"பயணங்கள்",
   expH:"செலவுகள்",
-  tripsN:"{n} பயணம்",
-  noTrips:"பயணம் இல்லை",
-  noExp:"செலவு இல்லை",
-  payTo:"கஸ்டமர் உங்களுக்கு எங்கே பணம் தருவாங்க",
+  tripsN:"{n} பயணங்கள்",
+  noTrips:"பயணம் எதுவும் இல்லீங்கோ",
+  noExp:"செலவு எதுவும் இல்லீங்கோ",
+  payTo:"வாடிக்கையாளர் உங்களுக்கு எங்கே பணம் தருவாங்கோ",
   name:"உங்க பேரு",
   upiId:"உங்க UPI ID",
   rates:"உங்க பில் கணக்கு",
-  helpNote:"ஒரு தடவை மட்டும் செட் பண்ணனும். தெரிஞ்சவங்க கிட்ட கேட்டு நிரப்புங்க",
+  helpNote:"ஒரு தடவை மட்டும் செட் பண்ணினா போதும்ங்கோ. தெரிஞ்சவங்க கிட்ட கேட்டு நிரப்புங்கோ",
   base:"ஆரம்பக் கட்டணம் (₹)",
   baseKm:"ஆரம்பத்துல எத்தனை கி.மீ",
   perKm:"அதுக்கு மேல ஒரு கி.மீக்கு (₹)",
-  waitRate:"வெயிட்டிங் ஒரு நிமிஷத்துக்கு (₹)",
+  waitRate:"காத்திருப்பு ஒரு நிமிஷத்துக்கு (₹)",
   moreRates:"இரவு கூடுதல் (வேணும்னா)",
   nightPct:"இரவு கூடுதல் (%)",
   nightFrom:"இரவு ஆரம்பம் (மணி 0-23)",
-  nightTo:"இரவு முடிவு (மணி 0-23)",
-  save:"சேமி",
-  wipe:"எல்லா பயணத்தையும் அழி",
+  nightTo:"இரவு முடியுறது (மணி 0-23)",
+  save:"சேமிச்சு வைங்கோ",
+  wipe:"எல்லா பயணத்தையும் அழிச்சிருங்கோ",
   nTrip:"பயணம்",
   nEarn:"வரவு",
   nExp:"செலவு",
   nSet:"செட்டிங்ஸ்",
-  needRates:"முதல் பயணத்துக்கு முன்னாடி செட்டிங்ஸ்ல UPI ID-யும் பில் கணக்கையும் செட் பண்ணுங்க",
-  gpsDenied:"லொகேஷன் அனுமதி இல்லை. போன் செட்டிங்ஸ்ல இந்த ஆப்புக்கு லொகேஷனை ஆன் பண்ணுங்க",
-  gpsNo:"இந்த போன்ல GPS கிடைக்கல",
-  gpsWeak:"வீக்கா இருக்கு",
-  gpsOk:"நல்லா இருக்கு",
-  gpsWait:"தேடுது...",
-  gpsOff:"போன் லொகேஷனை ஆன் பண்ணுங்க",
+  needRates:"முதல் பயணத்துக்கு முன்னாடி செட்டிங்ஸ்ல UPI ID-யும் பில் கணக்கையும் செட் பண்ணுங்கோ",
+  gpsDenied:"லொகேஷன் அனுமதி இல்லீங்கோ. போன் செட்டிங்ஸ்ல இந்த ஆப்புக்கு லொகேஷனை ஆன் பண்ணுங்கோ",
+  gpsNo:"இந்த போன்ல GPS கிடைக்கலீங்கோ",
+  gpsWeak:"சிக்னல் கம்மியா இருக்குதுங்கோ",
+  gpsOk:"சிக்னல் நல்லா இருக்குதுங்கோ",
+  gpsWait:"தேடிக்கிட்டு இருக்குதுங்கோ...",
+  gpsOff:"போன் லொகேஷனை ஆன் பண்ணுங்கோ",
   fBase:"ஆரம்பக் கட்டணம்",
-  fExtra:"தூரத்துக்கு",
-  fWait:"வெயிட்டிங்",
+  fExtra:"தூரத்துக்கானது",
+  fWait:"காத்திருப்பு",
   fNight:"இரவு கூடுதல்",
   fLug:"லக்கேஜ் / கூடுதல்",
-  needUpi:"QR காட்ட செட்டிங்ஸ்ல சரியான UPI ID போடுங்க",
-  qrNote:"கஸ்டமர் ஸ்கேன் பண்ணி இதே தொகையை கட்டுவார்",
-  saved:"சேவ் ஆயிடுச்சு",
-  badUpi:"name@bank மாதிரி சரியான UPI ID போடுங்க",
-  badNum:"கணக்கை செக் பண்ணுங்க. நம்பர் மட்டும் போடுங்க",
-  badBig:"ஒரு நம்பர் ரொம்ப பெருசா இருக்கு",
-  badNeg:"0-க்கு மேல நம்பர் போடுங்க",
-  confirmWipe:"சேவ் பண்ண எல்லா பயணத்தையும் அழிக்கவா?",
-  confirmDel:"இதை அழிக்கவா?",
-  billMsg:"{app} பில்\n{date}\nதூரம்: {km} கி.மீ\nவெயிட்டிங்: {w} நிமிஷம்\nமொத்தம்: ₹{fare}\nUPI-ல கட்ட: {link}",
-  disclaimer:"இந்த ஆப் GPS தூரம், உங்க சொந்த பில் கணக்கை வச்சு பில் போடுது. இது அரசாங்க மீட்டர் இல்லை. பில் போடுறதுக்கு முன்னாடி உங்க ஊர் ரூல்ஸை செக் பண்ணுங்க",
-  cashL:"பணம்",
+  needUpi:"QR காட்டணும்னா செட்டிங்ஸ்ல சரியான UPI ID போடுங்கோ",
+  qrNote:"வாடிக்கையாளர் ஸ்கேன் பண்ணி இதே தொகையைத்தான் கட்டுவாருங்கோ",
+  saved:"சேவ் ஆயிடுச்சுங்கோ",
+  badUpi:"name@bank மாதிரி சரியான UPI ID போடுங்கோ",
+  badNum:"கணக்கை செக் பண்ணுங்கோ. நம்பரை மட்டும் போடுங்கோ",
+  badBig:"ஒரு நம்பர் ரொம்ப பெருசா இருக்குதுங்கோ",
+  badNeg:"0-க்கு மேல நம்பரை போடுங்கோ",
+  confirmWipe:"சேவ் பண்ணின எல்லா பயணத்தையும் அழிச்சிரவா?",
+  confirmDel:"இதை அழிச்சிரவா?",
+  billMsg:"{app} பில்\n{date}\nதூரம்: {km} கி.மீ\nகாத்திருப்பு: {w} நிமிஷம்\nமொத்தம்: ₹{fare}\nUPI-ல் கட்ட: {link}",
+  disclaimer:"இந்த ஆப் GPS தூரம், உங்க சொந்த பில் கணக்கை வச்சு பில் போடுதுங்கோ. இது அரசாங்க மீட்டர் இல்லீங்கோ. பில் போடுறதுக்கு முன்னாடி உங்க ஊர் விதிமுறையை செக் பண்ணிக்கோங்கோ",
+  cashL:"ரொக்கம்",
   upiL:"UPI",
-  waitStart:"வெயிட்டிங் ஆரம்பி",
-  waitStop:"நிறுத்து",
-  mapOffline:"மேப்புக்கு நெட் வேணும். பாதைக் கோடு தெரியும்",
-  editTrip:"பயணத்தை மாத்து",
+  waitStart:"காத்திருப்பை தொடங்குங்கோ",
+  waitStop:"நிறுத்துங்கோ",
+  mapOffline:"மேப்புக்கு இணையம் வேணும்ங்கோ. பாதைக் கோடு தெரியும்ங்கோ",
+  editTrip:"பயணத்தை மாத்துங்கோ",
   fareL:"பில் (₹)",
-  modeL:"எப்படி கட்டினாங்க",
-  delete:"அழி",
-  cancel:"வேணாம்",
-  addExp:"செலவு சேர்",
+  modeL:"எப்படி கட்டினாங்கோ",
+  delete:"அழிச்சிருங்கோ",
+  cancel:"வேண்டாம்ங்கோ",
+  addExp:"செலவை சேருங்கோ",
   amountL:"தொகை (₹)",
-  noteL:"குறிப்பு (வேணும்னா)",
+  noteL:"குறிப்பு (வேணும்னா போடுங்கோ)",
   dateL:"தேதி",
   x_fuel:"பெட்ரோல் / டீசல்",
   x_rent:"வாடகை",
@@ -608,92 +667,92 @@ var TXT = {
   x_food:"சாப்பாடு",
   x_other:"மற்றது",
   cloudH:"கிளவுட் பேக்அப்",
-  cloudHelp:"உங்க பயணம், செலவு, பில் கணக்கு, UPI ID எல்லாம் நெட்ல சேவ் ஆகும். புது போன்ல உங்க பேக்அப் கீயால திரும்ப எடுத்துக்கலாம்",
-  cloudOn:"பேக்அப் ஆன் பண்ணு",
-  cloudRestore:"கீயால திரும்ப எடு",
-  restore:"திரும்ப எடு",
+  cloudHelp:"உங்க பயணம், செலவு, பில் கணக்கு, UPI ID எல்லாமே இணையத்துல சேவ் ஆகும்ங்கோ. புது போன்ல உங்க பேக்அப் கீயை வச்சு திரும்ப எடுத்துக்கலாம்ங்கோ",
+  cloudOn:"பேக்அப்பை ஆன் பண்ணுங்கோ",
+  cloudRestore:"கீயை வச்சு திரும்ப எடுங்கோ",
+  restore:"திரும்ப எடுங்கோ",
   cloudKey:"உங்க பேக்அப் கீ",
-  cloudKeyNote:"இந்த கீயை எழுதி வச்சுக்குங்க. இது இல்லாம திரும்ப எடுக்க முடியாது",
-  cloudNow:"இப்போ சிங்க் பண்ணு",
-  cloudSynced:"சிங்க் ஆயிடுச்சு",
-  cloudFail:"சிங்க் பண்ண முடியல. நெட் இருக்கான்னு பாருங்க",
-  cloudNotReady:"கிளவுட் பேக்அப் இன்னும் செட் பண்ணல",
-  cloudBadKey:"இந்த கீ தப்பா இருக்கு",
-  cloudWorking:"சிங்க் பண்ணுது...",
+  cloudKeyNote:"இந்த கீயை எழுதி வச்சுக்கோங்கோ. இது இல்லாம திரும்ப எடுக்க முடியாதுங்கோ",
+  cloudNow:"இப்போ சிங்க் பண்ணுங்கோ",
+  cloudSynced:"சிங்க் ஆயிடுச்சுங்கோ",
+  cloudFail:"சிங்க் பண்ண முடியலீங்கோ. இணையம் இருக்கான்னு பாருங்கோ",
+  cloudNotReady:"கிளவுட் பேக்அப் இன்னும் செட் பண்ணலீங்கோ",
+  cloudBadKey:"இந்த கீ தப்பா இருக்குதுங்கோ",
+  cloudWorking:"சிங்க் பண்ணிக்கிட்டு இருக்குதுங்கோ...",
   sbH:"UPI பணம் வந்த அறிவிப்பு",
-  sbHelp:"GPay, PhonePe, Paytm, BHIM-ல இருந்து \"பணம் வந்தது\"னு வரும் நோட்டிஃபிகேஷனை இந்த போன்லயே படிச்சு தொகையை சொல்லும். தொகை மட்டும் தான் இந்த போன்ல சேவ் ஆகும்",
-  sbHelp2:"சுவிட்ச் சாம்பல் கலர்ல இருந்தா: போன் Settings, Apps, இந்த ஆப், மூணு புள்ளி, Allow restricted settings",
-  sbOnTxt:"பணம் வருதான்னு கேட்டுட்டு இருக்கு",
-  sbOffTxt:"கேட்கல. பணம் வந்த அறிவிப்பை ஆன் பண்ணுங்க",
-  sbEnable:"அறிவிப்பை ஆன் பண்ணு",
+  sbHelp:"GPay, PhonePe, Paytm, BHIM-லிருந்து \"பணம் வந்தது\"ன்னு வர்ற அறிவிப்பை இந்த போன்லயே படிச்சு தொகையை சொல்லும்ங்கோ. தொகை மட்டும் தான் இந்த போன்ல சேவ் ஆகும்ங்கோ",
+  sbHelp2:"சுவிட்ச் சாம்பல் கலர்ல இருந்தா: போன் Settings, Apps, இந்த ஆப், மூணு புள்ளி, Allow restricted settings-ஐ ஆன் பண்ணுங்கோ",
+  sbOnTxt:"பணம் வருதான்னு கேட்டுக்கிட்டு இருக்குதுங்கோ",
+  sbOffTxt:"கேட்கலீங்கோ. பணம் வந்த அறிவிப்பை ஆன் பண்ணுங்கோ",
+  sbEnable:"அறிவிப்பை ஆன் பண்ணுங்கோ",
   sbVoiceOn:"குரல்: ஆன்",
   sbVoiceOff:"குரல்: ஆஃப்",
-  sbTest:"குரலை சோதி",
-  sbBattery:"பின்னாடி ஓட அனுமதி",
-  payH:"இன்னைக்கு UPI அறிவிப்பு",
-  noPay:"இன்னைக்கு பணம் வந்த அறிவிப்பு இல்லை",
-  est:"பில் மதிப்பீடு",
-  estWhere:"எங்கே போகணும்?",
-  estSearch:"தேடு",
+  sbTest:"குரலை சோதிச்சு பாருங்கோ",
+  sbBattery:"பின்னாடி ஓட அனுமதி கொடுங்கோ",
+  payH:"இன்னைக்கு UPI அறிவிப்புகள்",
+  noPay:"இன்னைக்கு பணம் வந்த அறிவிப்பு எதுவும் இல்லீங்கோ",
+  est:"பில் எவ்வளவுன்னு பாருங்கோ",
+  estWhere:"எங்கே போகணும்ங்கோ?",
+  estSearch:"தேடுங்கோ",
   estFare:"மதிப்பீட்டு பில்",
   estDist:"தூரம்",
-  estTime:"ரோட்டு நேரம்",
-  estBack:"பின்னாடி",
-  estNote:"இது ரோட்டு தூரத்தை வச்சு போட்ட மதிப்பீடு. டிராஃபிக், வெயிட்டிங், சுத்தி போறதுனால இறுதி பில் மாறலாம்",
-  estType:"இடத்தோட பேரை டைப் பண்ணுங்க",
-  estSearching:"தேடுது...",
-  estNone:"இடம் கிடைக்கல. பெரிய பேரா போடுங்க, இல்ல ஊர் பேரையும் சேர்த்து போடுங்க",
-  estFail:"தேட முடியல. நெட் இருக்கான்னு பாருங்க",
-  estPick:"சரியான இடத்தை தொடுங்க:",
-  estLocating:"உங்க லொகேஷனை தேடுது...",
-  estNoLoc:"லொகேஷன் கிடைக்கல. போன் லொகேஷனை ஆன் பண்ணுங்க",
-  estRouting:"ரோட்டை தேடுது...",
-  estNoRoute:"ரோடு கிடைக்கல",
+  estTime:"சாலையில் ஆகும் நேரம்",
+  estBack:"பின்னாடி போங்கோ",
+  estNote:"இது சாலை தூரத்தை வச்சு போட்ட மதிப்பீடுங்கோ. டிராஃபிக், காத்திருப்பு, சுத்தி போறதால இறுதி பில் மாறலாம்ங்கோ",
+  estType:"இடத்தோட பேரை டைப் பண்ணுங்கோ",
+  estSearching:"தேடிக்கிட்டு இருக்குதுங்கோ...",
+  estNone:"இடம் கிடைக்கலீங்கோ. பெரிய பேரா போடுங்கோ, இல்ல ஊர் பேரையும் சேர்த்து போடுங்கோ",
+  estFail:"தேட முடியலீங்கோ. இணையம் இருக்கான்னு பாருங்கோ",
+  estPick:"சரியான இடத்தை தொடுங்கோ:",
+  estLocating:"உங்க லொகேஷனை தேடிக்கிட்டு இருக்குதுங்கோ...",
+  estNoLoc:"லொகேஷன் கிடைக்கலீங்கோ. போன் லொகேஷனை ஆன் பண்ணுங்கோ",
+  estRouting:"சாலையை தேடிக்கிட்டு இருக்குதுங்கோ...",
+  estNoRoute:"சாலை கிடைக்கலீங்கோ",
   estMin:"{n} நிமிஷம்",
-  pH:"என் விவரம்",
+  pH:"உங்களோட விவரம்",
   pMobile:"மொபைல் நம்பர்",
-  pChange:"PIN மாத்து",
-  pLockNow:"இப்போ லாக் பண்ணு",
-  pOut:"டேட்டாவை அழிச்சிட்டு வெளிய போ",
+  pChange:"PIN-ஐ மாத்துங்கோ",
+  pLockNow:"இப்பவே லாக் பண்ணுங்கோ",
+  pOut:"டேட்டாவை அழிச்சிட்டு வெளியே போங்கோ",
   pLockOn:"PIN லாக்: ஆன்",
   pLockOff:"PIN லாக்: ஆஃப்",
   aSignup:"சைன் அப்",
-  aWelcome:"ஒருமுறை சைன் அப் பண்ணுங்க. உங்க விவரம் இந்த போன்லயே இருக்கும்",
-  aPin:"4 நம்பர் PIN வைங்க",
-  aPin2:"PIN-ஐ திரும்ப போடுங்க",
-  aPinNote:"இந்த PIN, இந்த போன்ல மத்தவங்க ஆப்பை திறக்காம மட்டும் தடுக்கும்",
+  aWelcome:"ஒரு தடவை சைன் அப் பண்ணினா போதும்ங்கோ. உங்க விவரம் இந்த போன்லயே இருக்கும்ங்கோ",
+  aPin:"4 இலக்க PIN வைங்கோ",
+  aPin2:"PIN-ஐ திரும்ப போடுங்கோ",
+  aPinNote:"இந்த PIN, இந்த போன்ல மத்தவங்க ஆப்பை திறக்காம இருக்க மட்டும் தான்ங்கோ",
   aVeh:"ஆட்டோ விவரம் (வேணும்னா)",
   vAuto:"ஆட்டோ நம்பர்",
   vRc:"RC நம்பர்",
   vInsCo:"இன்சூரன்ஸ் கம்பெனி",
   vInsNo:"இன்சூரன்ஸ் பாலிசி நம்பர்",
   vInsExp:"இன்சூரன்ஸ் முடியுற தேதி",
-  aHave:"எங்கிட்ட பேக்அப் கீ இருக்கு",
-  aRestT:"பேக்அப்ல இருந்து எடு",
-  aSetPinT:"புது PIN வைங்க",
-  aLockT:"உங்க PIN-ஐ போடுங்க",
-  aHello:"வணக்கம், {n}",
-  aForgot:"PIN மறந்துட்டீங்களா?",
-  aForgotT:"PIN மறந்துட்டேன்",
-  aForgotTxt:"இந்த போன்ல இருக்கிற டேட்டா லாக் ஆயிருக்கு. இந்த போன் டேட்டாவை அழிச்சிட்டு திரும்ப ஆரம்பிக்கிறது மட்டும் தான் வழி. கிளவுட் பேக்அப் ஆன்ல இருந்தா, பேக்அப் கீயால எல்லாத்தையும் திரும்ப எடுக்கலாம்",
-  aErase:"இந்த போன் டேட்டாவை அழி",
-  aEraseSure:"இந்த போன்ல இருக்கிற எல்லா பயணம், செலவு, செட்டிங்ஸையும் அழிக்கவா?",
-  aBadName:"உங்க பேரை போடுங்க",
-  aBadMob:"6, 7, 8 அல்லது 9-ல ஆரம்பிக்கிற 10 நம்பர் மொபைல் நம்பர் போடுங்க",
-  aBadPin:"PIN 4 நம்பரா இருக்கணும்",
-  aPinMatch:"ரெண்டு PIN-ம் ஒண்ணா இல்ல",
-  aBadAuto:"ஆட்டோ நம்பரை செக் பண்ணுங்க. உதாரணம்: TN 45 AB 1234",
-  aBadDate:"இன்சூரன்ஸ் தேதியை செக் பண்ணுங்க",
-  aWrong:"PIN தப்பு. இன்னும் {n} தடவை முயற்சி பண்ணலாம்",
-  aWait:"ரொம்ப தடவை தப்பா போட்டுட்டீங்க. {n} நிமிஷம் காத்திருங்க",
-  aNoProfile:"இந்த பேக்அப்ல விவரம் இல்ல. சைன் அப் பாரத்தை நிரப்புங்க",
-  insSoon:"இன்சூரன்ஸ் {n} நாள்ல முடியுது",
-  insToday:"இன்சூரன்ஸ் இன்னைக்கு முடியுது",
-  insEnded:"இன்சூரன்ஸ் முடிஞ்சிடுச்சு",
+  aHave:"என்கிட்ட பேக்அப் கீ இருக்குதுங்கோ",
+  aRestT:"பேக்அப்பிலிருந்து திரும்ப எடுங்கோ",
+  aSetPinT:"புது PIN வைங்கோ",
+  aLockT:"உங்க PIN-ஐ போடுங்கோ",
+  aHello:"வணக்கம்ங்கோ, {n}",
+  aForgot:"PIN மறந்துட்டீங்களாங்கோ?",
+  aForgotT:"PIN மறந்துட்டேன்ங்கோ",
+  aForgotTxt:"இந்த போன்ல இருக்கிற டேட்டா லாக் ஆயிடுச்சுங்கோ. இந்த போன் டேட்டாவை அழிச்சிட்டு திரும்ப ஆரம்பிக்கிறது மட்டும் தான் வழிங்கோ. கிளவுட் பேக்அப் ஆன்ல இருந்துச்சுன்னா, பேக்அப் கீயை வச்சு எல்லாத்தையும் திரும்ப எடுத்துக்கலாம்ங்கோ",
+  aErase:"இந்த போன் டேட்டாவை அழிச்சிருங்கோ",
+  aEraseSure:"இந்த போன்ல இருக்கிற எல்லா பயணம், செலவு, செட்டிங்ஸையும் அழிச்சிரவா?",
+  aBadName:"உங்க பேரை போடுங்கோ",
+  aBadMob:"6, 7, 8 அல்லது 9-ல் ஆரம்பிக்கிற 10 இலக்க மொபைல் நம்பரை போடுங்கோ",
+  aBadPin:"PIN 4 இலக்கமாத்தான் இருக்கணும்ங்கோ",
+  aPinMatch:"ரெண்டு PIN-ம் ஒண்ணா இல்லீங்கோ",
+  aBadAuto:"ஆட்டோ நம்பரை செக் பண்ணுங்கோ. உதாரணம்: TN 45 AB 1234",
+  aBadDate:"இன்சூரன்ஸ் தேதியை செக் பண்ணுங்கோ",
+  aWrong:"PIN தப்புங்கோ. இன்னும் {n} தடவை முயற்சி பண்ணலாம்ங்கோ",
+  aWait:"ரொம்ப தடவை தப்பா போட்டுட்டீங்கோ. {n} நிமிஷம் காத்திருங்கோ",
+  aNoProfile:"இந்த பேக்அப்ல விவரமே இல்லீங்கோ. சைன் அப் படிவத்தை நிரப்புங்கோ",
+  insSoon:"இன்சூரன்ஸ் {n} நாள்ல முடியப்போகுதுங்கோ",
+  insToday:"இன்சூரன்ஸ் இன்னைக்கே முடியுதுங்கோ",
+  insEnded:"இன்சூரன்ஸ் முடிஞ்சு போச்சுங்கோ",
   rcptAuto:"ஆட்டோ: {n}",
-  total_say:"மொத்தம் {n} ரூபா"}
+  total_say:"மொத்தம் {n} ரூபாய்ங்கோ"}
 };
-var SVGI = {nTrip:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 15l2-6h9l4 4h3v2\"/><circle cx=\"7\" cy=\"17\" r=\"2\"/><circle cx=\"17\" cy=\"17\" r=\"2\"/><path d=\"M9 9V6h4\"/></svg>",nEarn:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/></svg>",nExp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 3h12v18l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 8h6M9 12h6\"/></svg>",nSet:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1\"/></svg>",start:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 4l13 8-13 8z\"/></svg>",end:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"/></svg>",est:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z\"/><path d=\"M9 4v14M15 6v14\"/></svg>",manual:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20h4L19 9l-4-4L4 16z\"/></svg>",cash:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"2\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",upi:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",share:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/><circle cx=\"18\" cy=\"19\" r=\"3\"/><path d=\"M8.6 10.7l6.8-4.4M8.6 13.3l6.8 4.4\"/></svg>",speak:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9z\"/><path d=\"M16 9a4 4 0 010 6\"/></svg>",payApp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",estSearch:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M21 21l-5-5\"/></svg>",pLockNow:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V8a4 4 0 018 0v3\"/></svg>"};
+var SVGI = {shareRide:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 16V4M7 9l5-5 5 5M5 20h14\"/></svg>",takeRide:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4v12M7 11l5 5 5-5M5 20h14\"/></svg>",nTrip:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 15l2-6h9l4 4h3v2\"/><circle cx=\"7\" cy=\"17\" r=\"2\"/><circle cx=\"17\" cy=\"17\" r=\"2\"/><path d=\"M9 9V6h4\"/></svg>",nEarn:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/></svg>",nExp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 3h12v18l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 8h6M9 12h6\"/></svg>",nSet:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1\"/></svg>",start:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 4l13 8-13 8z\"/></svg>",end:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"/></svg>",est:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z\"/><path d=\"M9 4v14M15 6v14\"/></svg>",manual:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20h4L19 9l-4-4L4 16z\"/></svg>",cash:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"2\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",upi:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",share:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/><circle cx=\"18\" cy=\"19\" r=\"3\"/><path d=\"M8.6 10.7l6.8-4.4M8.6 13.3l6.8 4.4\"/></svg>",speak:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9z\"/><path d=\"M16 9a4 4 0 010 6\"/></svg>",payApp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",estSearch:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M21 21l-5-5\"/></svg>",pLockNow:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V8a4 4 0 018 0v3\"/></svg>"};
 var ICON = {};
 function setLabel(el,k){
   el.textContent="";
@@ -724,6 +783,7 @@ var lang = (function(){ try{ var l=localStorage.getItem("ab_lang"); if(l==="en"|
 function t(k,v){ var s=(TXT[lang]&&TXT[lang][k])||TXT.en[k]||k; if(v) for(var x in v) s=s.replace(new RegExp("\\{"+x+"\\}","g"),v[x]); return s; }
 
 var DEF = {name:"",upi:"",base:"",baseKm:"",perKm:"",wait:"",night:"0",nightFrom:"23",nightTo:"5",saved:false,u:0};
+var RIDES = load("ab_rides", []);
 var S = load("ab_settings", DEF), TRIPS = load("ab_trips", []), EXP = load("ab_exp", []);
 TRIPS.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
 EXP.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
@@ -812,7 +872,7 @@ function sumRange(idx,pred){
   for(var k in idx){ if(pred(k)){ var o=idx[k]; s.inc+=o.inc; s.exp+=o.exp; s.km+=o.km; s.n+=o.trips.length; } }
   return s;
 }
-function renderAll(){ renderHome(); renderEarn(); renderExp(); if(bill) renderBill(); }
+function renderAll(){ if(typeof renderRides==="function") renderRides(); renderHome(); renderEarn(); renderExp(); if(bill) renderBill(); }
 
 function renderHome(){
   var o=buildIndex()[dk(Date.now())]||{inc:0,trips:[]};
@@ -1216,8 +1276,8 @@ $("waitBtn").onclick=function(){
 };
 function resetWait(){ if(wTimer){ clearInterval(wTimer); wTimer=null; } setWaitBtn(false); }
 
-function drawQr(text){
-  var box=$("qrBox"); box.innerHTML="";
+function drawQr(text,boxId){
+  var box=$(boxId||"qrBox"); box.innerHTML="";
   if(typeof qrcode!=="function") return false;
   try{
     var q=qrcode(0,"M"); q.addData(text); q.make();
@@ -1271,6 +1331,7 @@ function finish(mode){
   if(!(b.f.total>0)){ $("billErr").textContent=t("badNeg"); return; }
   TRIPS.push({id:uid(),t:Date.now(),km:b.km,wait:b.w,fare:b.f.total,mode:mode,u:Date.now()});
   saveData(); resetWait(); bill=null; show("sIdle"); renderAll();
+  var r=activeRide(); if(r){ r.st="owed"; r.act=false; saveRides(); renderRides(); openPay(r); }
 }
 $("saveCash").onclick=function(){ finish("cash"); };
 $("saveUpi").onclick=function(){ finish("upi"); };
@@ -1451,7 +1512,7 @@ function showAuth(id){
   renderProfileText(); window.scrollTo(0,0);
   var f={aSign:"gName",aRest:"rKey",aSetPin:"nPin",aLock:"lPin"}[id]; if(f) setTimeout(function(){ try{ $(f).focus(); }catch(e){} },80);
 }
-function hideAuth(){ $("auth").hidden=true; renderAll(); }
+function hideAuth(){ $("auth").hidden=true; renderAll(); if(typeof checkIncoming==="function") checkIncoming(); }
 function lockNow(){ if(PROFILE&&PROFILE.pinH&&PROFILE.lock!==false){ $("lPin").value=""; showAuth("aLock"); } }
 function bootAuth(){
   if(!PROFILE){ showAuth("aSign"); return; }
@@ -1512,7 +1573,7 @@ $("lForgot").onclick=function(){ showAuth("aForgot"); };
 $("fBack").onclick=function(){ $("lPin").value=""; showAuth("aLock"); };
 function eraseAll(){
   if(!confirm(t("aEraseSure"))) return;
-  ["ab_trips","ab_exp","ab_settings","ab_profile","ab_sync","ab_fail"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+  ["ab_trips","ab_exp","ab_settings","ab_profile","ab_sync","ab_fail","ab_rides"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
   location.reload();
 }
 $("fErase").onclick=eraseAll; $("pOut").onclick=eraseAll;
@@ -1548,6 +1609,101 @@ if(NATIVE){
     }
   }catch(e){}
 }
+
+/* ---------- ride sharing between drivers (WhatsApp groups) ---------- */
+var SHARE_BASE = "";   /* e.g. "https://yourname.github.io/auto-anna/" ; leave empty to share a code instead of a link */
+function saveRides(){ save("ab_rides",RIDES); }
+function activeRide(){ for(var i=0;i<RIDES.length;i++) if(RIDES[i].role==="y"&&RIDES[i].st==="taken"&&RIDES[i].act) return RIDES[i]; return null; }
+function b64e(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function b64d(x){ x=x.replace(/-/g,"+").replace(/_/g,"/"); while(x.length%4) x+="="; return JSON.parse(decodeURIComponent(escape(atob(x)))); }
+function rideLink(o){
+  var c=b64e(o), base=SHARE_BASE||(!NATIVE&&/^https?:/.test(location.href)?location.href.split("#")[0]:"");
+  return base ? base+"#r="+c : "AA1."+c;
+}
+function parseRide(txt){
+  txt=String(txt||"").trim(); var m=txt.match(/#r=([A-Za-z0-9_-]+)/)||txt.match(/AA1\.([A-Za-z0-9_-]+)/);
+  if(!m) return null;
+  try{
+    var o=b64d(m[1]);
+    if(!o||o.v!==1||!o.id||!(o.fare>0)||!(o.comm>=0)||o.comm>=o.fare||!o.upi) return null;
+    ["from","to","xn","xm","upi"].forEach(function(k){ o[k]=String(o[k]||"").slice(0,60); });
+    o.fare=Math.round(o.fare); o.comm=Math.round(o.comm); return o;
+  }catch(e){ return null; }
+}
+function rpane(id){ ["rShare","rPaste","rView","rPay"].forEach(function(p){ $(p).hidden=(p!==id); }); $("rideM").classList.add("on"); }
+function closeRide(){ $("rideM").classList.remove("on"); }
+$("rClose").onclick=closeRide;
+$("rideM").addEventListener("click",function(e){ if(e.target===$("rideM")) closeRide(); });
+
+/* X: share */
+$("shareRideBtn").onclick=function(){
+  if(needSetup()) return;
+  if(!(PROFILE&&PROFILE.name)){ $("gpsErr").textContent=t("rSetName"); return; }
+  $("rdErr").textContent=""; $("rFrom").value=""; $("rTo").value=""; $("rFare").value="";
+  $("rComm").value=load("ab_lastcomm","")||""; rpane("rShare");
+};
+$("rdGo").onclick=function(){
+  var f=($("rFrom").value||"").trim(), to=($("rTo").value||"").trim(), fare=clean($("rFare").value,99999), comm=clean($("rComm").value,9999);
+  if(!f||!to||!(fare>0)){ $("rdErr").textContent=t("rBad"); return; }
+  if(comm>=fare){ $("rdErr").textContent=t("rBadComm"); return; }
+  var o={v:1,id:uid(),from:f,to:to,fare:Math.round(fare),comm:Math.round(comm),xn:PROFILE.name,xm:PROFILE.mobile||"",upi:S.upi,t:Date.now()};
+  RIDES.unshift({id:o.id,role:"x",other:"",from:f,to:to,fare:o.fare,comm:o.comm,st:"shared",t:o.t}); RIDES=RIDES.slice(0,40);
+  save("ab_lastcomm",String(o.comm)); saveRides(); renderRides(); closeRide();
+  var msg=t("rMsg",{app:(lang==="ta"?APP_TA:APP_NAME),from:f,to:to,fare:o.fare,comm:o.comm,name:PROFILE.name,link:rideLink(o)});
+  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+};
+/* Y: receive */
+var INCOMING=null;
+function showIncoming(o){
+  INCOMING=o;
+  $("rvBy").textContent=t("rvBy",{n:o.xn}); $("rvRoute").textContent=o.from+" → "+o.to;
+  $("rvFare").textContent=inr(o.fare); $("rvComm").textContent=inr(o.comm); rpane("rView");
+}
+$("takeRideBtn").onclick=function(){ $("rCode").value=""; $("rPErr").textContent=""; rpane("rPaste"); };
+$("rOpen").onclick=function(){ var o=parseRide($("rCode").value); if(!o){ $("rPErr").textContent=t("rBadLink"); return; } showIncoming(o); };
+$("rvTake").onclick=function(){
+  var o=INCOMING; if(!o) return;
+  RIDES.forEach(function(r){ r.act=false; });
+  if(!RIDES.some(function(r){ return r.id===o.id&&r.role==="y"; }))
+    RIDES.unshift({id:o.id,role:"y",other:o.xn,mob:o.xm,upi:o.upi,from:o.from,to:o.to,fare:o.fare,comm:o.comm,st:"taken",act:true,t:Date.now()});
+  else RIDES.forEach(function(r){ if(r.id===o.id&&r.role==="y"&&r.st==="taken") r.act=true; });
+  RIDES=RIDES.slice(0,40); saveRides(); renderRides(); closeRide(); INCOMING=null;
+  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+  var mob=String(o.xm||"").replace(/\D/g,""); if(mob.length===10) mob="91"+mob;
+  var msg=t("rTaken",{from:o.from,to:o.to,name:(PROFILE&&PROFILE.name)||""});
+  window.open("https://wa.me/"+mob+"?text="+encodeURIComponent(msg),"_blank");
+};
+/* Y: pay commission */
+var PAYING=null;
+function openPay(r){
+  PAYING=r; var url="upi://pay?pa="+encodeURIComponent(r.upi)+"&pn="+encodeURIComponent(r.other||"Driver")+"&am="+r.comm.toFixed(2)+"&cu=INR&tn="+encodeURIComponent("Ride commission");
+  $("rpAmt").textContent=inr(r.comm); $("rpTo").textContent=r.other; $("rpLink").href=url; drawQr(url,"rqBox"); rpane("rPay");
+}
+$("rpPaid").onclick=function(){ if(PAYING){ PAYING.st="paid"; saveRides(); renderRides(); } PAYING=null; closeRide(); };
+/* list */
+function renderRides(){
+  var box=$("rideList"), card=$("rideCard"); box.innerHTML="";
+  var list=RIDES.slice(0,6); card.hidden=!list.length;
+  list.forEach(function(r){
+    var el=document.createElement("div"); el.className="item";
+    var l=document.createElement("span"); l.className="l";
+    var st=r.st==="shared"?t("stShared",{c:r.comm}):r.st==="taken"?t("stTaken"):r.st==="owed"?t("stOwed",{c:r.comm}):t("stPaid");
+    l.textContent=r.from+" → "+r.to+" · "+inr(r.fare)+"\n"+st; l.style.whiteSpace="pre-line";
+    el.appendChild(l);
+    var act=null;
+    if(r.st==="shared"){ act=[t("rGot"),function(){ r.st="paid"; saveRides(); renderRides(); }]; }
+    else if(r.st==="owed"){ act=[t("rPayBtn"),function(){ openPay(r); }]; }
+    else if(r.st==="taken"){ act=[t("rDrop"),function(){ RIDES=RIDES.filter(function(x){ return x!==r; }); saveRides(); renderRides(); }]; }
+    if(act){ var b=document.createElement("button"); b.type="button"; b.className="btn sm"; b.style.width="auto"; b.style.minHeight="48px"; b.style.padding="0 14px"; b.textContent=act[0]; b.onclick=act[1]; el.appendChild(b); }
+    box.appendChild(el);
+  });
+}
+function checkIncoming(){
+  if(!$("auth").hidden) return;
+  var o=parseRide(location.hash); if(o) showIncoming(o);
+}
+window.addEventListener("hashchange",checkIncoming);
+renderRides(); checkIncoming();
 scheduleSync();
 var BUILD="dev";
 (function(){ var v=$("verTxt"); if(v) v.textContent="Auto Anna build "+BUILD+(NATIVE?" (app)":" (web)"); })();

@@ -1,6 +1,6 @@
 // Network-first for the app's own files, so updates show up right away; cache is the offline fallback.
 // Maps, search and routing requests go straight to the network and are never cached or replaced.
-const CACHE = "auto-anna-v3";
+const CACHE = "auto-anna-v5";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 const QR_LIB = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
 
