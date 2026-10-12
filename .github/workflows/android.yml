@@ -27,6 +27,7 @@ jobs:
       - name: Copy web app into Android assets
         run: |
           mkdir -p android/app/src/main/assets/www
+          sed -i "s/var BUILD=\"dev\"/var BUILD=\"${{ github.run_number }}\"/" index.html
           cp index.html manifest.json sw.js icon-192.png icon-512.png icon-maskable-512.png android/app/src/main/assets/www/
 
       # Optional: sign with your own key so every APK installs as an update.

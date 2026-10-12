@@ -8,7 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.webkit.GeolocationPermissions
 import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -19,6 +21,8 @@ class MainActivity : Activity() {
 
     private lateinit var web: WebView
     private var pendingStart = false
+    private var geoCallback: GeolocationPermissions.Callback? = null
+    private var geoOrigin: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +47,21 @@ class MainActivity : Activity() {
                     startActivity(Intent(Intent.ACTION_VIEW, url))
                 } catch (e: Exception) { /* no app can open it */ }
                 return true
+            }
+        }
+        // Lets the page ask for the phone location (used by the fare estimate).
+        web.webChromeClient = object : WebChromeClient() {
+            override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    callback.invoke(origin, true, false)
+                } else {
+                    geoCallback = callback
+                    geoOrigin = origin
+                    requestPermissions(
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                        REQ_GEO
+                    )
+                }
             }
         }
         web.addJavascriptInterface(Bridge(), "AndroidBridge")
@@ -82,6 +101,12 @@ class MainActivity : Activity() {
 
     override fun onRequestPermissionsResult(code: Int, perms: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, perms, results)
+        if (code == REQ_GEO) {
+            val granted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            geoCallback?.invoke(geoOrigin ?: "", granted, false)
+            geoCallback = null; geoOrigin = null
+            return
+        }
         if (code != REQ_LOCATION || !pendingStart) return
         pendingStart = false
         val ok = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -130,5 +155,6 @@ class MainActivity : Activity() {
     companion object {
         private const val REQ_LOCATION = 1
         private const val REQ_NOTIF = 2
+        private const val REQ_GEO = 3
     }
 }
