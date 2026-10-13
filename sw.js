@@ -1,6 +1,6 @@
 // Network-first for the app's own files, so updates show up right away; cache is the offline fallback.
 // Maps, search and routing requests go straight to the network and are never cached or replaced.
-const CACHE = "auto-anna-v6";
+const CACHE = "auto-anna-v7";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 const QR_LIB = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
 
@@ -8,7 +8,8 @@ self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(CACHE).then(async (c) => {
       await c.addAll(SHELL);
-      try { await c.add(QR_LIB); } catch (err) {}   // cache QR library for offline use
+      try { await c.add("./qrcode.js"); } catch (err) {}   // bundled QR library, if present
+      try { await c.add(QR_LIB); } catch (err) {}   // web copy as a fallback
     })
   );
   self.skipWaiting();

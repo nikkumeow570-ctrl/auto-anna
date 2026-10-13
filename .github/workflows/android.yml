@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets/www
           sed -i "s/var BUILD=\"dev\"/var BUILD=\"${{ github.run_number }}\"/" index.html
+          curl -fsSL https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js -o android/app/src/main/assets/www/qrcode.js || echo 'QR library not bundled, the app will load it from the web'
           cp index.html manifest.json sw.js icon-192.png icon-512.png icon-maskable-512.png android/app/src/main/assets/www/
 
       # Optional: sign with your own key so every APK installs as an update.
