@@ -9,12 +9,12 @@ val ksFile: String? = System.getenv("KEYSTORE_FILE")
 
 android {
     namespace = "app.autoanna"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.autoanna"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
         versionName = "1.0.${System.getenv("GITHUB_RUN_NUMBER") ?: "0"}"
     }
@@ -32,7 +32,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // A real release key is required. Without it the build stops (see the workflow), so a debug-signed
+            // app can never be published by mistake.
             signingConfig = if (ksFile != null) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }
@@ -42,8 +46,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    bundle { language { enableSplit = false } }   // keep Tamil and English in every install
 }
 
 dependencies {
-    implementation("androidx.webkit:webkit:1.11.0")
+    implementation("androidx.webkit:webkit:1.12.1")
+    implementation("androidx.core:core-ktx:1.15.0")
 }

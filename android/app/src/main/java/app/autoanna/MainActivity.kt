@@ -15,6 +15,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
+import android.window.OnBackInvokedDispatcher
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewAssetLoader
 
 class MainActivity : Activity() {
@@ -27,7 +32,26 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         web = WebView(this)
-        setContentView(web)
+        // Android 15+ draws apps edge to edge. This frame keeps the web page clear of the status bar,
+        // the navigation bar, the camera cut-out and the keyboard.
+        val root = FrameLayout(this)
+        root.setBackgroundColor(0xFF111111.toInt())
+        root.addView(web, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        setContentView(root)
+        WindowCompat.getInsetsController(window, root).apply {
+            isAppearanceLightStatusBars = false      // the app header is dark, so keep the icons light
+            isAppearanceLightNavigationBars = false
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime.bottom))
+            WindowInsetsCompat.CONSUMED
+        }
+        // Back button: keep the app (and a running trip) alive instead of closing it.
+        if (Build.VERSION.SDK_INT >= 33) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT) { moveTaskToBack(true) }
+        }
 
         val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))

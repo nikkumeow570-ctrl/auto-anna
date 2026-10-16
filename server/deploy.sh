@@ -34,8 +34,38 @@ PF="$HOME/.auto-anna-pepper"
 if [ ! -s "$PF" ]; then ( umask 077; node -e 'process.stdout.write(require("crypto").randomBytes(32).toString("hex"))' > "$PF" ); echo "New pepper saved in $PF. Keep a copy somewhere safe. NEVER change it."; else echo "Using the pepper already saved in $PF"; fi
 PEPPER="$(cat "$PF")"
 
-echo "== 3/6 Upload the Worker"
-META="{\"main_module\":\"worker.js\",\"compatibility_date\":\"2025-01-01\",\"bindings\":[{\"type\":\"d1\",\"name\":\"DB\",\"id\":\"$DB\"},{\"type\":\"secret_text\",\"name\":\"KEY_PEPPER\",\"text\":\"$PEPPER\"}]}"
+echo "== 3/6 Upload the Worker (and your settings)"
+ENVF="$HOME/.auto-anna-env"
+if [ ! -f "$ENVF" ]; then
+  ( umask 077; cat > "$ENVF" <<'EOT'
+# Auto Anna server settings. Edit this file, then run  bash deploy.sh  again.
+# OTP_PROVIDER: whatsapp | sms | dev.  "dev" sends nothing (the app cannot sign up new drivers yet).
+OTP_PROVIDER=dev
+OTP_DEV=0
+MSG91_AUTHKEY=
+MSG91_NUMBER=
+MSG91_TEMPLATE=
+MSG91_NAMESPACE=
+MSG91_LANG=en
+MSG91_SMS_TEMPLATE=
+MSG91_SMS_VAR=OTP
+REF_REWARD=10
+REF_MIN_TRIPS=3
+REF_MIN_DAYS=3
+OTP_DAILY_CAP=3000
+EOT
+  ); echo "Created $ENVF  (fill in the MSG91 lines later)"
+fi
+grep -q '^ADMIN_KEY=..............' "$ENVF" || { ( umask 077; echo "ADMIN_KEY=$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("hex"))')" >> "$ENVF" ); echo "New ADMIN_KEY saved in $ENVF (only you use it, to export the driver list)."; }
+META="$(PEPPER="$PEPPER" DBID="$DB" ENVF="$ENVF" node -e '
+const fs=require("fs");
+const SECRET=new Set(["ADMIN_KEY","MSG91_AUTHKEY"]);
+const b=[{type:"d1",name:"DB",id:process.env.DBID},{type:"secret_text",name:"KEY_PEPPER",text:process.env.PEPPER}];
+for(const line of fs.readFileSync(process.env.ENVF,"utf8").split("\n")){
+  const m=line.match(/^([A-Z0-9_]+)=(.*)$/); if(!m||!m[2].trim()) continue;
+  b.push(SECRET.has(m[1])?{type:"secret_text",name:m[1],text:m[2].trim()}:{type:"plain_text",name:m[1],text:m[2].trim()});
+}
+process.stdout.write(JSON.stringify({main_module:"worker.js",compatibility_date:"2025-01-01",bindings:b}));')"
 R="$(cf -X PUT "$API/workers/scripts/$NAME" -F "metadata=$META;type=application/json" -F "worker.js=@worker.js;type=application/javascript+module;filename=worker.js")"
 [ "$(printf '%s' "$R" | jget success)" = "true" ] || fail "Upload failed." "$R"
 
@@ -66,4 +96,5 @@ echo "server answered: $R"
 echo "== 6/6 Put the address in the app"
 sed -i "s|var SYNC_URL = \"[^\"]*\";|var SYNC_URL = \"$URL\";|" ../index.html
 grep -n '^var SYNC_URL' ../index.html
+echo "Driver list later:  bash admin.sh stats   |   bash admin.sh csv > drivers.csv"
 echo "Done. Now:  cd .. && git add -A && git commit -m 'Cloudflare sync' && git push"

@@ -71,6 +71,11 @@ input{width:100%;min-height:54px;padding:0 14px;border-radius:12px;border:1.5px 
 summary{min-height:52px;display:flex;align-items:center;font-weight:700;cursor:pointer}
 details.adj{margin-top:6px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.chk{display:flex;gap:12px;align-items:flex-start;margin-top:14px;font-weight:600;line-height:1.4}
+.chk input[type=checkbox]{width:28px;height:28px;min-height:0;flex:none;margin:2px 0 0;padding:0;accent-color:var(--go)}
+.chk span{flex:1;min-width:0}
+.linkb{display:inline-block;margin-top:8px;font-weight:700;color:var(--ink);text-decoration:underline}
+.refbox{font:800 1.6rem/1.2 ui-monospace,Menlo,monospace;letter-spacing:.08em;background:var(--surface);border:2px dashed var(--amber);border-radius:12px;padding:12px;text-align:center;margin:10px 0}
 .warn{border-left:5px solid var(--amber);background:color-mix(in srgb,var(--amber) 16%,var(--surface));padding:12px 14px;border-radius:0 12px 12px 0;margin-bottom:12px}
 .err{color:var(--bad);min-height:1.4em;margin-top:6px}
 .ok{color:var(--good)}
@@ -146,10 +151,30 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
       <label for="gPin2" data-i="aPin2">Type the PIN again</label><input id="gPin2" class="digits pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password">
       <p class="muted" style="margin:6px 0 0" data-i="aPinNote"></p>
       <details style="margin-top:14px"><summary data-i="aVeh">Auto details (optional)</summary><div id="gVeh"></div></details>
+      <div id="gAcct" hidden>
+        <label for="gRef" data-i="aRef">Friend's referral code (optional)</label><input id="gRef" autocomplete="off" autocapitalize="characters" maxlength="12" spellcheck="false">
+        <label class="chk" for="gConsent"><input id="gConsent" type="checkbox"><span data-i="aConsent"></span></label>
+        <a class="linkb" id="gPriv" href="https://auto-anna.pages.dev/privacy.html" target="_blank" rel="noopener" data-i="aPrivacy">Privacy Policy</a>
+        <label class="chk" for="gBackup"><input id="gBackup" type="checkbox" checked><span data-i="aBackupOpt"></span></label>
+      </div>
       <div class="err" id="gErr" role="alert"></div>
       <div class="btns">
         <button class="btn" id="gGo" type="button" data-i="aSignup">Sign up</button>
         <button class="btn sm ghost" id="gHave" type="button" data-i="aHave">I already have a backup key</button>
+      </div>
+    </div>
+
+    <div id="aOtp" hidden>
+      <h2 style="margin:0 0 6px" data-i="aOtpT">Verify your mobile number</h2>
+      <p class="muted" style="margin:0 0 6px" id="oSent"></p>
+      <label for="oCode" data-i="aOtpCode">6-digit code</label>
+      <input id="oCode" class="digits" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+      <label class="chk" id="oConsentBox" for="oConsent" hidden><input id="oConsent" type="checkbox"><span data-i="aConsent"></span></label>
+      <div class="err" id="oErr" role="alert"></div>
+      <div class="btns">
+        <button class="btn" id="oGo" type="button" data-i="aOtpGo">Verify</button>
+        <button class="btn sm ghost" id="oResend" type="button" data-i="aOtpResend">Send the code again</button>
+        <button class="btn sm ghost" id="oBack" type="button" data-i="estBack">Back</button>
       </div>
     </div>
 
@@ -398,6 +423,28 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
       </div>
     </div>
 
+    <div class="card" id="frCard" hidden>
+      <h3 style="margin:0" data-i="frH">Friends and wallet</h3>
+      <div id="frOff">
+        <p class="muted" style="margin:6px 0 0" data-i="frVerifyTxt"></p>
+        <div class="btns"><button class="btn sm" id="frVerify" type="button" data-i="frVerify">Verify mobile number</button></div>
+      </div>
+      <div id="frOn" hidden>
+        <div class="muted" style="margin-top:8px" id="frMob"></div>
+        <div class="muted" style="margin-top:10px" data-i="frCode">Your referral code</div>
+        <div class="refbox" id="frCodeTxt"></div>
+        <div class="btns"><button class="btn sm" id="frShare" type="button" data-i="frShare">Share on WhatsApp</button></div>
+        <div class="grid2" style="margin-top:12px">
+          <div><div class="muted" data-i="frFriends">Friends</div><b id="frProg" style="font-size:1.3rem"></b></div>
+          <div><div class="muted" data-i="frWallet">Wallet</div><b id="frBal" style="font-size:1.3rem"></b></div>
+        </div>
+        <div class="muted" id="frPend" style="margin-top:6px"></div>
+        <div class="warn" style="margin-top:12px" id="frNote"></div>
+        <div class="muted" id="frErr" style="margin-top:6px"></div>
+        <div class="btns"><button class="btn sm ghost" id="frDel" type="button" data-i="frDel" style="color:var(--bad)">Delete my account from the server</button></div>
+      </div>
+    </div>
+
     <div class="card" id="cloudCard">
       <h3 style="margin:0" data-i="cloudH">Cloud backup</h3>
       <p class="muted" style="margin:6px 0 0" data-i="cloudHelp"></p>
@@ -452,7 +499,11 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
     <div id="rShare">
       <h3 style="margin:0" data-i="shareRide">Share ride</h3>
       <label for="rFrom" data-i="rFrom">Pickup</label><input id="rFrom" maxlength="60" autocomplete="off">
+      <div class="btns two stk"><button class="btn sm ghost" id="rHere" type="button" data-i="rHere">Use my location</button><button class="btn sm ghost" id="rFromSearch" type="button" data-i="rSearch">Search place</button></div>
+      <div id="rFromList"></div>
       <label for="rTo" data-i="rTo">Drop</label><input id="rTo" maxlength="60" autocomplete="off">
+      <div class="btns"><button class="btn sm ghost" id="rToSearch" type="button" data-i="rSearch">Search place</button></div>
+      <div id="rToList"></div>
       <div class="grid2">
         <div><label for="rFare" data-i="fareL">Fare (₹)</label><input id="rFare" inputmode="numeric" maxlength="5"></div>
         <div><label for="rComm" data-i="rComm">Your commission (₹)</label><input id="rComm" inputmode="numeric" maxlength="4"></div>
@@ -474,6 +525,7 @@ h3.sec{margin:14px 0 4px;font-size:1.1rem}
         <div class="row"><span data-i="fareL">Fare (₹)</span><b id="rvFare"></b></div>
         <div class="row"><span data-i="rComm">Commission</span><b id="rvComm"></b></div>
       </div>
+      <div class="btns two stk" id="rvMaps" hidden><button class="btn sm ghost" id="rvMapF" type="button" data-i="rMapFrom">Pickup on map</button><button class="btn sm ghost" id="rvMapT" type="button" data-i="rMapTo">Drop on map</button></div>
       <div class="muted" data-i="rvNote"></div>
       <div class="btns"><button class="btn go" id="rvTake" type="button" data-i="rvTake">I'll take it</button></div>
     </div>
@@ -506,7 +558,7 @@ var APP_NAME = "Auto Anna";
 var APP_TA = "ஆட்டோ அண்ணா";
 /* After you deploy the sync server (see server/README.md), put its address here:
    var SYNC_URL = "https://auto-anna-sync.yourname.workers.dev"; */
-var SYNC_URL = "https://auto-anna-sync.nikkumeow570.workers.dev";
+var SYNC_URL = "";
 /* ================== */
 
 var NATIVE = false;
@@ -516,6 +568,8 @@ var TXT = {
  en:{shareRide:"Share ride",takeRide:"Take ride",rList:"Shared rides",rFrom:"Pickup",rTo:"Drop",rComm:"Your commission (₹)",rdGo:"Share on WhatsApp",
   rBad:"Fill pickup, drop and fare.",rBadComm:"Commission must be less than the fare.",rPasteL:"Paste the ride link or code",rOpen:"Open ride",rBadLink:"This link is not valid.",
   rvTitle:"Ride offer",rvBy:"From {n}",rvTake:"I'll take it",rvNote:"Start your trip and bill as usual. After the trip you will pay the commission to the driver who shared it.",
+  rHere:"Use my location",rSearch:"Search place",rHereName:"Current location",rMapFrom:"Pickup on map",rMapTo:"Drop on map",
+  rMapLineF:"Pickup on map: {url}",rMapLineT:"Drop on map: {url}",
   rMsg:"{app} ride offer\n{from} to {to}\nFare: ₹{fare}\nCommission: ₹{comm} to {name}\nTake it: {link}",
   rTaken:"I will take your ride: {from} to {to}. - {name}",
   stShared:"Waiting for commission ₹{c}",stTaken:"You took this ride. Start trip.",stOwed:"Pay commission ₹{c}",stPaid:"Done",
@@ -569,13 +623,30 @@ var TXT = {
   aBadAuto:"Check the auto number. Example: TN 45 AB 1234.",aBadDate:"Check the insurance date.",aWrong:"Wrong PIN. {n} tries left.",aWait:"Too many tries. Wait {n} min.",
   aNoProfile:"No profile found in this backup. Please fill in the sign up form.",
   insSoon:"Insurance ends in {n} days",insToday:"Insurance ends today",insEnded:"Insurance has expired",rcptAuto:"Auto: {n}",
-  total_say:"Total {n} rupees"},
+  total_say:"Total {n} rupees",
+  aRef:"Friend's referral code (optional)",aConsent:"I agree to the Privacy Policy. Auto Anna may save my name and mobile number.",aPrivacy:"Read the Privacy Policy",
+  aBackupOpt:"Also back up my trips to the cloud (recommended). I can restore them on a new phone.",
+  aOtpT:"Verify your mobile number",aOtpSent:"We sent a 6-digit code to WhatsApp on +91 {m}.",aOtpCode:"6-digit code",aOtpGo:"Verify",
+  aOtpResend:"Send the code again",aOtpWait:"Send again in {s} seconds",aOtpWrong:"Wrong code. {n} tries left.",
+  aOtpExpired:"The code has expired. Send a new one.",aOtpLocked:"Too many wrong tries. Send a new code.",
+  aOtpMany:"Too many requests. Please try again after an hour.",aOtpBusy:"The server is busy. Please try again later.",
+  aOtpFail:"Could not send the code. Check your internet and try again.",aOtpNoCons:"Please tick the agreement box.",
+  aOtpNet:"No internet. Your mobile number must be verified once, with internet.",aOtpOff:"Sign up is not open yet. Please try again later.",
+  frH:"Friends and wallet",frVerifyTxt:"Verify your mobile number to get your referral code and wallet.",frVerify:"Verify mobile number",
+  frMob:"Mobile verified: +91 {m}",frCode:"Your referral code",frShare:"Share on WhatsApp",frFriends:"Friends",frWallet:"Wallet",
+  frProg:"{q} of {t}",frPend:"{p} invited, not counted yet",
+  frNote:"You get ₹{r} when a friend you invite signs up, stays 3 days and saves 3 trips with cloud backup on. Wallet credit pays for the Pro plan later. It is not cash.",
+  frDel:"Delete my account from the server",frDelAsk:"This deletes your name, mobile number, wallet and cloud backup from our server. Your trips on this phone stay. Continue?",
+  frDeleted:"Your account was deleted from the server.",frNeedNet:"Connect to the internet to refresh your wallet.",
+  frMsg:"Auto Anna is a free app for auto drivers: GPS bill, UPI QR and accounts. Download: {link}\nUse my code {code} when you sign up."},
  ta:{
   today:"இன்று",
 
   shareRide:"சவாரியைப் பகிரவும்",takeRide:"சவாரியை ஏற்கவும்",rList:"பகிரப்பட்ட சவாரிகள்",rFrom:"பயணம் தொடங்கும் இடம்",rTo:"பயணம் முடியும் இடம்",rComm:"உங்களுக்கான கமிஷன் (₹)",rdGo:"WhatsApp-ல் பகிரவும்",
   rBad:"பயணம் தொடங்கும் இடம், முடியும் இடம், கட்டணம் ஆகியவற்றை நிரப்பவும்.",rBadComm:"கமிஷன், கட்டணத்தைவிடக் குறைவாக இருக்க வேண்டும்.",rPasteL:"சவாரி லிங்க் அல்லது கோடை ஒட்டவும்",rOpen:"சவாரியைத் திறக்கவும்",rBadLink:"இந்த லிங்க் செல்லாது.",
   rvTitle:"சவாரி வாய்ப்பு",rvBy:"{n} இடமிருந்து",rvTake:"நான் இந்தச் சவாரியை ஏற்கிறேன்",rvNote:"வழக்கம்போல் பயணத்தைத் தொடங்கி பில் போடுங்க. பயணம் முடிந்ததும், சவாரியைப் பகிர்ந்த டிரைவருக்குக் கமிஷன் கொடுக்கவும்.",
+  rHere:"எனது இருப்பிடத்தைப் பயன்படுத்தவும்",rSearch:"இடத்தைத் தேடவும்",rHereName:"தற்போதைய இடம்",rMapFrom:"தொடங்கும் இடம் வரைபடத்தில்",rMapTo:"முடியும் இடம் வரைபடத்தில்",
+  rMapLineF:"பயணம் தொடங்கும் இடம் (வரைபடம்): {url}",rMapLineT:"பயணம் முடியும் இடம் (வரைபடம்): {url}",
   rMsg:"{app} சவாரி வாய்ப்பு\n{from} முதல் {to} வரை\nகட்டணம்: ₹{fare}\nகமிஷன்: ₹{comm} ({name} அவர்களுக்கு)\nஏற்க: {link}",
   rTaken:"உங்கள் சவாரியை நான் ஏற்கிறேன்: {from} முதல் {to} வரை. - {name}",
   stShared:"வர வேண்டிய கமிஷன்: ₹{c}",stTaken:"இந்தச் சவாரியை ஏற்றுக்கொண்டீர்கள். பயணத்தைத் தொடங்கவும்.",stOwed:"கொடுக்க வேண்டிய கமிஷன்: ₹{c}",stPaid:"முடிந்தது",
@@ -760,7 +831,22 @@ var TXT = {
   insToday:"இன்சூரன்ஸ் இன்றுடன் காலாவதியாகிறது.",
   insEnded:"இன்சூரன்ஸ் காலாவதியாகிவிட்டது.",
   rcptAuto:"ஆட்டோ: {n}",
-  total_say:"மொத்தம் {n} ரூபாய்"}
+  total_say:"மொத்தம் {n} ரூபாய்",
+  aRef:"நண்பரின் பரிந்துரைக் குறியீடு (விருப்பமானது)",aConsent:"தனியுரிமைக் கொள்கையை ஏற்கிறேன். ஆட்டோ அண்ணா எனது பெயரையும் மொபைல் எண்ணையும் சேமிக்க அனுமதிக்கிறேன்.",aPrivacy:"தனியுரிமைக் கொள்கையைப் படிக்கவும்",
+  aBackupOpt:"எனது பயணங்களை கிளவுடிலும் பேக்அப் எடுக்கவும் (பரிந்துரைக்கப்படுகிறது). புதிய போனில் மீட்டெடுக்கலாம்.",
+  aOtpT:"மொபைல் எண்ணைச் சரிபார்க்கவும்",aOtpSent:"+91 {m} எண்ணின் WhatsApp-க்கு 6 இலக்கக் குறியீட்டை அனுப்பியுள்ளோம்.",aOtpCode:"6 இலக்கக் குறியீடு",aOtpGo:"சரிபார்க்கவும்",
+  aOtpResend:"குறியீட்டை மீண்டும் அனுப்பவும்",aOtpWait:"{s} விநாடிகளில் மீண்டும் அனுப்பலாம்",aOtpWrong:"குறியீடு தவறானது. இன்னும் {n} முயற்சிகள் உள்ளன.",
+  aOtpExpired:"குறியீட்டின் நேரம் முடிந்துவிட்டது. புதியதை அனுப்பவும்.",aOtpLocked:"பலமுறை தவறாக உள்ளிட்டீர்கள். புதிய குறியீட்டை அனுப்பவும்.",
+  aOtpMany:"அதிகமான கோரிக்கைகள். ஒரு மணி நேரம் கழித்து முயற்சிக்கவும்.",aOtpBusy:"சேவையகம் பிஸியாக உள்ளது. சிறிது நேரம் கழித்து முயற்சிக்கவும்.",
+  aOtpFail:"குறியீட்டை அனுப்ப முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",aOtpNoCons:"ஒப்புதல் பெட்டியில் டிக் செய்யவும்.",
+  aOtpNet:"இணைய இணைப்பு இல்லை. மொபைல் எண்ணை ஒருமுறை இணையத்துடன் சரிபார்க்க வேண்டும்.",aOtpOff:"பதிவு இன்னும் திறக்கப்படவில்லை. சிறிது நேரம் கழித்து முயற்சிக்கவும்.",
+  frH:"நண்பர்கள் மற்றும் வாலட்",frVerifyTxt:"பரிந்துரைக் குறியீடு மற்றும் வாலட் பெற, மொபைல் எண்ணைச் சரிபார்க்கவும்.",frVerify:"மொபைல் எண்ணைச் சரிபார்க்கவும்",
+  frMob:"சரிபார்க்கப்பட்ட மொபைல்: +91 {m}",frCode:"உங்கள் பரிந்துரைக் குறியீடு",frShare:"WhatsApp-ல் பகிரவும்",frFriends:"நண்பர்கள்",frWallet:"வாலட்",
+  frProg:"{q} / {t}",frPend:"{p} பேரை அழைத்துள்ளீர்கள்; இன்னும் கணக்கில் சேரவில்லை",
+  frNote:"நீங்கள் அழைக்கும் நண்பர் பதிவு செய்து, 3 நாட்கள் தொடர்ந்து, கிளவுட் பேக்அப்புடன் 3 பயணங்களைச் சேமித்தால் உங்களுக்கு ₹{r} கிடைக்கும். வாலட் தொகை பின்னர் Pro திட்டக் கட்டணத்துக்குப் பயன்படும். இது ரொக்கம் அல்ல.",
+  frDel:"சேவையகத்திலிருந்து எனது கணக்கை நீக்கவும்",frDelAsk:"உங்கள் பெயர், மொபைல் எண், வாலட் மற்றும் கிளவுட் பேக்அப் எங்கள் சேவையகத்திலிருந்து நீக்கப்படும். இந்தப் போனில் உள்ள பயணங்கள் அப்படியே இருக்கும். தொடரவா?",
+  frDeleted:"சேவையகத்திலிருந்து உங்கள் கணக்கு நீக்கப்பட்டது.",frNeedNet:"வாலட்டைப் புதுப்பிக்க இணையத்துடன் இணைக்கவும்.",
+  frMsg:"ஆட்டோ அண்ணா ஆட்டோ ஓட்டுநர்களுக்கான இலவச ஆப்: GPS பில், UPI QR, கணக்கு. பதிவிறக்க: {link}\nபதிவு செய்யும்போது என் குறியீடு {code} பயன்படுத்தவும்."}
 };
 var SVGI = {shareRide:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 16V4M7 9l5-5 5 5M5 20h14\"/></svg>",takeRide:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4v12M7 11l5 5 5-5M5 20h14\"/></svg>",nTrip:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 15l2-6h9l4 4h3v2\"/><circle cx=\"7\" cy=\"17\" r=\"2\"/><circle cx=\"17\" cy=\"17\" r=\"2\"/><path d=\"M9 9V6h4\"/></svg>",nEarn:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/></svg>",nExp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 3h12v18l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 8h6M9 12h6\"/></svg>",nSet:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1\"/></svg>",start:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 4l13 8-13 8z\"/></svg>",end:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"2\"/></svg>",est:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z\"/><path d=\"M9 4v14M15 6v14\"/></svg>",manual:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20h4L19 9l-4-4L4 16z\"/></svg>",cash:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"2\" y=\"6\" width=\"20\" height=\"12\" rx=\"2\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",upi:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",share:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/><circle cx=\"18\" cy=\"19\" r=\"3\"/><path d=\"M8.6 10.7l6.8-4.4M8.6 13.3l6.8 4.4\"/></svg>",speak:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9z\"/><path d=\"M16 9a4 4 0 010 6\"/></svg>",payApp:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2\"/><path d=\"M11 18h2\"/></svg>",estSearch:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M21 21l-5-5\"/></svg>",pLockNow:"<svg class=\"ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V8a4 4 0 018 0v3\"/></svg>"};
 var ICON = {};
@@ -794,6 +880,8 @@ function t(k,v){ var s=(TXT[lang]&&TXT[lang][k])||TXT.en[k]||k; if(v) for(var x 
 
 var DEF = {name:"",upi:"",base:"",baseKm:"",perKm:"",wait:"",night:"0",nightFrom:"23",nightTo:"5",saved:false,u:0};
 var RIDES = load("ab_rides", []);
+var ACC = load("ab_acct", null);
+var SITE = "https://auto-anna.pages.dev";
 var S = load("ab_settings", DEF), TRIPS = load("ab_trips", []), EXP = load("ab_exp", []);
 TRIPS.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
 EXP.forEach(function(x){ if(!x.id){ x.id=uid(); x.u=x.u||x.t; } });
@@ -882,7 +970,7 @@ function sumRange(idx,pred){
   for(var k in idx){ if(pred(k)){ var o=idx[k]; s.inc+=o.inc; s.exp+=o.exp; s.km+=o.km; s.n+=o.trips.length; } }
   return s;
 }
-function renderAll(){ if(typeof renderRides==="function") renderRides(); renderHome(); renderEarn(); renderExp(); if(bill) renderBill(); }
+function renderAll(){ if(typeof renderFriends==="function") renderFriends(); if(typeof renderRides==="function") renderRides(); renderHome(); renderEarn(); renderExp(); if(bill) renderBill(); }
 
 function renderHome(){
   var o=buildIndex()[dk(Date.now())]||{inc:0,trips:[]};
@@ -1470,7 +1558,7 @@ async function syncNow(){
 function scheduleSync(){ if(!SY.key||!SYNC_URL) return; clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,4000); }
 $("cloudOn").onclick=function(){
   if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
-  SY={key:newKey(),last:0,pushed:0}; save("ab_sync",SY); renderCloud(); syncNow();
+  SY={key:newKey(),last:0,pushed:0}; save("ab_sync",SY); renderCloud(); syncNow(); linkKey();
 };
 $("cloudRestoreBtn").onclick=function(){
   if(!SYNC_URL){ cloudMsg(t("cloudNotReady")); return; }
@@ -1528,12 +1616,12 @@ function renderProfileText(){
   $("pLockBtn").textContent=(PROFILE&&PROFILE.lock===false)?t("pLockOff"):t("pLockOn");
   if(PROFILE) $("lHello").textContent=t("aHello",{n:PROFILE.name||""});
 }
-var PANELS=["aSign","aRest","aSetPin","aLock","aForgot"];
+var PANELS=["aSign","aOtp","aRest","aSetPin","aLock","aForgot"];
 function showAuth(id){
   $("auth").hidden=false; PANELS.forEach(function(x){ $(x).hidden=(x!==id); });
-  ["gErr","rErr","nErr","lErr"].forEach(function(e){ $(e).textContent=""; });
+  ["gErr","oErr","rErr","nErr","lErr"].forEach(function(e){ $(e).textContent=""; });
   renderProfileText(); window.scrollTo(0,0);
-  var f={aSign:"gName",aRest:"rKey",aSetPin:"nPin",aLock:"lPin"}[id]; if(f) setTimeout(function(){ try{ $(f).focus(); }catch(e){} },80);
+  var f={aSign:"gName",aOtp:"oCode",aRest:"rKey",aSetPin:"nPin",aLock:"lPin"}[id]; if(f) setTimeout(function(){ try{ $(f).focus(); }catch(e){} },80);
 }
 function hideAuth(){ $("auth").hidden=true; renderAll(); if(typeof checkIncoming==="function") checkIncoming(); }
 function lockNow(){ if(PROFILE&&PROFILE.pinH&&PROFILE.lock!==false){ $("lPin").value=""; showAuth("aLock"); } }
@@ -1552,6 +1640,11 @@ $("gGo").onclick=async function(){
   if(!/^\d{4}$/.test(pin)){ e.textContent=t("aBadPin"); return; }
   if(pin!==pin2){ e.textContent=t("aPinMatch"); return; }
   var v=readVeh("g"); if(v.err){ e.textContent=t(v.err); return; }
+  if(SYNC_URL){
+    if(!$("gConsent").checked){ e.textContent=t("aOtpNoCons"); return; }
+    PEND={mode:"signup",name:name,mob:mob,pin:pin,veh:v.vals,ref:($("gRef").value||"").trim().toUpperCase(),backup:$("gBackup").checked};
+    startOtp(); return;
+  }
   var salt=uid();
   PROFILE=Object.assign({name:name,mobile:mob,salt:salt,pinH:await hashPin(pin,salt),lock:true},v.vals);
   saveProfile(); ["gPin","gPin2"].forEach(function(i){ $(i).value=""; });
@@ -1596,10 +1689,129 @@ $("lForgot").onclick=function(){ showAuth("aForgot"); };
 $("fBack").onclick=function(){ $("lPin").value=""; showAuth("aLock"); };
 function eraseAll(){
   if(!confirm(t("aEraseSure"))) return;
-  ["ab_trips","ab_exp","ab_settings","ab_profile","ab_sync","ab_fail","ab_rides"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+  ["ab_trips","ab_exp","ab_settings","ab_profile","ab_sync","ab_fail","ab_rides","ab_acct","ab_ref"].forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
   location.reload();
 }
 $("fErase").onclick=eraseAll; $("pOut").onclick=eraseAll;
+
+/* ---------- mobile verification (OTP), referral and wallet ---------- */
+var PEND=null, otpTimer=0, frBusy=false, frAt=0;
+function apiUrl(path){ return SYNC_URL.replace(/\/+$/,"")+path; }
+async function api(path,body){
+  var r=await fetch(apiUrl(path),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})});
+  var j=null; try{ j=await r.json(); }catch(e){}
+  return {s:r.status,j:j||{}};
+}
+try{
+  var rq=new URLSearchParams(location.search).get("ref")||""; rq=rq.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(/^[A-Z0-9]{4,12}$/.test(rq)) localStorage.setItem("ab_ref",rq);
+  var rs=localStorage.getItem("ab_ref"); if(rs) $("gRef").value=rs;
+}catch(e){}
+$("gAcct").hidden=!SYNC_URL;
+function otpErrText(s,j){
+  var er=(j&&j.error)||"";
+  if(s===0) return t("aOtpNet");
+  if(er==="wrong code") return t("aOtpWrong",{n:j.left});
+  if(er==="expired") return t("aOtpExpired");
+  if(er==="locked") return t("aOtpLocked");
+  if(er==="too many") return t("aOtpMany");
+  if(er==="busy") return t("aOtpBusy");
+  if(er==="otp not configured") return t("aOtpOff");
+  if(er==="bad mobile") return t("aBadMob");
+  if(er==="consent needed") return t("aOtpNoCons");
+  if(er==="name needed") return t("aBadName");
+  return t("aOtpFail");
+}
+function otpCountdown(sec){
+  clearInterval(otpTimer); var b=$("oResend"); b.disabled=true;
+  var left=sec;
+  function tick(){ if(left<=0){ clearInterval(otpTimer); b.disabled=false; b.textContent=t("aOtpResend"); return; } b.textContent=t("aOtpWait",{s:left}); left--; }
+  tick(); otpTimer=setInterval(tick,1000);
+}
+async function startOtp(resend){
+  var errEl=resend?$("oErr"):($("auth").hidden?$("frErr"):$("gErr")); errEl.textContent="";
+  var res;
+  try{ res=await api("/otp/send",{mobile:PEND.mob}); }catch(e){ res={s:0,j:{}}; }
+  var waitOnly=(res.s===429&&res.j.error==="wait");
+  if(res.s!==200&&!waitOnly){ errEl.textContent=otpErrText(res.s,res.j); return; }
+  if($("aOtp").hidden) showAuth("aOtp");
+  $("oSent").textContent=t("aOtpSent",{m:PEND.mob});
+  $("oConsentBox").hidden=(PEND.mode!=="verify"); if(!resend) $("oConsent").checked=false;
+  $("oErr").textContent="";
+  if(res.j&&res.j.dev_code) $("oCode").value=res.j.dev_code; else if(!resend) $("oCode").value="";
+  otpCountdown(waitOnly?(res.j.wait||30):30);
+  setTimeout(function(){ try{ $("oCode").focus(); }catch(e){} },80);
+}
+$("oResend").onclick=function(){ if(PEND) startOtp(true); };
+$("oBack").onclick=function(){ if(PEND&&PEND.mode==="signup") showAuth("aSign"); else hideAuth(); };
+$("oCode").addEventListener("input",function(){ if($("oCode").value.length===6) $("oGo").focus(); });
+$("oGo").onclick=async function(){
+  if(!PEND) return;
+  var e=$("oErr"), code=$("oCode").value.trim();
+  if(!/^\d{6}$/.test(code)){ e.textContent=t("aOtpWrong",{n:"-"}).split(".")[0]+"."; return; }
+  var consent=PEND.mode==="signup"?true:$("oConsent").checked;
+  if(!consent){ e.textContent=t("aOtpNoCons"); return; }
+  $("oGo").disabled=true; e.textContent=t("cloudWorking");
+  var res;
+  try{ res=await api("/otp/verify",{mobile:PEND.mob,code:code,name:PEND.name,consent:true,ref:PEND.ref||"",auto_no:(PEND.veh&&PEND.veh.autoNo)||(PROFILE&&PROFILE.autoNo)||"",city:""}); }catch(x){ res={s:0,j:{}}; }
+  $("oGo").disabled=false;
+  if(res.s!==200||!res.j.token){ e.textContent=otpErrText(res.s,res.j); return; }
+  clearInterval(otpTimer);
+  ACC={token:res.j.token,mobile:PEND.mob,me:res.j.me,at:Date.now()}; save("ab_acct",ACC);
+  try{ localStorage.removeItem("ab_ref"); }catch(x){}
+  if(PEND.mode==="signup"){
+    var salt=uid();
+    PROFILE=Object.assign({name:PEND.name,mobile:PEND.mob,salt:salt,pinH:await hashPin(PEND.pin,salt),lock:true},PEND.veh);
+    saveProfile(); ["gPin","gPin2"].forEach(function(i){ $(i).value=""; });
+    if(PEND.backup&&!SY.key){ SY={key:newKey(),last:0,pushed:0}; save("ab_sync",SY); renderCloud(); syncNow(); }
+    fillProfile();
+  }
+  PEND=null; linkKey(); hideAuth(); renderFriends(true);
+};
+async function linkKey(){
+  if(!SYNC_URL||!ACC||!SY||!SY.key||ACC.linked===SY.key) return;
+  try{ var r=await api("/me/link",{token:ACC.token,key:SY.key}); if(r.s===200){ ACC.linked=SY.key; save("ab_acct",ACC); } else if(r.s===401){ ACC=null; try{ localStorage.removeItem("ab_acct"); }catch(e){} } }catch(e){}
+}
+function renderFriends(force){
+  var c=$("frCard"); if(!c) return;
+  if(!SYNC_URL||!PROFILE){ c.hidden=true; return; }
+  c.hidden=false; $("frOff").hidden=!!ACC; $("frOn").hidden=!ACC;
+  if(!ACC) return;
+  var me=ACC.me||{};
+  $("frMob").textContent=t("frMob",{m:ACC.mobile});
+  $("frCodeTxt").textContent=me.ref_code||"";
+  var rf=me.refs||{qualified:0,pending:0,target:5};
+  $("frProg").textContent=t("frProg",{q:rf.qualified,t:rf.target});
+  $("frBal").textContent="₹"+(me.wallet||0);
+  $("frPend").textContent=rf.pending?t("frPend",{p:rf.pending}):"";
+  $("frNote").textContent=t("frNote",{r:me.reward||10});
+  if(frBusy||(!force&&Date.now()-frAt<60000)) return;
+  frBusy=true; frAt=Date.now();
+  api("/me",{token:ACC.token}).then(function(r){
+    if(r.s===401){ ACC=null; try{ localStorage.removeItem("ab_acct"); }catch(e){} renderFriends(); return; }
+    if(r.s===200&&r.j.me){ ACC.me=r.j.me; save("ab_acct",ACC); $("frErr").textContent=""; renderFriends(); }
+  }).catch(function(){ $("frErr").textContent=t("frNeedNet"); }).then(function(){ frBusy=false; });
+  linkKey();
+}
+$("frVerify").onclick=function(){
+  if(!PROFILE) return;
+  PEND={mode:"verify",name:PROFILE.name,mob:PROFILE.mobile,ref:"",veh:null};
+  startOtp();
+};
+$("frShare").onclick=function(){
+  var me=(ACC&&ACC.me)||{}; if(!me.ref_code) return;
+  var msg=t("frMsg",{link:SITE+"/r/"+me.ref_code,code:me.ref_code});
+  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+};
+$("frDel").onclick=async function(){
+  if(!ACC||!confirm(t("frDelAsk"))) return;
+  try{
+    var r=await api("/me/delete",{token:ACC.token});
+    if(r.s===200||r.s===401){ ACC=null; try{ localStorage.removeItem("ab_acct"); }catch(e){} SY={key:"",last:0,pushed:0}; save("ab_sync",SY); renderCloud(); renderFriends(); $("frErr").textContent=t("frDeleted"); }
+    else $("frErr").textContent=t("aOtpFail");
+  }catch(e){ $("frErr").textContent=t("aOtpNet"); }
+};
+
 /* profile card in Settings */
 $("pSave").onclick=function(){
   var e=$("pErr"); e.className="err";
@@ -1650,6 +1862,9 @@ function parseRide(txt){
     var o=b64d(m[1]);
     if(!o||o.v!==1||!o.id||!(o.fare>0)||!(o.comm>=0)||o.comm>=o.fare||!o.upi) return null;
     ["from","to","xn","xm","upi"].forEach(function(k){ o[k]=String(o[k]||"").slice(0,60); });
+    ["fl","tl"].forEach(function(k){
+      var v=o[k]; if(!(Array.isArray(v)&&v.length===2&&isFinite(v[0])&&isFinite(v[1])&&Math.abs(v[0])<=90&&Math.abs(v[1])<=180)) delete o[k]; else o[k]=[Number(v[0]),Number(v[1])];
+    });
     o.fare=Math.round(o.fare); o.comm=Math.round(o.comm); return o;
   }catch(e){ return null; }
 }
@@ -1663,16 +1878,74 @@ $("shareRideBtn").onclick=function(){
   if(needSetup()) return;
   if(!(PROFILE&&PROFILE.name)){ $("gpsErr").textContent=t("rSetName"); return; }
   $("rdErr").textContent=""; $("rFrom").value=""; $("rTo").value=""; $("rFare").value="";
+  RP={from:null,to:null}; $("rFromList").innerHTML=""; $("rToList").innerHTML="";
   $("rComm").value=load("ab_lastcomm","")||""; rpane("rShare");
+  autoHere();
 };
+/* pickup and drop: GPS for the pickup, place search for both (explicit Search button, as Nominatim asks) */
+var RP={from:null,to:null};
+function r5(v){ return Math.round(v*100000)/100000; }
+function mapsUrl(pt){ return "https://www.google.com/maps/search/?api=1&query="+pt[0]+","+pt[1]; }
+async function nomWait(){ var w=1100-(Date.now()-lastSearchAt); if(w>0) await new Promise(function(r){ setTimeout(r,w); }); lastSearchAt=Date.now(); }
+async function reverseName(lat,lon){
+  await nomWait();
+  var r=await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&accept-language="+(lang==="ta"?"ta,en":"en")+"&lat="+lat+"&lon="+lon,{headers:{"Accept":"application/json"}});
+  if(!r.ok) throw new Error("http "+r.status);
+  var j=await r.json(); return placeName(j).slice(0,60);
+}
+async function useHere(quiet){
+  var e=$("rdErr"); if(!quiet) e.textContent=t("estLocating");
+  var h; try{ h=await getHere(); }catch(x){ if(!quiet) e.textContent=t("estNoLoc"); return; }
+  RP.from=[r5(h.lat),r5(h.lon)];
+  var name=""; try{ name=await reverseName(h.lat,h.lon); }catch(x){}
+  $("rFrom").value=name||t("rHereName"); if(!quiet||name) e.textContent="";
+}
+function autoHere(){
+  if($("rFrom").value) return;
+  try{
+    if(eHere&&Date.now()-eHere.ts<60000){ useHere(true); return; }
+    if(navigator.permissions&&navigator.permissions.query) navigator.permissions.query({name:"geolocation"}).then(function(p){ if(p.state==="granted") useHere(true); }).catch(function(){});
+  }catch(x){}
+}
+$("rHere").onclick=function(){ useHere(false); };
+async function placeSearch(which){
+  var inp=which==="from"?$("rFrom"):$("rTo"), list=which==="from"?$("rFromList"):$("rToList"), e=$("rdErr");
+  var q=inp.value.trim(); list.innerHTML="";
+  if(q.length<3){ e.textContent=t("estType"); return; }
+  e.textContent=t("estSearching");
+  try{
+    await nomWait();
+    var url=NOMINATIM+"?format=jsonv2&limit=5&countrycodes=in&accept-language="+(lang==="ta"?"ta,en":"en")+"&q="+encodeURIComponent(q);
+    if(eHere){ var d=0.4; url+="&viewbox="+(eHere.lon-d)+","+(eHere.lat+d)+","+(eHere.lon+d)+","+(eHere.lat-d); }
+    var r=await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!r.ok) throw new Error("http "+r.status);
+    var arr=await r.json();
+    if(!Array.isArray(arr)||!arr.length){ e.textContent=t("estNone"); return; }
+    e.textContent=t("estPick");
+    arr.forEach(function(x){
+      var b=document.createElement("button"); b.type="button"; b.className="res"; b.textContent=placeName(x);
+      b.onclick=function(){ inp.value=placeName(x).slice(0,60); RP[which]=[r5(parseFloat(x.lat)),r5(parseFloat(x.lon))]; list.innerHTML=""; e.textContent=""; };
+      list.appendChild(b);
+    });
+  }catch(x){ e.textContent=t("estFail"); }
+}
+$("rFromSearch").onclick=function(){ placeSearch("from"); };
+$("rToSearch").onclick=function(){ placeSearch("to"); };
+$("rFrom").addEventListener("input",function(){ RP.from=null; });
+$("rTo").addEventListener("input",function(){ RP.to=null; });
+$("rFrom").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); placeSearch("from"); } });
+$("rTo").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); placeSearch("to"); } });
 $("rdGo").onclick=function(){
   var f=($("rFrom").value||"").trim(), to=($("rTo").value||"").trim(), fare=clean($("rFare").value,99999), comm=clean($("rComm").value,9999);
   if(!f||!to||!(fare>0)){ $("rdErr").textContent=t("rBad"); return; }
   if(comm>=fare){ $("rdErr").textContent=t("rBadComm"); return; }
   var o={v:1,id:uid(),from:f,to:to,fare:Math.round(fare),comm:Math.round(comm),xn:PROFILE.name,xm:PROFILE.mobile||"",upi:S.upi,t:Date.now()};
+  if(RP.from) o.fl=RP.from; if(RP.to) o.tl=RP.to;
   RIDES.unshift({id:o.id,role:"x",other:"",from:f,to:to,fare:o.fare,comm:o.comm,st:"shared",t:o.t}); RIDES=RIDES.slice(0,40);
   save("ab_lastcomm",String(o.comm)); saveRides(); renderRides(); closeRide();
   var msg=t("rMsg",{app:(lang==="ta"?APP_TA:APP_NAME),from:f,to:to,fare:o.fare,comm:o.comm,name:PROFILE.name,link:rideLink(o)});
+  if(o.fl) msg+="\n"+t("rMapLineF",{url:mapsUrl(o.fl)});
+  if(o.tl) msg+="\n"+t("rMapLineT",{url:mapsUrl(o.tl)});
   window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
 };
 /* Y: receive */
@@ -1680,10 +1953,13 @@ var INCOMING=null;
 function showIncoming(o){
   INCOMING=o;
   $("rvBy").textContent=t("rvBy",{n:o.xn}); $("rvRoute").textContent=o.from+" → "+o.to;
-  $("rvFare").textContent=inr(o.fare); $("rvComm").textContent=inr(o.comm); rpane("rView");
+  $("rvFare").textContent=inr(o.fare); $("rvComm").textContent=inr(o.comm);
+  $("rvMaps").hidden=!(o.fl||o.tl); $("rvMapF").hidden=!o.fl; $("rvMapT").hidden=!o.tl; rpane("rView");
 }
 $("takeRideBtn").onclick=function(){ $("rCode").value=""; $("rPErr").textContent=""; rpane("rPaste"); };
 $("rOpen").onclick=function(){ var o=parseRide($("rCode").value); if(!o){ $("rPErr").textContent=t("rBadLink"); return; } showIncoming(o); };
+$("rvMapF").onclick=function(){ if(INCOMING&&INCOMING.fl) window.open(mapsUrl(INCOMING.fl),"_blank"); };
+$("rvMapT").onclick=function(){ if(INCOMING&&INCOMING.tl) window.open(mapsUrl(INCOMING.tl),"_blank"); };
 $("rvTake").onclick=function(){
   var o=INCOMING; if(!o) return;
   RIDES.forEach(function(r){ r.act=false; });
